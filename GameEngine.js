@@ -155,18 +155,33 @@ Hero = function (game, spriteSheet) {
     this.y = 0;
     this.game = game;
     this.context = game.context;
-    this.moveRight = true; 
+    this.moveRight = true;
+    this.health;
 }
 
 Hero.prototype = new Entity();
 Hero.prototype.constructor = Hero;
 
 Hero.prototype.draw = function () {
-    
+    if (this.moveRight) {
+        this.rightAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
+    } else {
+        this.downAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
+    }
 }
 
 Hero.prototype.update = function () {
-    
+    if (this.moveRight) {
+        this.x += 2;
+        if (this.x % 23 === 0) {
+            this.moveRight = false;
+        }
+    } else {
+        this.y += 2;
+        if (this.y % 15 === 0) {
+            this.moveRight = true;
+        }
+    }
 }
 
 Warrior = function (game, spriteSheet) {
@@ -177,14 +192,15 @@ Warrior.prototype = new Hero();
 Warrior.prototype.constructor = Warrior;
 
 Mage = function (game, spriteSheet) {
-
+    this.mana;
+    this.hitpoints = this.health;
 }
 
 Mage.prototype = new Hero();
 Mage.prototype.constructor = Mage;
 
 Archer = function (game, spriteSheet) {
-
+    this.shootBow = new Animation(/* TODO: FILL IN */); 
 }
 
 Archer.prototype = new Hero();

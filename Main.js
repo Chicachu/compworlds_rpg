@@ -13,4 +13,5 @@ ASSET_MANAGER.downloadAll(function () {
 
     gameEngine.addEntity(new Hero(gameEngine, ASSET_MANAGER.getAsset("./imgs/hero_hooded.png")));
     gameEngine.addEntity(new Enemy(gameEngine, ASSET_MANAGER.getAsset("./imgs/skeleton.png")));
+    gameEngine.addEntity(new Mage(gameEngine, ASSET_MANAGER.getAsset("./imgs/hero_hooded.png")));
 });
