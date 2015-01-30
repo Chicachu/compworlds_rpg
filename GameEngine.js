@@ -63,7 +63,11 @@ GameEngine = function () {
     this.context = null;
     this.width = null;
     this.height = null;
-    this.timer = null; 
+    this.timer = null;
+    this.key_up_arrow = null;
+    this.key_down_arrow = null;
+    this.key_left_arrow = null;
+    this.key_right_arrow = null;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -71,6 +75,11 @@ GameEngine.prototype.init = function (context) {
     this.width = this.context.canvas.width;
     this.height = this.context.canvas.height;
     this.timer = new Timer();
+    this.startInput(); 
+}
+
+GameEngine.prototype.startInput = function () {
+
 }
 
 GameEngine.prototype.start = function () {
@@ -140,8 +149,8 @@ Entity.prototype.draw = function () {
 Entity.prototype.reset = function () {
 }
 
-Hero = function (game, spriteSheet) {
-    
+/* HERO and subclasses */ 
+Hero = function (game, spriteSheet) { 
     this.x = 0;
     this.y = 0;
     this.game = game;
@@ -160,6 +169,28 @@ Hero.prototype.update = function () {
     
 }
 
+Warrior = function (game, spriteSheet) {
+    
+}
+
+Warrior.prototype = new Hero();
+Warrior.prototype.constructor = Warrior;
+
+Mage = function (game, spriteSheet) {
+
+}
+
+Mage.prototype = new Hero();
+Mage.prototype.constructor = Mage;
+
+Archer = function (game, spriteSheet) {
+
+}
+
+Archer.prototype = new Hero();
+Archer.prototype.constructor = Archer;
+
+/* ENEMY and subclasses */
 Enemy = function (game, spriteSheet) {
     
 }
@@ -173,4 +204,20 @@ Enemy.prototype.draw = function () {
 
 Enemy.prototype.update = function () {
     
+}
+
+/* NPC */
+NPC = function (game, spriteSheet) {
+
+}
+
+NPC.prototype = new Entity();
+NPC.prototype.constructor = NPC;
+
+NPC.prototype.draw = function () {
+
+}
+
+NPC.prototype.update = function () {
+
 }
