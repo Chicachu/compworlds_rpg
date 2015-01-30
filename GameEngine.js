@@ -141,8 +141,7 @@ Entity.prototype.reset = function () {
 }
 
 Hero = function (game, spriteSheet) {
-    this.rightAnimation = new Animation(spriteSheet, 0, 2, 32, 32, 0.05, 3, true, false);
-    this.downAnimation = new Animation(spriteSheet, 0, 0, 32, 32, 0.05, 3, true, false); 
+    
     this.x = 0;
     this.y = 0;
     this.game = game;
@@ -154,63 +153,24 @@ Hero.prototype = new Entity();
 Hero.prototype.constructor = Hero;
 
 Hero.prototype.draw = function () {
-    if (this.moveRight) {
-        this.rightAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
-    } else {
-        this.downAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
-    }
+    
 }
 
 Hero.prototype.update = function () {
-    if (this.moveRight) {
-        this.x += 2;
-        if (this.x % 23 === 0) {
-            this.moveRight = false; 
-        }
-    } else {
-        this.y += 2;
-        if (this.y % 15 === 0) {
-            this.moveRight = true; 
-        }
-    }
+    
 }
 
 Enemy = function (game, spriteSheet) {
-    this.moveLeftAnimation = new Animation(spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false);
-    this.shootLeftAnimation = new Animation(spriteSheet, 0, 18, 64, 64, 0.05, 13, true, false);
-    this.moveRightAnimation = new Animation(spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false); 
-    this.x = game.context.canvas.width - 1;
-    this.y = 100;
-    this.game = game;
-    this.context = game.context;
-    this.moveLeft = true;
-    this.shootLeft = true;
+    
 }
 
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function () {
-    if (this.moveLeft) {
-        this.moveLeftAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
-    } else if (this.shootLeft) {
-        this.shootLeftAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
-    } else {
-        this.moveRightAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
-    }
+   
 }
 
 Enemy.prototype.update = function () {
-    if (this.moveLeft) {
-        this.x -= 2;
-        if (this.x < 220) {
-            this.moveLeft = false; 
-        }
-    } else if (this.shootLeft) {
-        if (this.game.timer.gameTime > 3.0) {
-            this.shootLeft = false; 
-        }
-    } else {
-        this.x += 2; 
-    }
+    
 }
