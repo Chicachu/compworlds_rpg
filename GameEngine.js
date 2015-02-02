@@ -64,10 +64,8 @@ GameEngine = function () {
     this.width = null;
     this.height = null;
     this.timer = null;
-    this.key_up_arrow = null;
-    this.key_down_arrow = null;
-    this.key_left_arrow = null;
-    this.key_right_arrow = null;
+    this.key = null; 
+    this.space = null; 
 }
 
 GameEngine.prototype.init = function (context) {
@@ -79,7 +77,26 @@ GameEngine.prototype.init = function (context) {
 }
 
 GameEngine.prototype.startInput = function () {
+    var that = this;
 
+    this.context.canvas.addEventListener("keydown", function (e) {
+        that.key = null;
+        that.space = null; 
+        if (String.fromCharCode(e.which) === ' ') {
+            that.space = true;
+        } else if (String.fromCharCode(e.which) === '37'
+                   || String.fromCharCode(e.which) === '38'
+                   || String.fromCharCode(e.which) === '39'
+                   || String.fromCharCode(e.which) === '40') {
+            that.key = String.fromCharCode(e.which);
+        }
+        e.preventDefault();
+    }, false);
+
+    this.context.canvas.addEventListener("keyup", function (e) {
+        that.key = null;
+        that.space = null;
+    }, false);
 }
 
 GameEngine.prototype.start = function () {
@@ -134,106 +151,103 @@ Timer.prototype.tick = function () {
     return gameDelta;
 }
 
-Entity = function (game, x, y) {
+var Direction = {
+    UP: { value: "up", code: "38" },
+    LEFT: { value: "left", code: "37" },
+    DOWN: { value: "down", code: "40" },
+    RIGHT: { value: "right", code: "39" }
+}
+Object.freeze(Direction);
+
+Entity = function (game, x, y, spriteSheet) {
     this.game = game;
     this.x = x;
     this.y = y;
-}
-
-Entity.prototype.update = function () {
-}
-
-Entity.prototype.draw = function () {
-}
-
-Entity.prototype.reset = function () {
-}
-
-/* HERO and subclasses */ 
-Hero = function (game, spriteSheet) { 
-    this.x = 0;
-    this.y = 0;
-    this.game = game;
+    this.direction = Direction.DOWN;
     this.context = game.context;
     this.moveRight = true;
     this.health;
+    this.spriteSheet = spriteSheet;
+    this.down_animation = new Animation(spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false);
+    this.up_animation = new Animation(spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false);
+    this.left_animation = new Animation(spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false);
+    this.right_animation = new Animation(spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false);
 }
 
-Hero.prototype = new Entity();
-Hero.prototype.constructor = Hero;
+/* ENTITY - Super class to the heroes, npcs, and enemies. */ 
+Entity.prototype.draw = function (context) {
+    switch (this.direction) {
+        case Direction.DOWN:
+            direction_animation = this.down_animation;
+            break;
+        case Direction.UP:
+            direction_animation = this.up_animation;
+            break;
+        case Direction.LEFT:
+            direction_animation = this.left_animation;
+            break;
+        case Direction.RIGHT:
+            direction_animation = this.right_animation;
+            break;
+        default:;
+    }
+    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+}
 
-Hero.prototype.draw = function () {
-    if (this.moveRight) {
-        this.rightAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
-    } else {
-        this.downAnimation.drawFrame(this.game.clockTick, this.context, this.x, this.y);
+Entity.prototype.update = function () {
+    if (this.game.space) {
+        // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
+    } else if (this.game.key === '37') { // left
+        this.direction = Direction.LEFT;
+    } else if (this.game.key === '38') { // up
+        this.direction = Direction.UP;
+    } else if (this.game.key === '39') { // right
+        this.direction = Direction.RIGHT;
+    } else if (this.game.key === '40') { // down
+        this.direction = Direction.DOWN;
+    }
+    switch (this.Direction) {
+        case Direction.DOWN:
+            this.y += 2;
+            break;
+        case Direction.UP:
+            this.y -= 2;
+            break;
+        case Direction.LEFT:
+            this.x -= 2;
+            break;
+        case Direction.RIGHT:
+            this.y += 2;
+            break;
+        default:;
     }
 }
 
-Hero.prototype.update = function () {
-    if (this.moveRight) {
-        this.x += 2;
-        if (this.x % 23 === 0) {
-            this.moveRight = false;
-        }
-    } else {
-        this.y += 2;
-        if (this.y % 15 === 0) {
-            this.moveRight = true;
-        }
-    }
-}
-
-Warrior = function (game, spriteSheet) {
+Entity.prototype.reset = function () {
     
 }
 
-Warrior.prototype = new Hero();
+/* HERO subclasses */ 
+
+Warrior = function (game) {
+    this.spriteSheet = "./imgs/warrior.png";
+    this.x = 50;
+    this.y = 50; 
+    Entity.call(this, game, this.x, this.y, this.spriteSheet); 
+}
+
+Warrior.prototype = new Entity();
 Warrior.prototype.constructor = Warrior;
 
-Mage = function (game, spriteSheet) {
-    this.mana;
-    this.hitpoints = this.health;
+Warrior.prototype.draw = function (context) {
+    Entity.prototype.draw.call(this, context); 
 }
 
-Mage.prototype = new Hero();
-Mage.prototype.constructor = Mage;
-
-Archer = function (game, spriteSheet) {
-    this.shootBow = new Animation(/* TODO: FILL IN */); 
+Warrior.prototype.update = function () {
+    Entity.prototype.update.call(this); 
 }
-
-Archer.prototype = new Hero();
-Archer.prototype.constructor = Archer;
 
 /* ENEMY and subclasses */
-Enemy = function (game, spriteSheet) {
-    
-}
-
-Enemy.prototype = new Entity();
-Enemy.prototype.constructor = Enemy;
-
-Enemy.prototype.draw = function () {
-   
-}
-
-Enemy.prototype.update = function () {
-    
-}
 
 /* NPC */
-NPC = function (game, spriteSheet) {
 
-}
-
-NPC.prototype = new Entity();
-NPC.prototype.constructor = NPC;
-
-NPC.prototype.draw = function () {
-
-}
-
-NPC.prototype.update = function () {
-
-}
