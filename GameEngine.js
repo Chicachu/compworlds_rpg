@@ -79,21 +79,23 @@ GameEngine.prototype.init = function (context) {
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    this.context.canvas.addEventListener("keydown", function (e) {
+    this.context.canvas.addEventListener('keydown', function (e) {
         that.key = null;
         that.space = null; 
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
-        } else if (String.fromCharCode(e.which) === '37'
-                   || String.fromCharCode(e.which) === '38'
-                   || String.fromCharCode(e.which) === '39'
-                   || String.fromCharCode(e.which) === '40') {
-            that.key = String.fromCharCode(e.which);
+            console.log('space'); 
+        } else if (e.which === 37
+                   || e.which === 38
+                   || e.which === 39
+                   || e.which === 40) {
+            that.key = e.which;
+            console.log('keydown'); 
         }
         e.preventDefault();
     }, false);
 
-    this.context.canvas.addEventListener("keyup", function (e) {
+    this.context.canvas.addEventListener('keyup', function (e) {
         that.key = null;
         that.space = null;
     }, false);
@@ -192,19 +194,19 @@ Entity.prototype.draw = function (context) {
         default:
             direction_animation = this.down_animation;
     }
-    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y); 
+    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75); 
 }
 
 Entity.prototype.update = function () {
     if (this.game.space) {
         // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
-    } else if (this.game.key === '37') { // left
+    } else if (this.game.key === 37) { // left
         this.direction = Direction.LEFT;
-    } else if (this.game.key === '38') { // up
+    } else if (this.game.key === 38) { // up
         this.direction = Direction.UP;
-    } else if (this.game.key === '39') { // right
+    } else if (this.game.key === 39) { // right
         this.direction = Direction.RIGHT;
-    } else if (this.game.key === '40') { // down
+    } else if (this.game.key === 40) { // down
         this.direction = Direction.DOWN;
     }
     switch (this.Direction) {
