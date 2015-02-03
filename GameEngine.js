@@ -175,7 +175,7 @@ Entity = function (game, x, y, spriteSheet) {
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */ 
 Entity.prototype.draw = function (context) {
-    var direction_animation = null; 
+    var direction_animation = this.down_animation; 
     switch (this.direction) {
         case Direction.DOWN:
             direction_animation = this.down_animation;
@@ -192,7 +192,7 @@ Entity.prototype.draw = function (context) {
         default:
             direction_animation = this.down_animation;
     }
-    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y); Entity.prototype.draw.call(this, context);
+    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y); 
 }
 
 Entity.prototype.update = function () {
@@ -232,7 +232,7 @@ Entity.prototype.reset = function () {
 
 Warrior = function (game) {
     this.game = game; 
-    this.spriteSheet = "./imgs/warrior.png";
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/warrior.png");
     this.x = 50;
     this.y = 50; 
     Entity.call(this, game, this.x, this.y, this.spriteSheet); 
@@ -242,7 +242,7 @@ Warrior.prototype = new Entity();
 Warrior.prototype.constructor = Warrior;
 
 Warrior.prototype.draw = function (context) {
-    Entity.prototype.draw(this, context);
+    Entity.prototype.draw.call(this, context);
 }
 
 Warrior.prototype.update = function () {
