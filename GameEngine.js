@@ -111,21 +111,22 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-GameEngine.prototype.draw = function () {
+GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     this.context.save();
 
     for (var i = 0; i < this.entities.length; i++) {
-        var entity = this.entities[i];
-        entity.draw(this.context); 
+        this.entities[i].draw(this.context); 
+    }
+    if (drawCallBack) {
+        drawCallBack(this); 
     }
     this.context.restore();
 }
 
 GameEngine.prototype.update = function () {
     for (var i = 0; i < this.entities.length; i++) {
-        var entity = this.entities[i];
-        entity.update(); 
+        this.entities[i].update();         
     }
 }
  
@@ -162,12 +163,10 @@ Object.freeze(Direction);
 Entity = function (game, x, y, spriteSheet) {
     this.game = game;
     this.x = x;
-    this.y = y;
+    this.y = y; 
     this.direction = Direction.DOWN;
-    this.context = game.context;
     this.moveRight = true;
     this.health;
-    this.spriteSheet = spriteSheet;
     this.down_animation = new Animation(spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false);
     this.up_animation = new Animation(spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false);
     this.left_animation = new Animation(spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false);
@@ -176,6 +175,7 @@ Entity = function (game, x, y, spriteSheet) {
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */ 
 Entity.prototype.draw = function (context) {
+    var direction_animation = null; 
     switch (this.direction) {
         case Direction.DOWN:
             direction_animation = this.down_animation;
@@ -189,9 +189,10 @@ Entity.prototype.draw = function (context) {
         case Direction.RIGHT:
             direction_animation = this.right_animation;
             break;
-        default:;
+        default:
+            direction_animation = this.down_animation;
     }
-    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y); Entity.prototype.draw.call(this, context);
 }
 
 Entity.prototype.update = function () {
@@ -230,6 +231,7 @@ Entity.prototype.reset = function () {
 /* HERO subclasses */ 
 
 Warrior = function (game) {
+    this.game = game; 
     this.spriteSheet = "./imgs/warrior.png";
     this.x = 50;
     this.y = 50; 
@@ -240,7 +242,7 @@ Warrior.prototype = new Entity();
 Warrior.prototype.constructor = Warrior;
 
 Warrior.prototype.draw = function (context) {
-    Entity.prototype.draw.call(this, context); 
+    Entity.prototype.draw(this, context);
 }
 
 Warrior.prototype.update = function () {
