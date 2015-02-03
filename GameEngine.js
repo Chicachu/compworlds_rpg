@@ -167,32 +167,42 @@ Entity = function (game, x, y, spriteSheet) {
     this.direction = Direction.DOWN;
     this.moveRight = true;
     this.health;
+    this.spriteSheet = spriteSheet; 
     this.down_animation = new Animation(spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false);
     this.up_animation = new Animation(spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false);
     this.left_animation = new Animation(spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false);
     this.right_animation = new Animation(spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false);
+    this.stop_move_animation = new Animation(spriteSheet, 0, 10, 64, 64, 0.05, 1, true, false); 
+}
+
+Entity.prototype.stopAnimation = function (animation) {
+    this.stop_move_animation = new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */ 
 Entity.prototype.draw = function (context) {
-    var direction_animation = this.down_animation; 
-    switch (this.direction) {
-        case Direction.DOWN:
-            direction_animation = this.down_animation;
-            break;
-        case Direction.UP:
-            direction_animation = this.up_animation;
-            break;
-        case Direction.LEFT:
-            direction_animation = this.left_animation;
-            break;
-        case Direction.RIGHT:
-            direction_animation = this.right_animation;
-            break;
-        default:
-            direction_animation = this.down_animation;
+    if (this.game.key !== 0 && this.game.key !== null) {
+        var direction_animation = this.down_animation;
+        switch (this.direction) {
+            case Direction.DOWN:
+                direction_animation = this.down_animation;
+                break;
+            case Direction.UP:
+                direction_animation = this.up_animation;
+                break;
+            case Direction.LEFT:
+                direction_animation = this.left_animation;
+                break;
+            case Direction.RIGHT:
+                direction_animation = this.right_animation;
+                break;
+            default:
+                direction_animation = this.down_animation;
+        }
+        direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75);
+    } else {
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75);
     }
-    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75); 
 }
 
 Entity.prototype.update = function () {
@@ -223,6 +233,22 @@ Entity.prototype.update = function () {
                 break;
             default:;
         }
+    } else {
+        switch (this.direction) {
+            case Direction.DOWN:
+                this.stopAnimation(this.down_animation);
+                break;
+            case Direction.UP:
+                this.stopAnimation(this.up_animation);
+                break;
+            case Direction.LEFT:
+                this.stopAnimation(this.left_animation);
+                break;
+            case Direction.RIGHT:
+                this.stopAnimation(this.right_animation);
+                break;
+            default:;
+        }        
     }
 }
 
