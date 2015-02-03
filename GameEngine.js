@@ -80,8 +80,6 @@ GameEngine.prototype.startInput = function () {
     var that = this;
 
     this.context.canvas.addEventListener('keydown', function (e) {
-        that.key = null;
-        that.space = null; 
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
             console.log('space'); 
@@ -96,8 +94,8 @@ GameEngine.prototype.startInput = function () {
     }, false);
 
     this.context.canvas.addEventListener('keyup', function (e) {
-        that.key = null;
-        that.space = null;
+        that.key = 0;
+        that.space = 0;
     }, false);
 }
 
@@ -209,20 +207,22 @@ Entity.prototype.update = function () {
     } else if (this.game.key === 40) { // down
         this.direction = Direction.DOWN;
     }
-    switch (this.Direction) {
-        case Direction.DOWN:
-            this.y += 2;
-            break;
-        case Direction.UP:
-            this.y -= 2;
-            break;
-        case Direction.LEFT:
-            this.x -= 2;
-            break;
-        case Direction.RIGHT:
-            this.y += 2;
-            break;
-        default:;
+    if (this.game.key !== 0 && this.game.key !== null) {
+        switch (this.direction) {
+            case Direction.DOWN:
+                this.y += 2;
+                break;
+            case Direction.UP:
+                this.y -= 2;
+                break;
+            case Direction.LEFT:
+                this.x -= 2;
+                break;
+            case Direction.RIGHT:
+                this.x += 2;
+                break;
+            default:;
+        }
     }
 }
 
