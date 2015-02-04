@@ -241,7 +241,7 @@ Statistics = function(health, attack, defense)
 
 Warrior = function (game) {
     this.game = game; 
-    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/warrior.png");
     this.x = 50;
     this.y = 50; 
     var stats = new Statistics(50, 20, 10);
