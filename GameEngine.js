@@ -230,14 +230,22 @@ Entity.prototype.reset = function () {
     
 }
 
+
+Statistics = function(health, attack, defense)
+{
+    this.health = health;
+    this.attack = attack;
+    this.defense = defense;
+}
 /* HERO subclasses */ 
 
 Warrior = function (game) {
     this.game = game; 
-    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/warrior.png");
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 50;
     this.y = 50; 
-    Entity.call(this, game, this.x, this.y, this.spriteSheet); 
+    var stats = new Statistics(50, 20, 10);
+    Entity.call(this, game, this.x, this.y, this.spriteSheet, stats); 
 }
 
 Warrior.prototype = new Entity();
@@ -252,6 +260,31 @@ Warrior.prototype.update = function () {
 }
 
 /* ENEMY and subclasses */
+Enemy = function (game) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
+    this.x = 50;
+    this.y = 50;
+    //this.attackAnimation = new Animation(this.spriteSheet, )
+    Entity.call(this, game, this.x, this.y, this.spriteSheet);
+}
+
+Enemy.prototype = new Entity();
+Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.draw = function(context) {
+    Entity.prototype.draw.call(this, context);
+}
+Enemy.prototype.update = function()
+{
+    Entity.prototype.update.call(this);
+}
+
+Enemy.prototype.attack = function()
+{
+
+}
+
 
 /* NPC */
 
