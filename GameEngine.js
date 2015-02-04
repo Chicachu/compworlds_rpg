@@ -153,60 +153,47 @@ Timer.prototype.tick = function () {
 }
 
 var Direction = {
-    UP: { value: "up", code: "38" },
-    LEFT: { value: "left", code: "37" },
-    DOWN: { value: "down", code: "40" },
-    RIGHT: { value: "right", code: "39" }
+    UP: { value: "up", code: 38 },
+    LEFT: { value: "left", code: 37 },
+    DOWN: { value: "down", code: 40 },
+    RIGHT: { value: "right", code: 39 }
 }
 Object.freeze(Direction);
 
-Entity = function (game, x, y, spriteSheet) {
+/* ENTITY - Super class to the heroes, npcs, and enemies. */
+Entity = function (game, x, y, spriteSheet, animations) { 
     this.game = game;
     this.x = x;
     this.y = y; 
     this.direction = Direction.DOWN;
     this.moveRight = true;
     this.health;
-    this.down_animation = new Animation(spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false);
-    this.up_animation = new Animation(spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false);
-    this.left_animation = new Animation(spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false);
-    this.right_animation = new Animation(spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false);
+    this.spriteSheet = spriteSheet;
+    if (animations) {
+        this.animations = animations;
+        this.move_animation = this.animations.down;
+        this.stop_move_animation = this.stopAnimation(this.move_animation);
+    }
 }
 
-/* ENTITY - Super class to the heroes, npcs, and enemies. */ 
-Entity.prototype.draw = function (context) {
-    var direction_animation = this.down_animation; 
+Entity.prototype.changeMoveAnimation = function () {
     switch (this.direction) {
         case Direction.DOWN:
-            direction_animation = this.down_animation;
+            this.move_animation = this.animations.down;
             break;
         case Direction.UP:
-            direction_animation = this.up_animation;
+            this.move_animation = this.animations.up;
             break;
         case Direction.LEFT:
-            direction_animation = this.left_animation;
+            this.move_animation = this.animations.left;
             break;
         case Direction.RIGHT:
-            direction_animation = this.right_animation;
+            this.move_animation = this.animations.right;
             break;
-        default:
-            direction_animation = this.down_animation;
     }
-    direction_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75); 
 }
 
-Entity.prototype.update = function () {
-    if (this.game.space) {
-        // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
-    } else if (this.game.key === 37) { // left
-        this.direction = Direction.LEFT;
-    } else if (this.game.key === 38) { // up
-        this.direction = Direction.UP;
-    } else if (this.game.key === 39) { // right
-        this.direction = Direction.RIGHT;
-    } else if (this.game.key === 40) { // down
-        this.direction = Direction.DOWN;
-    }
+Entity.prototype.changeLocation = function (force_direction) { // force direction used for NPCS. leave param empty for user-controlled characters
     if (this.game.key !== 0 && this.game.key !== null) {
         switch (this.direction) {
             case Direction.DOWN:
@@ -221,31 +208,69 @@ Entity.prototype.update = function () {
             case Direction.RIGHT:
                 this.x += 2;
                 break;
-            default:;
         }
+    } else {
+        this.stop_move_animation = this.stopAnimation(this.move_animation);
     }
 }
 
+Entity.prototype.changeDirection = function () {
+    if (this.game.space) {
+        // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
+    } else if (this.game.key === Direction.LEFT.code) { 
+        this.direction = Direction.LEFT;
+    } else if (this.game.key === Direction.UP.code) { 
+        this.direction = Direction.UP;
+    } else if (this.game.key === Direction.RIGHT.code) {
+        this.direction = Direction.RIGHT;
+    } else if (this.game.key === Direction.DOWN.code) {
+        this.direction = Direction.DOWN;
+    }
+}
+
+Entity.prototype.stopAnimation = function (animation) {
+    return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
+}
+
+Entity.prototype.draw = function (context) {
+    if (this.game.key !== 0 && this.game.key !== null) {
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75);
+    } else {
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75);
+    }
+}
+
+Entity.prototype.update = function () {
+    this.changeDirection();
+    this.changeMoveAnimation();
+    this.changeLocation();
+}
+
 Entity.prototype.reset = function () {
-    
+
 }
 
 
-Statistics = function(health, attack, defense)
-{
+Statistics = function (health, attack, defense) {
     this.health = health;
     this.attack = attack;
     this.defense = defense;
 }
-/* HERO subclasses */ 
+/* HERO subclasses */
 
 Warrior = function (game) {
-    this.game = game; 
+    this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/warrior.png");
+    this.animations = {
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
+    };
     this.x = 50;
-    this.y = 50; 
-    var stats = new Statistics(50, 20, 10);
-    Entity.call(this, game, this.x, this.y, this.spriteSheet, stats); 
+    this.y = 50;
+    //var stats = new Statistics(50, 20, 10);
+    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
 }
 
 Warrior.prototype = new Entity();
@@ -256,7 +281,7 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    Entity.prototype.update.call(this); 
+    Entity.prototype.update.call(this);
 }
 
 /* ENEMY and subclasses */
@@ -272,19 +297,16 @@ Enemy = function (game) {
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
-Enemy.prototype.draw = function(context) {
+Enemy.prototype.draw = function (context) {
     Entity.prototype.draw.call(this, context);
 }
-Enemy.prototype.update = function()
-{
+Enemy.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
-Enemy.prototype.attack = function()
-{
+Enemy.prototype.attack = function () {
 
 }
 
 
-/* NPC */
-
+    /* NPC */
