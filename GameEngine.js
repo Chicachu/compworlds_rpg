@@ -334,14 +334,24 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-    Entity.prototype.draw.call(this, context);
+    if (this.game.key !== 0 && this.game.key !== null) {
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    } else {
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    }
 }
 Enemy.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
 Enemy.prototype.attack = function (vs_player) {
+    this.move_animation = this.animations.right;
+    vs_player.health = vs_player.health - ((this.attack / vs_player.defense) * (Math.random() * 100));
+}
 
+Enemy.prototype.hit = function (vs_player)
+{
+    this.health = this.health - ((vs_player.attack / this.defense) * (Math.random() * 100));
 }
 
 /* NPC */
