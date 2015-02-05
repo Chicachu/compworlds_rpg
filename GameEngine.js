@@ -350,44 +350,36 @@ NPC.prototype.update = function () {
 }
 
 
+
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
 Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     if (tileSheetPathName) {
         this.sheet = ASSET_MANAGER.getAsset(tileSheetPathName);
     }
     this.tileSize = tileSize;
-    this.sheetWidth = sheetWidth; 
-    this.tiles = {};
-}
-
-/* Loop over Tile sheet found in asset manager, assign an integer to each one and add to Tile object */
-Tilesheet.prototype.initializeTiles = function () {
-    // Tile object might look something like {1: <img>, 2: <img>, 3: <img> ... etc} where the img is a tile from the tile sheet. 
-
+    this.sheetWidth = sheetWidth;
 }
 
 Background = function () {
     // "Map" will be a double array of integer values. Each value will correspond to a map tile. 
     // tile associated with it taken from our condensed tile sheet. 
     this.map = [[]]; // probably best to hard code this
-    this.tileSheet = new Tilesheet(/* TODO: Put tilesheet pathname here */);
+    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
 }
 
-/* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. 
-    example: Map[0][0] has a 1, in the Tiles object, 1 is associated with the grass tile, draw the grass tile from 0,0, to 32,32 (or whatever 
-    size the tile is. */
+/* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Background.prototype.draw = function (context, scaleBy) {
     var scaleBy = (scaleBy || 1);
+    var that = this;
+    for (var i = 0; i < that.map[0].length; i++) { // length of each row
+        for (var j = 0; j < that.map.length; j++) { // length of each column
+            var tile_index = that.map[i][j];
 
-    for (var i = 0; i < this.map[0].length; i++) { // length of each row
-        for (var j = 0; j < this.map.length; j++) { // length of each column
-            var tile_index = this.map[i][j];
-
-            context.drawImage(this.tileSheet.tiles.tile_index, 
-                              this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // where to start clipping
-                              this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
-                              this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
-                              this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
+            context.drawImage(that.tileSheet,
+                              tile_index % that.tileSheet.sheetWidth, tile_index / that.tileSheet.sheetWidth, // where to start clipping
+                              that.tileSheet.tileSize, that.tileSheet.tileSize,  // how much to clip
+                              that.tileSheet.tileSize * i, that.tileSheet.tileSize * j, // coordinates to start drawing to 
+                              that.tileSheet.tileSize * scaleBy, that.tileSheet.tileSize * scaleBy); // how big to draw.                          
         }
     }
 }
@@ -395,6 +387,8 @@ Background.prototype.draw = function (context, scaleBy) {
 Background.prototype.update = function () {
 
 }
+
+
 
 BattleScreen = function(img, game)
 {
