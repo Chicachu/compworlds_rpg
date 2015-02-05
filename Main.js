@@ -11,21 +11,23 @@ ASSET_MANAGER.downloadAll(function () {
 
     var gameEngine = new GameEngine();
 
-    var warrior = new Warrior(gameEngine);
-    var npc = new NPC(gameEngine);
-    var enemy = new Enemy(gameEngine);
+    var warrior = new Warrior(gameEngine, new Statistics(50, 20, 10));
+    //var npc = new NPC(gameEngine);
+    var enemy = new Enemy(gameEngine, new Statistics(30, 15, 5));
 
     var battlescreen = new BattleScreen("./imgs/woods.png", gameEngine);
 
     battlescreen.drawBackground(context);
     gameEngine.addEntity(warrior);
-    gameEngine.addEntity(npc);
+    //gameEngine.addEntity(npc);
     gameEngine.addEntity(enemy);
 
     //gameEngine.addEntity(new Enemy(gameEngine, ASSET_MANAGER.getAsset("./imgs/skeleton.png")));
     gameEngine.init(context);
-
     
+   // console.log(warrior.stats.health);
+   // enemy.fight(warrior);
+   // console.log(warrior.stats.health);
     gameEngine.start();
 
     
