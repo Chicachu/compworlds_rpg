@@ -3,6 +3,7 @@ var ASSET_MANAGER = new AssetManager();
 //ASSET_MANAGER.queueDownload("./imgs/hero_hooded.png");
 //ASSET_MANAGER.queueDownload("./imgs/skeleton.png");
 ASSET_MANAGER.queueDownload("./imgs/warrior.png")
+ASSET_MANAGER.queueDownload("./imgs/npc-female.png")
 
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
