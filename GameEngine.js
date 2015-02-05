@@ -271,13 +271,13 @@ Hero.prototype.changeMoveAnimation = function () {
 }
 
 Hero.prototype.draw = function (context) {
-    Entity.prototype.draw(context);
+    Entity.prototype.draw.call(this, context);
 }
 
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
-    Entity.prototype.changeLocation();
+    Entity.prototype.changeLocation.call(this);
 }
 
 Hero.prototype = new Entity();
