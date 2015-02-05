@@ -67,6 +67,7 @@ GameEngine = function () {
     this.key = null; 
     this.space = null;
     this.curr_background = null;
+    this.is_battle = false;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -165,7 +166,7 @@ var Direction = {
 Object.freeze(Direction);
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */
-Entity = function (game, x, y, spriteSheet, animations) { 
+Entity = function (game, x, y, spriteSheet, animations, stats) { 
     this.game = game;
     this.x = x;
     this.y = y; 
@@ -173,6 +174,7 @@ Entity = function (game, x, y, spriteSheet, animations) {
     this.moveRight = true;
     this.health;
     this.spriteSheet = spriteSheet;
+    this.stats = stats;
     if (animations) {
         this.animations = animations;
         this.move_animation = this.animations.down;
@@ -230,8 +232,8 @@ Statistics = function (health, attack, defense) {
 }
 
 /* HERO and subclasses */
-Hero = function (game, x, y, spriteSheet, animations) {
-    Entity.call(this, game, x, y, spriteSheet, animations);
+Hero = function (game, x, y, spriteSheet, animations, stats) {
+    Entity.call(this, game, x, y, spriteSheet, animations, stats);
 }
 
 Hero.prototype = new Entity();
@@ -285,7 +287,7 @@ Hero.prototype.update = function () {
 }
 
 
-Warrior = function (game) {
+Warrior = function (game, stats) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/warrior.png");
     this.animations = {
@@ -297,7 +299,7 @@ Warrior = function (game) {
     this.x = 50;
     this.y = 50;
     //var stats = new Statistics(50, 20, 10);
-    Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations);
+    Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
 Warrior.prototype = new Hero();
@@ -312,14 +314,11 @@ Warrior.prototype.update = function () {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game) {
+Enemy = function (game, stats) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 100;
     this.y = 50;
-    this.health = 30;
-    this.attack = 20;
-    this.defense = 5;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -327,7 +326,7 @@ Enemy = function (game) {
         // right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false)
     };
-    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
+    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
 Enemy.prototype = new Entity();
@@ -345,9 +344,9 @@ Enemy.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
-Enemy.prototype.attack = function (vs_player) {
+Enemy.prototype.fight = function (vs_player) {
     this.move_animation = this.animations.right;
-    vs_player.health = vs_player.health - ((this.attack / vs_player.defense) * (Math.random() * 100));
+    vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
 }
 
 Enemy.prototype.hit = function (vs_player)
