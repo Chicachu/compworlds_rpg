@@ -15,9 +15,6 @@ ASSET_MANAGER.downloadAll(function () {
     //var npc = new NPC(gameEngine);
     var enemy = new Enemy(gameEngine, new Statistics(30, 15, 5));
 
-    var battlescreen = new BattleScreen("./imgs/woods.png", gameEngine);
-
-    battlescreen.drawBackground(context);
     gameEngine.addEntity(warrior);
     //gameEngine.addEntity(npc);
     gameEngine.addEntity(enemy);

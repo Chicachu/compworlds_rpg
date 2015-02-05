@@ -171,7 +171,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.x = x;
     this.y = y; 
     this.direction = Direction.DOWN;
-    this.moveRight = true;
+    this.moving = false;
     this.health;
     this.spriteSheet = spriteSheet;
     this.stats = stats;
@@ -186,6 +186,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 Entity.prototype.changeLocation = function () { 
   
     if (this.game.key !== 0 && this.game.key !== null) {
+        this.moving = true;
         switch (this.direction) {
             case Direction.DOWN:
                 this.y += 2;
@@ -201,6 +202,7 @@ Entity.prototype.changeLocation = function () {
                 break;
         }
     } else {
+        this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
     }
     
@@ -282,18 +284,28 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
+    if (Math.round(Math.random() * 1000) >= 999)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 Hero.prototype.startBattle = function () {
     // do stuff that needs to happen for the battle. 
-    this.game.is_battle = true; 
+    this.game.is_battle = true;
+    this.game.drawBackground("./imgs/woods.png");
+    
 }
 
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
-    if (this.checkSurroundings()) {
+    if (this.checkSurroundings() && this.moving) {
         this.startBattle(); 
     }
 }
@@ -433,15 +445,15 @@ Background.prototype.update = function () {
 
 
 
-BattleScreen = function(img, game)
-{
-    this.game = game;
-    this.img = img;
-}
+//BattleScreen = function(img)
+//{
+    //this.game = game;
+  //  this.img = img;
+//}
 
-BattleScreen.prototype.drawBackground = function()
+GameEngine.prototype.drawBackground = function(img)
 {
-    this.game.curr_background = ASSET_MANAGER.getAsset(this.img);
+    this.curr_background = ASSET_MANAGER.getAsset(img);
 }
 
 
