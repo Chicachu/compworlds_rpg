@@ -26,6 +26,6 @@ ASSET_MANAGER.downloadAll(function () {
    // enemy.fight(warrior);
    // console.log(warrior.stats.health);
     gameEngine.start();
-
+    enemy.fight(warrior);
     
 });

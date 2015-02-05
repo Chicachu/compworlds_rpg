@@ -279,7 +279,12 @@ Hero.prototype.draw = function (context) {
     if (this.game.key !== 0 && this.game.key !== null && this.moving) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     } else {
-        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+        if (this.game.is_battle) {
+            this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        }
+        else {
+            this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+        }
     }
 }
 
@@ -305,7 +310,7 @@ Hero.prototype.startBattle = function () {
     this.enemy = this.game.entities[1];
     this.enemy.x = 100;
     this.enemy.y = 250;
-    this.enemy.move_animation = this.enemy.animations.right;
+    //this.enemy.move_animation = this.enemy.animations.right;
     
 }
 
@@ -350,25 +355,32 @@ Enemy = function (game, stats) {
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 100;
     this.y = 50;
-    this.direction = Direction.RIGHT;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
         left: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
-        right: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false)
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
     };
+    
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
+    this.stop_move_animation = this.stopAnimation(this.animations.right);
+    this.direction = Direction.RIGHT;
 }
 
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
+    if (this.game.is_battle) {
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    }
+    else {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    }
 }
 
 Enemy.prototype.update = function () {
-    Entity.prototype.update.call(this);
+    
 }
 
 Enemy.prototype.fight = function (vs_player) {
