@@ -84,13 +84,11 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
-            console.log('space'); 
         } else if (e.which === 37
                    || e.which === 38
                    || e.which === 39
                    || e.which === 40) {
-            that.key = e.which;
-            console.log('keydown'); 
+            that.key = e.which; 
         }
         e.preventDefault();
     }, false);
@@ -185,7 +183,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () { 
   
-    if (this.game.key !== 0 && this.game.key !== null) {
+    if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
         switch (this.direction) {
             case Direction.DOWN:
@@ -243,16 +241,19 @@ Hero.prototype.constructor = Hero;
 
 /* Tells the entity what direction they should face depending on what key was pressed. */
 Hero.prototype.changeDirection = function () {
-    if (this.game.space) {
-        // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
-    } else if (this.game.key === Direction.LEFT.code) {
-        this.direction = Direction.LEFT;
-    } else if (this.game.key === Direction.UP.code) {
-        this.direction = Direction.UP;
-    } else if (this.game.key === Direction.RIGHT.code) {
-        this.direction = Direction.RIGHT;
-    } else if (this.game.key === Direction.DOWN.code) {
-        this.direction = Direction.DOWN;
+    if (!this.game.is_battle) {
+        if (this.game.space) {
+            // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
+        }
+        else if (this.game.key === Direction.LEFT.code) {
+            this.direction = Direction.LEFT;
+        } else if (this.game.key === Direction.UP.code) {
+            this.direction = Direction.UP;
+        } else if (this.game.key === Direction.RIGHT.code) {
+            this.direction = Direction.RIGHT;
+        } else if (this.game.key === Direction.DOWN.code) {
+            this.direction = Direction.DOWN;
+        }
     }
 }
 
@@ -275,7 +276,7 @@ Hero.prototype.changeMoveAnimation = function () {
 }
 
 Hero.prototype.draw = function (context) {
-    if (this.game.key !== 0 && this.game.key !== null) {
+    if (this.game.key !== 0 && this.game.key !== null && this.moving) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     } else {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
@@ -298,6 +299,13 @@ Hero.prototype.startBattle = function () {
     // do stuff that needs to happen for the battle. 
     this.game.is_battle = true;
     this.game.drawBackground("./imgs/woods.png");
+    this.x = 350;
+    this.y = 250;
+    this.direction = Direction.LEFT;
+    this.enemy = this.game.entities[1];
+    this.enemy.x = 100;
+    this.enemy.y = 250;
+    this.enemy.move_animation = this.enemy.animations.right;
     
 }
 
@@ -342,12 +350,12 @@ Enemy = function (game, stats) {
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 100;
     this.y = 50;
+    this.direction = Direction.RIGHT;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
-        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
-        // right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
-        right: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false)
+        left: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
+        right: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false)
     };
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
@@ -356,11 +364,7 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-    if (this.game.key !== 0 && this.game.key !== null) {
-        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
-    } else {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
-    }
 }
 
 Enemy.prototype.update = function () {
@@ -368,7 +372,7 @@ Enemy.prototype.update = function () {
 }
 
 Enemy.prototype.fight = function (vs_player) {
-    this.move_animation = this.animations.right;
+    this.move_animation = this.animations.left;
     vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
 }
 
