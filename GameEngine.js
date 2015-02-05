@@ -247,9 +247,9 @@ Entity.prototype.stopAnimation = function (animation) {
 
 Entity.prototype.draw = function (context) {
     if (this.game.key !== 0 && this.game.key !== null) {
-        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75);
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     } else {
-        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 0.75);
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
