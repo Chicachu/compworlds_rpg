@@ -176,6 +176,7 @@ Entity = function (game, x, y, spriteSheet, animations) {
     }
 }
 
+/* Tells the Entity which animation to use for the direction its moving in */ 
 Entity.prototype.changeMoveAnimation = function () {
     switch (this.direction) {
         case Direction.DOWN:
@@ -346,34 +347,48 @@ NPC.prototype.update = function () {
 }
 
 
-/* BACKGROUND */
+/* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
+Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
+    if (tileSheetPathName) {
+        this.sheet = ASSET_MANAGER.getAsset(tileSheetPathName);
+    }
+    this.tileSize = tileSize;
+    this.sheetWidth = sheetWidth; 
+    this.tiles = {};
+}
+
+/* Loop over Tile sheet found in asset manager, assign an integer to each one and add to Tile object */
+Tilesheet.prototype.initializeTiles = function () {
+    // Tile object might look something like {1: <img>, 2: <img>, 3: <img> ... etc} where the img is a tile from the tile sheet. 
+
+}
+
 Background = function () {
     // "Map" will be a double array of integer values. Each value will correspond to a map tile. 
-    // "Tiles" will be a key/value mapping. The key will be the integer described above, and the value will be the image of the
     // tile associated with it taken from our condensed tile sheet. 
-    this.Map = [[]];
-    this.Tiles = {}; 
-}
-
-/* Reads a text file that has integers corresponding to map tiles, reads them, and initializes the Map array with the numbers.
-    This text file should have rows and columns that match the number of rows and columns of tiles on the map. */
-Background.prototype.initializeMap = function (text_file) {
-
-}
-
-/* Loop over Tile sheet found in asset manager, assign an integer to each one and add to Tile object */ 
-Background.prototype.initializeTiles = function () {
-    // Tile object might look something like {1: <img>, 2: <img>, 3: <img> ... etc} where the img is a tile from the tile sheet. 
+    this.map = [[]]; // probably best to hard code this
+    this.tileSheet = new Tilesheet(/* TODO: Put tilesheet pathname here */);
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. 
     example: Map[0][0] has a 1, in the Tiles object, 1 is associated with the grass tile, draw the grass tile from 0,0, to 32,32 (or whatever 
     size the tile is. */
-Background.prototype.draw = function (context) {
-    
+Background.prototype.draw = function (context, scaleBy) {
+    var scaleBy = (scaleBy || 1);
+
+    for (var i = 0; i < this.map[0].length; i++) { // length of each row
+        for (var j = 0; j < this.map.length; j++) { // length of each column
+            var tile_index = this.map[i][j];
+
+            context.drawImage(this.tileSheet.tiles.tile_index, 
+                              this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // where to start clipping
+                              this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
+                              this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
+                              this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
+        }
+    }
 }
 
-/* Updates any tiles that need to be animated, such as a door opening. */
 Background.prototype.update = function () {
 
 }
