@@ -211,11 +211,7 @@ Entity.prototype.stopAnimation = function (animation) {
 }
 
 Entity.prototype.draw = function (context) {
-    if (this.game.key !== 0 && this.game.key !== null) {
-        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
-    } else {
-        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
-    }
+    
 }
 
 Entity.prototype.update = function () {
@@ -271,7 +267,11 @@ Hero.prototype.changeMoveAnimation = function () {
 }
 
 Hero.prototype.draw = function (context) {
-    Entity.prototype.draw.call(this, context);
+    if (this.game.key !== 0 && this.game.key !== null) {
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    } else {
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    }
 }
 
 Hero.prototype.update = function () {
@@ -381,8 +381,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
 }
 
 Background = function () {
-    // "Map" will be a double array of integer values. Each value will correspond to a map tile. 
-    // tile associated with it taken from our condensed tile sheet. 
+    // "Map" will be a double array of integer values. 
     this.map = [[],
                 [],
                 [],
