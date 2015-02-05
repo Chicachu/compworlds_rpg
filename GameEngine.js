@@ -180,63 +180,28 @@ Entity = function (game, x, y, spriteSheet, animations) {
     }
 }
 
-/* Tells the Entity which animation to use for the direction its moving in */ 
-Entity.prototype.changeMoveAnimation = function () {
-    switch (this.direction) {
-        case Direction.DOWN:
-            this.move_animation = this.animations.down;
-            break;
-        case Direction.UP:
-            this.move_animation = this.animations.up;
-            break;
-        case Direction.LEFT:
-            this.move_animation = this.animations.left;
-            break;
-        case Direction.RIGHT:
-            this.move_animation = this.animations.right;
-            break;
-    }
-}
-
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
-Entity.prototype.changeLocation = function (force_direction) { // force direction used for NPCS. leave param empty for user-controlled characters
-    if (force_direction) {
-
-    } else {
-        if (this.game.key !== 0 && this.game.key !== null) {
-            switch (this.direction) {
-                case Direction.DOWN:
-                    this.y += 2;
-                    break;
-                case Direction.UP:
-                    this.y -= 2;
-                    break;
-                case Direction.LEFT:
-                    this.x -= 2;
-                    break;
-                case Direction.RIGHT:
-                    this.x += 2;
-                    break;
-            }
-        } else {
-            this.stop_move_animation = this.stopAnimation(this.move_animation);
+Entity.prototype.changeLocation = function () { 
+  
+    if (this.game.key !== 0 && this.game.key !== null) {
+        switch (this.direction) {
+            case Direction.DOWN:
+                this.y += 2;
+                break;
+            case Direction.UP:
+                this.y -= 2;
+                break;
+            case Direction.LEFT:
+                this.x -= 2;
+                break;
+            case Direction.RIGHT:
+                this.x += 2;
+                break;
         }
+    } else {
+        this.stop_move_animation = this.stopAnimation(this.move_animation);
     }
-}
-
-/* Tells the entity what direction they should face depending on what key was pressed. */ 
-Entity.prototype.changeDirection = function () {
-    if (this.game.space) {
-        // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
-    } else if (this.game.key === Direction.LEFT.code) { 
-        this.direction = Direction.LEFT;
-    } else if (this.game.key === Direction.UP.code) { 
-        this.direction = Direction.UP;
-    } else if (this.game.key === Direction.RIGHT.code) {
-        this.direction = Direction.RIGHT;
-    } else if (this.game.key === Direction.DOWN.code) {
-        this.direction = Direction.DOWN;
-    }
+    
 }
 
 /* Returns the last frame of the last animation used, this is used to show the character stopped but still in the last position of the last
@@ -254,9 +219,7 @@ Entity.prototype.draw = function (context) {
 }
 
 Entity.prototype.update = function () {
-    this.changeDirection();
-    this.changeMoveAnimation();
-    this.changeLocation();
+    
 }
 
 Entity.prototype.reset = function () {
@@ -270,9 +233,55 @@ Statistics = function (health, attack, defense) {
     this.defense = defense;
 }
 /* HERO and subclasses */
-Hero = function (game) {
-
+Hero = function (game, x, y, spriteSheet, animations) {
+    Entity.call(this, game, x, y, spriteSheet, animations);
 }
+
+/* Tells the entity what direction they should face depending on what key was pressed. */
+Hero.prototype.changeDirection = function () {
+    if (this.game.space) {
+        // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
+    } else if (this.game.key === Direction.LEFT.code) {
+        this.direction = Direction.LEFT;
+    } else if (this.game.key === Direction.UP.code) {
+        this.direction = Direction.UP;
+    } else if (this.game.key === Direction.RIGHT.code) {
+        this.direction = Direction.RIGHT;
+    } else if (this.game.key === Direction.DOWN.code) {
+        this.direction = Direction.DOWN;
+    }
+}
+
+/* Tells the Entity which animation to use for the direction its moving in */
+Hero.prototype.changeMoveAnimation = function () {
+    switch (this.direction) {
+        case Direction.DOWN:
+            this.move_animation = this.animations.down;
+            break;
+        case Direction.UP:
+            this.move_animation = this.animations.up;
+            break;
+        case Direction.LEFT:
+            this.move_animation = this.animations.left;
+            break;
+        case Direction.RIGHT:
+            this.move_animation = this.animations.right;
+            break;
+    }
+}
+
+Hero.prototype.draw = function (context) {
+    Entity.prototype.draw(context);
+}
+
+Hero.prototype.update = function () {
+    this.changeDirection();
+    this.changeMoveAnimation();
+    Entity.prototype.changeLocation();
+}
+
+Hero.prototype = new Entity();
+Hero.prototype.constructor = Hero;
 
 Warrior = function (game) {
     this.game = game;
@@ -286,18 +295,18 @@ Warrior = function (game) {
     this.x = 50;
     this.y = 50;
     //var stats = new Statistics(50, 20, 10);
-    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
+    Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations);
 }
 
-Warrior.prototype = new Entity();
+Warrior.prototype = new Hero();
 Warrior.prototype.constructor = Warrior;
 
 Warrior.prototype.draw = function (context) {
-    Entity.prototype.draw.call(this, context);
+    Hero.prototype.draw.call(this, context);
 }
 
 Warrior.prototype.update = function () {
-    Entity.prototype.update.call(this);
+    Hero.prototype.update.call(this);
 }
 
 /* ENEMY and subclasses */
@@ -333,9 +342,7 @@ Enemy.prototype.attack = function (vs_player) {
 
 }
 
-
 /* NPC */
-
 NPC = function (game) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
@@ -376,7 +383,10 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
 Background = function () {
     // "Map" will be a double array of integer values. Each value will correspond to a map tile. 
     // tile associated with it taken from our condensed tile sheet. 
-    this.map = [[]]; // probably best to hard code this
+    this.map = [[],
+                [],
+                [],
+                []]; 
     this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
 }
 
