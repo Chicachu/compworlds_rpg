@@ -304,9 +304,19 @@ Warrior.prototype.update = function () {
 Enemy = function (game) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
-    this.x = 50;
+    this.x = 100;
     this.y = 50;
-    Entity.call(this, game, this.x, this.y, this.spriteSheet);
+    this.health = 30;
+    this.attack = 20;
+    this.defense = 5;
+    this.animations = {
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        // right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false)
+    };
+    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
 }
 
 Enemy.prototype = new Entity();
@@ -319,7 +329,7 @@ Enemy.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
-Enemy.prototype.attack = function () {
+Enemy.prototype.attack = function (vs_player) {
 
 }
 
