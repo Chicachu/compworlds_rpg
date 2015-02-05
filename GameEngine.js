@@ -65,7 +65,8 @@ GameEngine = function () {
     this.height = null;
     this.timer = null;
     this.key = null; 
-    this.space = null; 
+    this.space = null;
+    this.curr_background = null;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -114,7 +115,10 @@ GameEngine.prototype.addEntity = function (entity) {
 GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     this.context.save();
-
+    if (this.curr_background)
+    {
+        this.context.drawImage(this.curr_background, 0, 0);
+    }
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.context); 
     }
@@ -299,7 +303,6 @@ Enemy = function (game) {
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 50;
     this.y = 50;
-    //this.attackAnimation = new Animation(this.spriteSheet, )
     Entity.call(this, game, this.x, this.y, this.spriteSheet);
 }
 
@@ -391,6 +394,17 @@ Background.prototype.draw = function (context, scaleBy) {
 
 Background.prototype.update = function () {
 
+}
+
+BattleScreen = function(img, game)
+{
+    this.game = game;
+    this.img = img;
+}
+
+BattleScreen.prototype.drawBackground = function()
+{
+    this.game.curr_background = ASSET_MANAGER.getAsset(this.img);
 }
 
 
