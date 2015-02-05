@@ -269,7 +269,10 @@ Statistics = function (health, attack, defense) {
     this.attack = attack;
     this.defense = defense;
 }
-/* HERO subclasses */
+/* HERO and subclasses */
+Hero = function (game) {
+
+}
 
 Warrior = function (game) {
     this.game = game;
