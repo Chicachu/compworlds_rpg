@@ -336,7 +336,7 @@ Background.prototype.initializeMap = function (text_file) {
 
 /* Loop over Tile sheet found in asset manager, assign an integer to each one and add to Tile object */ 
 Background.prototype.initializeTiles = function () {
-    // Tile object might look something like {1: <img>, 2: <img>, 3: <img> ... etc} where the img a tile from the tile sheet. 
+    // Tile object might look something like {1: <img>, 2: <img>, 3: <img> ... etc} where the img is a tile from the tile sheet. 
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. 
