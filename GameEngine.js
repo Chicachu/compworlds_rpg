@@ -193,27 +193,33 @@ Entity.prototype.changeMoveAnimation = function () {
     }
 }
 
+/* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function (force_direction) { // force direction used for NPCS. leave param empty for user-controlled characters
-    if (this.game.key !== 0 && this.game.key !== null) {
-        switch (this.direction) {
-            case Direction.DOWN:
-                this.y += 2;
-                break;
-            case Direction.UP:
-                this.y -= 2;
-                break;
-            case Direction.LEFT:
-                this.x -= 2;
-                break;
-            case Direction.RIGHT:
-                this.x += 2;
-                break;
-        }
+    if (force_direction) {
+
     } else {
-        this.stop_move_animation = this.stopAnimation(this.move_animation);
+        if (this.game.key !== 0 && this.game.key !== null) {
+            switch (this.direction) {
+                case Direction.DOWN:
+                    this.y += 2;
+                    break;
+                case Direction.UP:
+                    this.y -= 2;
+                    break;
+                case Direction.LEFT:
+                    this.x -= 2;
+                    break;
+                case Direction.RIGHT:
+                    this.x += 2;
+                    break;
+            }
+        } else {
+            this.stop_move_animation = this.stopAnimation(this.move_animation);
+        }
     }
 }
 
+/* Tells the entity what direction they should face depending on what key was pressed. */ 
 Entity.prototype.changeDirection = function () {
     if (this.game.space) {
         // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
@@ -228,6 +234,8 @@ Entity.prototype.changeDirection = function () {
     }
 }
 
+/* Returns the last frame of the last animation used, this is used to show the character stopped but still in the last position of the last
+    animation. */
 Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
@@ -309,4 +317,38 @@ Enemy.prototype.attack = function () {
 }
 
 
-    /* NPC */
+/* NPC */
+
+/* BACKGROUND */
+Background = function () {
+    // "Map" will be a double array of integer values. Each value will correspond to a map tile. 
+    // "Tiles" will be a key/value mapping. The key will be the integer described above, and the value will be the image of the
+    // tile associated with it taken from our condensed tile sheet. 
+    this.Map = [[]];
+    this.Tiles = {}; 
+}
+
+/* Reads a text file that has integers corresponding to map tiles, reads them, and initializes the Map array with the numbers.
+    This text file should have rows and columns that match the number of rows and columns of tiles on the map. */
+Background.prototype.initializeMap = function (text_file) {
+
+}
+
+/* Loop over Tile sheet found in asset manager, assign an integer to each one and add to Tile object */ 
+Background.prototype.initializeTiles = function () {
+    // Tile object might look something like {1: <img>, 2: <img>, 3: <img> ... etc} where the img a tile from the tile sheet. 
+}
+
+/* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. 
+    example: Map[0][0] has a 1, in the Tiles object, 1 is associated with the grass tile, draw the grass tile from 0,0, to 32,32 (or whatever 
+    size the tile is. */
+Background.prototype.draw = function (context) {
+    
+}
+
+/* Updates any tiles that need to be animated, such as a door opening. */
+Background.prototype.update = function () {
+
+}
+
+
