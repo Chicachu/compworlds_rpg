@@ -278,12 +278,23 @@ Hero.prototype.draw = function (context) {
     }
 }
 
+Hero.prototype.checkSurroundings = function () {
+    // return true or false
+}
+
+Hero.prototype.startBattle = function () {
+    // do stuff that needs to happen for the battle. 
+    this.game.is_battle = true; 
+}
+
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
+    if (this.checkSurroundings()) {
+        this.startBattle(); 
+    }
 }
-
 
 Warrior = function (game) {
     this.game = game;
@@ -381,8 +392,6 @@ NPC.prototype.draw = function (context) {
 NPC.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
-
-
 
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
 Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
