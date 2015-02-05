@@ -228,10 +228,14 @@ Statistics = function (health, attack, defense) {
     this.attack = attack;
     this.defense = defense;
 }
+
 /* HERO and subclasses */
 Hero = function (game, x, y, spriteSheet, animations) {
     Entity.call(this, game, x, y, spriteSheet, animations);
 }
+
+Hero.prototype = new Entity();
+Hero.prototype.constructor = Hero;
 
 /* Tells the entity what direction they should face depending on what key was pressed. */
 Hero.prototype.changeDirection = function () {
@@ -280,8 +284,6 @@ Hero.prototype.update = function () {
     Entity.prototype.changeLocation.call(this);
 }
 
-Hero.prototype = new Entity();
-Hero.prototype.constructor = Hero;
 
 Warrior = function (game) {
     this.game = game;
