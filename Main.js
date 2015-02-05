@@ -11,10 +11,16 @@ ASSET_MANAGER.downloadAll(function () {
     var gameEngine = new GameEngine();
 
     var warrior = new Warrior(gameEngine);
+    var npc = new NPC(gameEngine);
+
 
     gameEngine.addEntity(warrior);
+    gameEngine.addEntity(npc);
+
+
     //gameEngine.addEntity(new Enemy(gameEngine, ASSET_MANAGER.getAsset("./imgs/skeleton.png")));
     gameEngine.init(context);
     gameEngine.start();
-    //asdfasdfasdf
+
+
 });

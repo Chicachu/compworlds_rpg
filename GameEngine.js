@@ -319,6 +319,33 @@ Enemy.prototype.attack = function () {
 
 /* NPC */
 
+NPC = function (game) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
+    this.animations = {
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
+    };
+
+    this.x = 10;
+    this.y = 10;
+    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
+}
+
+NPC.prototype = new Entity();
+NPC.prototype.constructor = NPC;
+
+NPC.prototype.draw = function (context) {
+    Entity.prototype.draw.call(this, context);
+}
+
+NPC.prototype.update = function () {
+    Entity.prototype.update.call(this);
+}
+
+
 /* BACKGROUND */
 Background = function () {
     // "Map" will be a double array of integer values. Each value will correspond to a map tile. 
