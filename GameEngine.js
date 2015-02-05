@@ -370,16 +370,16 @@ Background = function () {
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Background.prototype.draw = function (context, scaleBy) {
     var scaleBy = (scaleBy || 1);
-    var that = this;
-    for (var i = 0; i < that.map[0].length; i++) { // length of each row
-        for (var j = 0; j < that.map.length; j++) { // length of each column
-            var tile_index = that.map[i][j];
 
-            context.drawImage(that.tileSheet,
-                              tile_index % that.tileSheet.sheetWidth, tile_index / that.tileSheet.sheetWidth, // where to start clipping
-                              that.tileSheet.tileSize, that.tileSheet.tileSize,  // how much to clip
-                              that.tileSheet.tileSize * i, that.tileSheet.tileSize * j, // coordinates to start drawing to 
-                              that.tileSheet.tileSize * scaleBy, that.tileSheet.tileSize * scaleBy); // how big to draw.                          
+    for (var i = 0; i < this.map[0].length; i++) { // length of each row
+        for (var j = 0; j < this.map.length; j++) { // length of each column
+            var tile_index = this.map[i][j];
+
+            context.drawImage(this.tileSheet,
+                              tile_index % this.tileSheet.sheetWidth, tile_index / this.tileSheet.sheetWidth, // where to start clipping
+                              this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
+                              this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
+                              this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
         }
     }
 }
