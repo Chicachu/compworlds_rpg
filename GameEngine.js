@@ -211,11 +211,11 @@ Entity.prototype.stopAnimation = function (animation) {
 }
 
 Entity.prototype.draw = function (context) {
-    
+    // code for NPCs and Enemies. 
 }
 
 Entity.prototype.update = function () {
-    
+    // code for NPCs and Enemies.
 }
 
 Entity.prototype.reset = function () {
@@ -340,6 +340,7 @@ Enemy.prototype.draw = function (context) {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
+
 Enemy.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
