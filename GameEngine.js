@@ -86,7 +86,7 @@ GameEngine.prototype.init = function (context) {
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    this.context.canvas.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
         } else if (e.which === 37
@@ -98,7 +98,7 @@ GameEngine.prototype.startInput = function () {
         e.preventDefault();
     }, false);
 
-    this.context.canvas.addEventListener('keyup', function (e) {
+    document.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
     }, false);
@@ -163,9 +163,11 @@ GameEngine.prototype.battleOver = function ()
         {
             this.is_battle = false;
             this.drawBackground("./imgs/desert.png");
+            this.entities[0].stats.health = 50;
         }
         else if(this.entities[1].stats.health <= 0)
         {
+            this.entities[1].stats.health = 1000;
             this.is_battle = false;
         }
     }
@@ -261,7 +263,8 @@ Entity.prototype.fight = function (vs_player) {
     this.attack_anim = true;
     vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
     vs_player.fight_animation = vs_player.animations.hit;
-    vs_player.attack_anim = true;
+
+    //vs_player.attack_anim = true;
 }
 
 Statistics = function (health, attack, defense) {
@@ -353,16 +356,17 @@ Hero.prototype.update = function () {
     if (this.checkSurroundings() && this.moving) {
         this.game.setBattle(this, this.game.entities[1]); 
     }
-    if (this.game.battleOver())
+    if (this.game.space) {
+        //console.log(this.game.entities[1].stats.health);
+        this.fight(this.game.entities[1]);
+    }
+
+    if (this.game.battleOver() && this.fight_animation.looped)
     {
         this.game.is_battle = false;
     }
     
-    if(this.game.space)
-    {
-        console.log(this.game.entities[1].stats.health);
-        this.fight(this.game.entities[1]);
-    }
+    
 }
 
 Warrior = function (game, stats) {
