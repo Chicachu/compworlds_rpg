@@ -150,6 +150,7 @@ GameEngine.prototype.setBattle = function (player, foe) {
     player.direction = Direction.LEFT;
     foe.x = 100;
     foe.y = 250;
+    this.menu.showMenu(true);
 }
 
 GameEngine.prototype.battleOver = function ()
@@ -326,20 +327,6 @@ Hero.prototype.checkSurroundings = function () {
     {
         return false;
     }
-}
-
-Hero.prototype.startBattle = function () {
-    // do stuff that needs to happen for the battle. 
-    this.game.is_battle = true;
-    this.game.drawBackground("./imgs/woods.png");
-    this.x = 350;
-    this.y = 250;
-    this.direction = Direction.LEFT;
-    this.enemy = this.game.entities[1];
-    this.enemy.x = 100;
-    this.enemy.y = 250;
-    //this.enemy.move_animation = this.enemy.animations.right;
-    this.game.menu.showMenu(true);
 }
 
 Hero.prototype.update = function () {
@@ -529,9 +516,11 @@ GameEngine.prototype.drawBackground = function(img)
 
 BattleMenu = function (menu_element) {
     this.menu = menu_element;
-    this.attack = this.menu_element.childNodes[1].childNodes[1];
-    this.use_item = this.menu_element.childNodes[1].childNodes[3];
-    this.flee = this.menu_element.childNodes[1].childNodes[5];
+    if (this.menu) {
+        this.attack = this.menu.childNodes[1].childNodes[1];
+        this.use_item = this.menu.childNodes[1].childNodes[3];
+        this.flee = this.menu.childNodes[1].childNodes[5];
+    }
 }
 
 BattleMenu.prototype.showMenu = function (flag) {
