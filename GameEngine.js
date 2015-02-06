@@ -68,6 +68,7 @@ GameEngine = function () {
     this.space = null;
     this.curr_background = null;
     this.is_battle = false;
+    this.menu = null; 
 }
 
 GameEngine.prototype.init = function (context) {
@@ -75,13 +76,14 @@ GameEngine.prototype.init = function (context) {
     this.width = this.context.canvas.width;
     this.height = this.context.canvas.height;
     this.timer = new Timer();
-    this.startInput(); 
+    this.startInput();
+    this.menu = new BattleMenu(document.getElementById("battle_menu"));
 }
 
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    this.context.canvas.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
         } else if (e.which === 37
@@ -93,7 +95,7 @@ GameEngine.prototype.startInput = function () {
         e.preventDefault();
     }, false);
 
-    this.context.canvas.addEventListener('keyup', function (e) {
+    document.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
     }, false);
@@ -311,7 +313,7 @@ Hero.prototype.startBattle = function () {
     this.enemy.x = 100;
     this.enemy.y = 250;
     //this.enemy.move_animation = this.enemy.animations.right;
-    
+    this.game.menu.showMenu(true);
 }
 
 Hero.prototype.update = function () {
@@ -420,6 +422,11 @@ NPC.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
+Tile = function (id) {
+    this.id = id;
+
+}
+
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
 Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     if (tileSheetPathName) {
@@ -470,6 +477,22 @@ Background.prototype.update = function () {
 GameEngine.prototype.drawBackground = function(img)
 {
     this.curr_background = ASSET_MANAGER.getAsset(img);
+}
+
+BattleMenu = function (menu_element) {
+    this.menu = menu_element;
+    this.attack = this.menu_element.childNodes[1].childNodes[1];
+    this.use_item = this.menu_element.childNodes[1].childNodes[3];
+    this.flee = this.menu_element.childNodes[1].childNodes[5];
+}
+
+BattleMenu.prototype.showMenu = function (flag) {
+    if (flag) {
+        this.menu.style.visibility = "visible";
+        this.attack.focus();
+    } else {
+        this.menu.style.visibility = "hidden"; 
+    }
 }
 
 
