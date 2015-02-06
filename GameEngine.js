@@ -475,9 +475,10 @@ NPC.prototype.update = function () {
 
 }
 
-Tile = function (id) {
+Tile = function (id, passable, selectable) {
     this.id = id;
-
+    this.passable = passable;
+    this.selectable = selectable;
 }
 
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
@@ -487,6 +488,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     }
     this.tileSize = tileSize;
     this.sheetWidth = sheetWidth;
+    this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
 
 Background = function () {

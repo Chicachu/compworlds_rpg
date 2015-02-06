@@ -6,6 +6,7 @@ ASSET_MANAGER.queueDownload("./imgs/warrior.png")
 ASSET_MANAGER.queueDownload("./imgs/npc-female.png")
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
+
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
     var context = canvas.getContext("2d");
