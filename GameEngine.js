@@ -21,6 +21,7 @@ Animation = function (spriteSheet, startX, startY, frameWidth, frameHeight, fram
     this.elapsedTime = 0;
     this.loop = loop;
     this.reverse = reverse;
+    this.looped = false;
 }
 
 Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
@@ -29,6 +30,7 @@ Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
     if (this.loop) {
         if (this.isDone()) {
             this.elapsedTime = 0;
+            this.looped = true;
         }
     } else if (this.isDone()) {
         return; 
@@ -87,7 +89,6 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
-            console.log("a;ldskfj");
         } else if (e.which === 37
                    || e.which === 38
                    || e.which === 39
@@ -158,12 +159,12 @@ GameEngine.prototype.battleOver = function ()
 {
     if(this.is_battle)
     {
-        if(this.entities[0].health <= 0)
+        if(this.entities[0].stats.health <= 0)
         {
             this.is_battle = false;
             this.drawBackground("./imgs/desert.png");
         }
-        else if(this.entities[1].health <= 0)
+        else if(this.entities[1].stats.health <= 0)
         {
             this.is_battle = false;
         }
@@ -200,13 +201,14 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.y = y; 
     this.direction = Direction.DOWN;
     this.moving = false;
-    this.health;
     this.spriteSheet = spriteSheet;
     this.stats = stats;
+    this.attack_anim = false;
     if (animations) {
         this.animations = animations;
         this.move_animation = this.animations.down;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
+        this.fight_animation = this.animations.destroy;
     }
 }
 
@@ -254,6 +256,13 @@ Entity.prototype.reset = function () {
 
 }
 
+Entity.prototype.fight = function (vs_player) {
+    this.fight_animation = this.animations.destroy;
+    this.attack_anim = true;
+    vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
+    vs_player.fight_animation = vs_player.animations.hit;
+    vs_player.attack_anim = true;
+}
 
 Statistics = function (health, attack, defense) {
     this.health = health;
@@ -309,7 +318,10 @@ Hero.prototype.draw = function (context) {
     if (this.game.key !== 0 && this.game.key !== null && this.moving) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     } else {
-        if (this.game.is_battle) {
+        if (this.game.is_battle && this.attack_anim) {
+            this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        }
+        else if (this.game.is_battle) {
             this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
         }
         else {
@@ -320,7 +332,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 500)
+    if (Math.round(Math.random() * 1000) >= 999)
     {
         return true;
     }
@@ -331,6 +343,10 @@ Hero.prototype.checkSurroundings = function () {
 }
 
 Hero.prototype.update = function () {
+    if (this.attack_anim && this.fight_animation.looped) {
+        this.fight_animation.looped = false;
+        this.attack_anim = false;
+    }
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
@@ -341,14 +357,12 @@ Hero.prototype.update = function () {
     {
         this.game.is_battle = false;
     }
-    //this.health = 50;
+    
     if(this.game.space)
     {
-        this.game.entities[1].fight(this);
-        //  console.log("lkjdf");
-        //console.log(this.game.entities[1].attack_anim);
-        //this.health = 0;
-    } 
+        console.log(this.game.entities[1].stats.health);
+        this.fight(this.game.entities[1]);
+    }
 }
 
 Warrior = function (game, stats) {
@@ -358,7 +372,9 @@ Warrior = function (game, stats) {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
-        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
+        hit: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.05, 12, true, false)
     };
     this.x = 50;
     this.y = 50;
@@ -383,13 +399,13 @@ Enemy = function (game, stats) {
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 100;
     this.y = 50;
-    this.attack_anim = false;
-    this.total_frames = 12;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
         left: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
-        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.07, 5, true, false)
     };
     
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
@@ -401,9 +417,8 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-   // console.log(this.attack_anim);
     if (this.game.is_battle && this.attack_anim) {
-        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
     else if (this.game.is_battle)
     {
@@ -417,22 +432,17 @@ Enemy.prototype.draw = function (context) {
 
 Enemy.prototype.update = function ()
 {
-    if(this.attack_anim && this.total_frames === this.move_animation.currentFrame())
+    if(this.attack_anim && this.fight_animation.looped)
     {
+        this.fight_animation.looped = false;
         this.attack_anim = false;
     }
 }
 
-Enemy.prototype.fight = function (vs_player) {
-    this.move_animation = this.animations.left;
-    console.log(this.attack_anim);
-    this.attack_anim = true;
-    vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
-}
 
-Enemy.prototype.hit = function (vs_player)
+Enemy.prototype.hit = function ()
 {
-    this.health = this.health - ((vs_player.attack / this.defense) * (Math.random() * 100));
+    
 }
 
 /* NPC */
@@ -442,7 +452,7 @@ NPC = function (game) {
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
-        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
     }
     this.x = 10;
