@@ -86,6 +86,7 @@ GameEngine.prototype.startInput = function () {
     document.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
+            console.log("a;ldskfj");
         } else if (e.which === 37
                    || e.which === 38
                    || e.which === 39
@@ -141,6 +142,31 @@ GameEngine.prototype.loop = function () {
     this.draw(); 
 }
 
+GameEngine.prototype.setBattle = function (player, foe) {
+    this.is_battle = true;
+    this.drawBackground("./imgs/woods.png");
+    player.x = 350;
+    player.y = 250;
+    player.direction = Direction.LEFT;
+    foe.x = 100;
+    foe.y = 250;
+}
+
+GameEngine.prototype.battleOver = function ()
+{
+    if(this.is_battle)
+    {
+        if(this.entities[0].health <= 0)
+        {
+            this.is_battle = false;
+            this.drawBackground("./imgs/desert.png");
+        }
+        else if(this.entities[1].health <= 0)
+        {
+            this.is_battle = false;
+        }
+    }
+}
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
@@ -292,7 +318,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 999)
+    if (Math.round(Math.random() * 1000) >= 500)
     {
         return true;
     }
@@ -302,6 +328,7 @@ Hero.prototype.checkSurroundings = function () {
     }
 }
 
+<<<<<<< HEAD
 Hero.prototype.startBattle = function () {
     // do stuff that needs to happen for the battle. 
     this.game.is_battle = true;
@@ -316,13 +343,27 @@ Hero.prototype.startBattle = function () {
     this.game.menu.showMenu(true);
 }
 
+=======
+>>>>>>> bfc247c788ad0f4122e4a0a442b1a6a1431f1d5b
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
     if (this.checkSurroundings() && this.moving) {
-        this.startBattle(); 
+        this.game.setBattle(this, this.game.entities[1]); 
     }
+    if (this.game.battleOver())
+    {
+        this.game.is_battle = false;
+    }
+    //this.health = 50;
+    if(this.game.space)
+    {
+        this.game.entities[1].fight(this);
+        //  console.log("lkjdf");
+        //console.log(this.game.entities[1].attack_anim);
+        //this.health = 0;
+    } 
 }
 
 Warrior = function (game, stats) {
@@ -357,6 +398,8 @@ Enemy = function (game, stats) {
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 100;
     this.y = 50;
+    this.attack_anim = false;
+    this.total_frames = 12;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -373,20 +416,32 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-    if (this.game.is_battle) {
+   // console.log(this.attack_anim);
+    if (this.game.is_battle && this.attack_anim) {
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    }
+    else if (this.game.is_battle)
+    {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
-    else {
+    else
+    {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
-Enemy.prototype.update = function () {
-    
+Enemy.prototype.update = function ()
+{
+    if(this.attack_anim && this.total_frames === this.move_animation.currentFrame())
+    {
+        this.attack_anim = false;
+    }
 }
 
 Enemy.prototype.fight = function (vs_player) {
     this.move_animation = this.animations.left;
+    console.log(this.attack_anim);
+    this.attack_anim = true;
     vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
 }
 
@@ -404,8 +459,7 @@ NPC = function (game) {
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
-    };
-
+    }
     this.x = 10;
     this.y = 10;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
@@ -415,11 +469,15 @@ NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
 NPC.prototype.draw = function (context) {
-    Entity.prototype.draw.call(this, context);
-}
+    if (this.game.is_battle) {
+        //do nothing? (un-draw npc?)
+    }
+    else {
+        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+    }}
 
 NPC.prototype.update = function () {
-    Entity.prototype.update.call(this);
+
 }
 
 Tile = function (id) {
@@ -466,13 +524,6 @@ Background.prototype.update = function () {
 
 }
 
-
-
-//BattleScreen = function(img)
-//{
-    //this.game = game;
-  //  this.img = img;
-//}
 
 GameEngine.prototype.drawBackground = function(img)
 {
