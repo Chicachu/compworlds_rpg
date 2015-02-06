@@ -139,6 +139,31 @@ GameEngine.prototype.loop = function () {
     this.draw(); 
 }
 
+GameEngine.prototype.setBattle = function (player, foe) {
+    this.is_battle = true;
+    this.drawBackground("./imgs/woods.png");
+    player.x = 350;
+    player.y = 250;
+    player.direction = Direction.LEFT;
+    foe.x = 100;
+    foe.y = 250;
+}
+
+GameEngine.prototype.battleOver = function ()
+{
+    if(this.is_battle)
+    {
+        if(this.entities[0].health <= 0)
+        {
+            this.is_battle = false;
+            this.drawBackground("./imgs/desert.png");
+        }
+        else if(this.entities[1].health <= 0)
+        {
+            this.is_battle = false;
+        }
+    }
+}
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
@@ -300,26 +325,21 @@ Hero.prototype.checkSurroundings = function () {
     }
 }
 
-Hero.prototype.startBattle = function () {
-    // do stuff that needs to happen for the battle. 
-    this.game.is_battle = true;
-    this.game.drawBackground("./imgs/woods.png");
-    this.x = 350;
-    this.y = 250;
-    this.direction = Direction.LEFT;
-    this.enemy = this.game.entities[1];
-    this.enemy.x = 100;
-    this.enemy.y = 250;
-    //this.enemy.move_animation = this.enemy.animations.right;
-    
-}
-
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
     if (this.checkSurroundings() && this.moving) {
-        this.startBattle(); 
+        this.game.setBattle(this, this.game.entities[1]); 
+    }
+    if (this.game.battleOver())
+    {
+        this.game.is_battle = false;
+    }
+    this.health = 50;
+    if(this.game.space)
+    {
+        this.health = 0;
     }
 }
 
@@ -384,7 +404,7 @@ Enemy.prototype.update = function () {
 }
 
 Enemy.prototype.fight = function (vs_player) {
-    this.move_animation = this.animations.left;
+    //this.move_animation = this.animations.left;
     vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
 }
 
@@ -459,13 +479,6 @@ Background.prototype.update = function () {
 
 }
 
-
-
-//BattleScreen = function(img)
-//{
-    //this.game = game;
-  //  this.img = img;
-//}
 
 GameEngine.prototype.drawBackground = function(img)
 {
