@@ -84,6 +84,7 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
+            console.log("a;ldskfj");
         } else if (e.which === 37
                    || e.which === 38
                    || e.which === 39
@@ -315,7 +316,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 999)
+    if (Math.round(Math.random() * 1000) >= 500)
     {
         return true;
     }
@@ -336,11 +337,14 @@ Hero.prototype.update = function () {
     {
         this.game.is_battle = false;
     }
-    this.health = 50;
+    //this.health = 50;
     if(this.game.space)
     {
-        this.health = 0;
-    }
+        this.game.entities[1].fight(this);
+        //  console.log("lkjdf");
+        //console.log(this.game.entities[1].attack_anim);
+        //this.health = 0;
+    } 
 }
 
 Warrior = function (game, stats) {
@@ -375,6 +379,8 @@ Enemy = function (game, stats) {
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     this.x = 100;
     this.y = 50;
+    this.attack_anim = false;
+    this.total_frames = 12;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -391,20 +397,32 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-    if (this.game.is_battle) {
+   // console.log(this.attack_anim);
+    if (this.game.is_battle && this.attack_anim) {
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    }
+    else if (this.game.is_battle)
+    {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
-    else {
+    else
+    {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
-Enemy.prototype.update = function () {
-    
+Enemy.prototype.update = function ()
+{
+    if(this.attack_anim && this.total_frames === this.move_animation.currentFrame())
+    {
+        this.attack_anim = false;
+    }
 }
 
 Enemy.prototype.fight = function (vs_player) {
-    //this.move_animation = this.animations.left;
+    this.move_animation = this.animations.left;
+    console.log(this.attack_anim);
+    this.attack_anim = true;
     vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
 }
 
