@@ -328,7 +328,6 @@ Hero.prototype.checkSurroundings = function () {
     }
 }
 
-<<<<<<< HEAD
 Hero.prototype.startBattle = function () {
     // do stuff that needs to happen for the battle. 
     this.game.is_battle = true;
@@ -343,8 +342,6 @@ Hero.prototype.startBattle = function () {
     this.game.menu.showMenu(true);
 }
 
-=======
->>>>>>> bfc247c788ad0f4122e4a0a442b1a6a1431f1d5b
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
