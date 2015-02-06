@@ -78,12 +78,13 @@ GameEngine.prototype.init = function (context) {
     this.timer = new Timer();
     this.startInput();
     this.menu = new BattleMenu(document.getElementById("battle_menu"));
+    this.context.canvas.focus();
 }
 
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    document.addEventListener('keydown', function (e) {
+    this.context.canvas.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
             console.log("a;ldskfj");
@@ -96,7 +97,7 @@ GameEngine.prototype.startInput = function () {
         e.preventDefault();
     }, false);
 
-    document.addEventListener('keyup', function (e) {
+    this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
     }, false);
@@ -517,16 +518,24 @@ GameEngine.prototype.drawBackground = function(img)
 BattleMenu = function (menu_element) {
     this.menu = menu_element;
     if (this.menu) {
-        this.attack = this.menu.childNodes[1].childNodes[1];
-        this.use_item = this.menu.childNodes[1].childNodes[3];
-        this.flee = this.menu.childNodes[1].childNodes[5];
+        this.attack = document.getElementById("attack");
+        this.use_item = document.getElementById("use_item");
+        this.flee = document.getElementById("flee");
     }
+}
+
+BattleMenu.prototype.init = function () {
+    var that = this;
+    
+    this.attack.addEventListener("focus", function () {
+        that.attack.style.color = "white"; 
+    });
 }
 
 BattleMenu.prototype.showMenu = function (flag) {
     if (flag) {
         this.menu.style.visibility = "visible";
-        this.attack.focus();
+        window.setTimeout("this.attack.focus();", 0);
     } else {
         this.menu.style.visibility = "hidden"; 
     }
