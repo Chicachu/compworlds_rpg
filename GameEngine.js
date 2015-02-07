@@ -570,9 +570,9 @@ Environment = function (game) {
     this.tileSheet = new Tilesheet("./imgs/tiles.png", 32, 26);
     var firesheet1 = ASSET_MANAGER.getAsset("./imgs/fire.png");
     var firesheet2 = ASSET_MANAGER.getAsset("./imgs/fire2.png");
-    this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.05, 9, true, false);
-    this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.05, 12, true, false);
-    this.flame1_locations = [[0,4],[1,4],[7,4],[14,4],[16,4]];
+    this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.5, 9, true, false);
+    this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.5, 4, true, false);
+    this.flame1_locations = [[0,3],[1,3],[7,3],[14,3],[16,3]];
     this.flame2_locations = [[2,1],[14,1],[1,2],[16,2]];
 }
 
@@ -605,13 +605,13 @@ Environment.prototype.draw = function (context, scaleBy) {
     for (var i = 0; i < this.flame1_locations.length; i++) {
         var x = this.flame1_locations[i][0];
         var y = this.flame1_locations[i][1];
-        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x, y);
+        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
         
     }
     for (var i = 0; i < this.flame2_locations.length; i++) {
         var x = this.flame2_locations[i][0];
         var y = this.flame2_locations[i][1];
-        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x, y);
+        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
         
     }
 
