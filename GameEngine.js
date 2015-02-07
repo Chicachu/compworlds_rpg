@@ -87,14 +87,11 @@ GameEngine.prototype.init = function (context) {
 
 GameEngine.prototype.startInput = function () {
     var that = this;
-
-    document.addEventListener('keypress', function (e) {
+    
+    document.addEventListener('keydown', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
-        }
-    });
-    document.addEventListener('keydown', function (e) {
-        if (e.which === 37
+        } else if (e.which === 37
                    || e.which === 38
                    || e.which === 39
                    || e.which === 40) {
@@ -299,6 +296,8 @@ Statistics = function (health, attack, defense) {
 /* HERO and subclasses */
 Hero = function (game, x, y, spriteSheet, animations, stats) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
+    this.width = 64; 
+    this.height = 64; 
 }
 
 Hero.prototype = new Entity();
@@ -358,7 +357,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 999)
+    if (Math.round(Math.random() * 1000) === 1018939327848374)
     {
         return true;
     }
@@ -392,7 +391,7 @@ Hero.prototype.update = function () {
 
 // Boundary detection
 Hero.prototype.boundaryRight = function () {
-    return this.x > this.game.context.canvas.width;
+    return this.x + this.width > this.game.context.canvas.width;
 }
 
 Hero.prototype.boundaryLeft = function () {
@@ -404,25 +403,26 @@ Hero.prototype.boundaryUp = function () {
 }
 
 Hero.prototype.boundaryDown = function () {
-    return this.y > this.game.context.canvas.height; 
+    return this.y + this.height > this.game.context.canvas.height; 
 }
 
 Hero.prototype.checkBoundaries = function () {
-    if (this.boundaryRight) {
-        if (!this.game.map.curr_quadrant === 2 && !this.game.map.curr_quadrant === 5) {
-            this.game.map.curr_quadrant += 1;
+    var quadrant = this.game.environment.curr_quadrant;
+    if (this.boundaryRight()) {
+        if (quadrant !== 2 && quadrant !== 5) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
         }
-    } else if (this.boundaryLeft) {
-        if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 3) {
-            this.game.map.curr_quadrant -= 1;
+    } else if (this.boundaryLeft()) {
+        if (quadrant !== 0 && quadrant !== 3) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
         }
-    } else if (this.boundaryUp) {
-        if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 1 && !this.game.map.curr_quadrant === 2) {
-            this.game.map.curr_quadrant -= 3;
+    } else if (this.boundaryUp()) {
+        if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
         }
-    } else if (this.boundaryDown) {
-        if (!this.game.map.curr_quadrant === 3 && !this.game.map.curr_quadrant === 4 && !this.game.map.curr_quadrant === 5) {
-            this.game.map.curr_quadrant += 3;
+    } else if (this.boundaryDown()) {
+        if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
         }
     }
 }
@@ -601,6 +601,10 @@ Environment = function (game) {
     this.curr_quadrant = 0;
 }
 
+Environment.prototype.setQuadrant = function (number) {
+    this.curr_quadrant = number;
+}
+
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Environment.prototype.draw = function (context, scaleBy) {
     this.context = context; 
@@ -627,19 +631,20 @@ Environment.prototype.draw = function (context, scaleBy) {
     }
 
     // draw flames
-    for (var i = 0; i < this.flame1_locations.length; i++) {
-        var x = this.flame1_locations[i][0];
-        var y = this.flame1_locations[i][1];
-        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-        
-    }
-    for (var i = 0; i < this.flame2_locations.length; i++) {
-        var x = this.flame2_locations[i][0];
-        var y = this.flame2_locations[i][1];
-        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-        
-    }
+    if (this.curr_quadrant === 0) {
+        for (var i = 0; i < this.flame1_locations.length; i++) {
+            var x = this.flame1_locations[i][0];
+            var y = this.flame1_locations[i][1];
+            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
 
+        }
+        for (var i = 0; i < this.flame2_locations.length; i++) {
+            var x = this.flame2_locations[i][0];
+            var y = this.flame2_locations[i][1];
+            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+
+        }
+    }
 }
 
 Environment.prototype.update = function () {
