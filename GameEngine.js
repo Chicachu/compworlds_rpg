@@ -243,7 +243,7 @@ Entity.prototype.changeLocation = function () {
   
     if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
-        this.changeCoordinates();
+        this.changeCoordinates(.25, .25, .25, .25);
     } else {
         this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
@@ -251,19 +251,19 @@ Entity.prototype.changeLocation = function () {
     
 }
 
-Entity.prototype.changeCoordinates = function () {
+Entity.prototype.changeCoordinates = function (down, up, left, right) {
     switch (this.direction) {
         case Direction.DOWN:
-            this.y += 0.25;
+            this.y += down;
             break;
         case Direction.UP:
-            this.y -= 0.25;
+            this.y -= up;
             break;
         case Direction.LEFT:
-            this.x -= 0.25;
+            this.x -= left;
             break;
         case Direction.RIGHT:
-            this.x += 0.25;
+            this.x += right;
             break;
     }
 }
@@ -397,8 +397,8 @@ Warrior = function (game, stats) {
         destroy: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         hit: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.05, 12, true, false)
     };
-    this.x = 50;
-    this.y = 50;
+    this.x = 10;
+    this.y = 224;
     //var stats = new Statistics(50, 20, 10);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
@@ -472,8 +472,8 @@ NPC = function (game) {
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
     }
-    this.x = 10;
-    this.y = 10;
+    this.x = 160;
+    this.y = 224;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
 }
 
@@ -487,24 +487,38 @@ NPC.prototype.draw = function (context) {
 }
 
 NPC.prototype.update = function () {
-    if (this.x === 10 && this.y === 75) {
-        // change right
+    //if (this.x === 10 && this.y === 75) {
+    //    // change right
+    //    this.move_animation = this.animations.right;
+    //    this.direction = Direction.RIGHT; 
+    //} else if (this.x === 95 && this.y === 75) {
+    //    // change up
+    //    this.move_animation = this.animations.up;
+    //    this.direction = Direction.UP;
+    //} else if (this.x === 95 && this.y === 10) {
+    //    // change left
+    //    this.move_animation = this.animations.left;
+    //    this.direction = Direction.LEFT;
+    //} else if (this.x === 10 && this.y === 10) {
+    //    // change down
+    //    this.move_animation = this.animations.down;
+    //    this.direction = Direction.DOWN;
+    //}
+    if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
         this.move_animation = this.animations.right;
-        this.direction = Direction.RIGHT; 
-    } else if (this.x === 95 && this.y === 75) {
-        // change up
+        this.direction = Direction.RIGHT;
+    } else if (this.x === 288 && this.y === 224 && this.direction === Direction.RIGHT) {
         this.move_animation = this.animations.up;
         this.direction = Direction.UP;
-    } else if (this.x === 95 && this.y === 10) {
-        // change left
+    } else if (this.x === 288 && this.y === 224 && this.direction === Direction.UP) {
         this.move_animation = this.animations.left;
         this.direction = Direction.LEFT;
-    } else if (this.x === 10 && this.y === 10) {
-        // change down
+    } else if (this.x === 160 && this.y === 224 && this.direction === Direction.LEFT) {
         this.move_animation = this.animations.down;
         this.direction = Direction.DOWN;
     }
-    this.changeCoordinates();
+    this.changeCoordinates(0, 0, 0.25, 0.25);
+    
 }
 
 Tile = function (id, passable, selectable) {
