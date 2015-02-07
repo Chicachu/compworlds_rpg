@@ -147,30 +147,29 @@ GameEngine.prototype.loop = function () {
 GameEngine.prototype.setBattle = function (player, foe) {
     this.is_battle = true;
     this.drawBackground("./imgs/woods.png");
-    player.x = 350;
+    player.x = 300;
     player.y = 250;
     player.direction = Direction.LEFT;
-    foe.x = 100;
+    foe.x = 50;
     foe.y = 250;
     this.menu.showMenu(true);
-    player.fight_animation = player.stopAnimation(fight_animation);
-    foe.fight_animation = foe.stopAnimation(fight_animation);
+    player.attack_anim = false;
+    player.fight_animation.looped = false;
+    foe.attack_anim = false;
+    foe.fight_animation.looped = false;
 }
 
 GameEngine.prototype.battleOver = function ()
 {
     if(this.is_battle)
     {
-        if (this.entities[0].stats.health <= 0 && this.entities[0].fight_animation.looped && this.entities[1].fight_animation.looped)
+        if ((this.entities[0].stats.health <= 0 || this.entities[1].stats.health <= 0))
         {
             this.is_battle = false;
             this.drawBackground("./imgs/desert.png");
             this.entities[0].stats.health = 50;
-        }
-        else if (this.entities[1].stats.health <= 0 && this.entities[1].fight_animation.looped && this.entities[0].fight_animation.looped)
-        {
-            this.entities[1].stats.health = 1000;
-            this.is_battle = false;
+            this.entities[1].stats.health = 2000;
+            this.menu.showMenu(false);
         }
     }
 }
@@ -180,8 +179,17 @@ GameEngine.prototype.fight = function(player, foe)
     player.fight_animation = player.animations.destroy;
     player.attack_anim = true;
     foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
-    foe.fight_animation = foe.animations.hit;
-    foe.attack_anim = true;
+}
+
+GameEngine.prototype.queueAction = function(player, foe)
+{
+    if(player.fight_animation.looped)
+    {
+        player.attack_anim = false;
+        player.fight_animation.looped = false;
+        foe.fight_animation = foe.animations.hit;
+        foe.attack_anim = true;
+    }
 }
 
 Timer = function () {
@@ -270,14 +278,6 @@ Entity.prototype.reset = function () {
 
 }
 
-Entity.prototype.fight = function (vs_player) {
-    this.fight_animation = this.animations.destroy;
-    this.attack_anim = true;
-    vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
-    vs_player.fight_animation = vs_player.animations.hit;
-
-    vs_player.attack_anim = true;
-}
 
 Statistics = function (health, attack, defense) {
     this.health = health;
@@ -359,7 +359,7 @@ Hero.prototype.checkSurroundings = function () {
 
 Hero.prototype.update = function () {
     if (this.attack_anim && this.fight_animation.looped) {
-        this.fight_animation.looped = false;
+        //this.fight_animation.looped = false;
         this.attack_anim = false;
     }
     this.changeDirection();
@@ -369,10 +369,10 @@ Hero.prototype.update = function () {
         this.game.setBattle(this, this.game.entities[1]); 
     }
     if (this.game.space) {
-        console.log(this.game.entities[1].stats.health);
+        //console.log(this.game.entities[1].stats.health);
         this.game.fight(this, this.game.entities[1]);
     }
-
+    this.game.queueAction(this, this.game.entities[1]);
     this.game.battleOver();
     
     
@@ -436,10 +436,6 @@ Enemy.prototype.draw = function (context) {
     else if (this.game.is_battle)
     {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-    }
-    else
-    {
-        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
