@@ -355,7 +355,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 999)
+    if (Math.round(Math.random() * 10000) >= 9999)
     {
         return true;
     }
