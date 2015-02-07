@@ -6,10 +6,7 @@ ASSET_MANAGER.queueDownload("./imgs/warrior.png");
 ASSET_MANAGER.queueDownload("./imgs/npc-female.png");
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/origin
 ASSET_MANAGER.queueDownload("./imgs/ourtiles.png");
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
