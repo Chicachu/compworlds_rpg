@@ -172,6 +172,16 @@ GameEngine.prototype.battleOver = function ()
         }
     }
 }
+
+GameEngine.prototype.fight = function(player, foe)
+{
+    player.fight_animation = player.animations.destroy;
+    player.attack_anim = true;
+    foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
+    foe.fight_animation = foe.animations.hit;
+    foe.attack_anim = true;
+}
+
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
@@ -258,14 +268,6 @@ Entity.prototype.reset = function () {
 
 }
 
-Entity.prototype.fight = function (vs_player) {
-    this.fight_animation = this.animations.destroy;
-    this.attack_anim = true;
-    vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
-    vs_player.fight_animation = vs_player.animations.hit;
-
-    //vs_player.attack_anim = true;
-}
 
 Statistics = function (health, attack, defense) {
     this.health = health;
@@ -357,14 +359,11 @@ Hero.prototype.update = function () {
         this.game.setBattle(this, this.game.entities[1]); 
     }
     if (this.game.space) {
-        //console.log(this.game.entities[1].stats.health);
-        this.fight(this.game.entities[1]);
+        console.log(this.game.entities[1].stats.health);
+        this.game.fight(this, this.game.entities[1]);
     }
 
-    if (this.game.battleOver() && this.fight_animation.looped)
-    {
-        this.game.is_battle = false;
-    }
+    this.game.battleOver();
     
     
 }
