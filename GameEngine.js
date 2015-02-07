@@ -82,7 +82,7 @@ GameEngine.prototype.init = function (context) {
     this.startInput();
     this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
-    this.environment = new Environment();
+    this.environment = new Environment(this);
 }
 
 GameEngine.prototype.startInput = function () {
@@ -243,7 +243,7 @@ Entity.prototype.changeLocation = function () {
   
     if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
-        this.changeCoordinates();
+        this.changeCoordinates(.5, .5, .5, .5);
     } else {
         this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
@@ -251,19 +251,19 @@ Entity.prototype.changeLocation = function () {
     
 }
 
-Entity.prototype.changeCoordinates = function () {
+Entity.prototype.changeCoordinates = function (down, up, left, right) {
     switch (this.direction) {
         case Direction.DOWN:
-            this.y += 0.25;
+            this.y += down;
             break;
         case Direction.UP:
-            this.y -= 0.25;
+            this.y -= up;
             break;
         case Direction.LEFT:
-            this.x -= 0.25;
+            this.x -= left;
             break;
         case Direction.RIGHT:
-            this.x += 0.25;
+            this.x += right;
             break;
     }
 }
@@ -397,8 +397,8 @@ Warrior = function (game, stats) {
         destroy: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         hit: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.05, 12, true, false)
     };
-    this.x = 50;
-    this.y = 50;
+    this.x = 10;
+    this.y = 224;
     //var stats = new Statistics(50, 20, 10);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
@@ -472,8 +472,8 @@ NPC = function (game) {
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
     }
-    this.x = 10;
-    this.y = 10;
+    this.x = 160;
+    this.y = 224;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
 }
 
@@ -487,24 +487,38 @@ NPC.prototype.draw = function (context) {
 }
 
 NPC.prototype.update = function () {
-    if (this.x === 10 && this.y === 75) {
-        // change right
+    //if (this.x === 10 && this.y === 75) {
+    //    // change right
+    //    this.move_animation = this.animations.right;
+    //    this.direction = Direction.RIGHT; 
+    //} else if (this.x === 95 && this.y === 75) {
+    //    // change up
+    //    this.move_animation = this.animations.up;
+    //    this.direction = Direction.UP;
+    //} else if (this.x === 95 && this.y === 10) {
+    //    // change left
+    //    this.move_animation = this.animations.left;
+    //    this.direction = Direction.LEFT;
+    //} else if (this.x === 10 && this.y === 10) {
+    //    // change down
+    //    this.move_animation = this.animations.down;
+    //    this.direction = Direction.DOWN;
+    //}
+    if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
         this.move_animation = this.animations.right;
-        this.direction = Direction.RIGHT; 
-    } else if (this.x === 95 && this.y === 75) {
-        // change up
+        this.direction = Direction.RIGHT;
+    } else if (this.x === 288 && this.y === 224 && this.direction === Direction.RIGHT) {
         this.move_animation = this.animations.up;
         this.direction = Direction.UP;
-    } else if (this.x === 95 && this.y === 10) {
-        // change left
+    } else if (this.x === 288 && this.y === 224 && this.direction === Direction.UP) {
         this.move_animation = this.animations.left;
         this.direction = Direction.LEFT;
-    } else if (this.x === 10 && this.y === 10) {
-        // change down
+    } else if (this.x === 160 && this.y === 224 && this.direction === Direction.LEFT) {
         this.move_animation = this.animations.down;
         this.direction = Direction.DOWN;
     }
-    this.changeCoordinates();
+    this.changeCoordinates(0, 0, 0.25, 0.25);
+    
 }
 
 Tile = function (id, passable, selectable) {
@@ -523,7 +537,8 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
 
-Environment = function () {
+Environment = function (game) {
+    this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 15, 17, 15, 0, 17, 0, 94, 0, 94, 94, 0, 94, 94, 94, 94, 62, 64, 3, 4, 3, 4, 62],
                 [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 18, 16, 18, 15, 16, 94, 95, 94, 95, 95, 94, 95, 95, 95, 95, 3, 4, 5, 6, 5, 6, 63],
@@ -549,8 +564,18 @@ Environment = function () {
                 [90, 91, 36, 36, 95, 95, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 64, 5, 6, 28, 0, 20, 3, 4, 62, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
                 [92, 93, 90, 91, 94, 94, 94, 94, 94, 3, 4, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 3, 4, 28, 28, 29, 28, 19, 5, 6, 3, 4, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 95, 95, 95, 95, 5, 6, 5, 6, 64, 37, 38, 62, 62, 19, 62, 65, 5, 6, 29, 29, 0, 29, 62, 37, 38, 5, 6, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
+<<<<<<< HEAD
                ];
+=======
+    ];
+>>>>>>> origin/gh-pages
     this.tileSheet = new Tilesheet("./imgs/tiles.png", 32, 26);
+    var firesheet1 = ASSET_MANAGER.getAsset("./imgs/fire.png");
+    var firesheet2 = ASSET_MANAGER.getAsset("./imgs/fire2.png");
+    this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.05, 9, true, false);
+    this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.05, 12, true, false);
+    this.flame1_locations = [[0,4],[1,4],[7,4],[14,4],[16,4]];
+    this.flame2_locations = [[2,1],[14,1],[1,2],[16,2]];
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
@@ -558,6 +583,7 @@ Environment.prototype.draw = function (context, scaleBy) {
     this.context = context; 
     var scaleBy = (scaleBy || 1);
 
+    //draw tiles
     for (var i = 0; i < this.map.length; i++) { // length of each row
         for (var j = 0; j < this.map[0].length; j++) { // length of each column
             var tile_index = this.map[i][j];
@@ -573,9 +599,24 @@ Environment.prototype.draw = function (context, scaleBy) {
                               x_start_clip, y_start_clip, // where to start clipping
                               amount_clip, amount_clip,  // how much to clip
                               x_coord, y_coord, // coordinates to start drawing to 
-                              draw_size, draw_size); // how big to draw.                          
+                              draw_size, draw_size); // how big to draw. 
         }
     }
+
+    // draw flames
+    for (var i = 0; i < this.flame1_locations.length; i++) {
+        var x = this.flame1_locations[i][0];
+        var y = this.flame1_locations[i][1];
+        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x, y);
+        
+    }
+    for (var i = 0; i < this.flame2_locations.length; i++) {
+        var x = this.flame2_locations[i][0];
+        var y = this.flame2_locations[i][1];
+        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x, y);
+        
+    }
+
 }
 
 Environment.prototype.update = function () {

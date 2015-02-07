@@ -7,6 +7,8 @@ ASSET_MANAGER.queueDownload("./imgs/npc-female.png");
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/tiles.png");
+ASSET_MANAGER.queueDownload("./imgs/fire.png");
+ASSET_MANAGER.queueDownload("./imgs/fire2.png");
 
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
