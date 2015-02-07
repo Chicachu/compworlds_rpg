@@ -239,25 +239,29 @@ Entity.prototype.changeLocation = function () {
   
     if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
-        switch (this.direction) {
-            case Direction.DOWN:
-                this.y += 2;
-                break;
-            case Direction.UP:
-                this.y -= 2;
-                break;
-            case Direction.LEFT:
-                this.x -= 2;
-                break;
-            case Direction.RIGHT:
-                this.x += 2;
-                break;
-        }
+        this.changeCoordinates();
     } else {
         this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
     }
     
+}
+
+Entity.prototype.changeCoordinates = function () {
+    switch (this.direction) {
+        case Direction.DOWN:
+            this.y += 0.5;
+            break;
+        case Direction.UP:
+            this.y -= 0.5;
+            break;
+        case Direction.LEFT:
+            this.x -= 0.5;
+            break;
+        case Direction.RIGHT:
+            this.x += 0.5;
+            break;
+    }
 }
 
 /* Returns the last frame of the last animation used, this is used to show the character stopped but still in the last position of the last
@@ -459,10 +463,10 @@ NPC = function (game) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     this.animations = {
-        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
-        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
-        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
+        down: new Animation(this.spriteSheet, 0, 6, 64, 64, 0.05, 8, true, false),
+        up: new Animation(this.spriteSheet, 0, 4, 64, 64, 0.05, 8, true, false),
+        left: new Animation(this.spriteSheet, 0, 5, 64, 64, 0.05, 8, true, false),
+        right: new Animation(this.spriteSheet, 0, 7, 64, 64, 0.05, 8, true, false)
     }
     this.x = 10;
     this.y = 10;
@@ -473,15 +477,30 @@ NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
 NPC.prototype.draw = function (context) {
-    if (this.game.is_battle) {
-        //do nothing? (un-draw npc?)
+    if (!this.game.is_battle) {
+        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
-    else {
-        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
-    }}
+}
 
 NPC.prototype.update = function () {
-
+    if (this.x === 10 && this.y === 75) {
+        // change right
+        this.move_animation = this.animations.right;
+        this.direction = Direction.RIGHT; 
+    } else if (this.x === 95 && this.y === 75) {
+        // change up
+        this.move_animation = this.animations.up;
+        this.direction = Direction.UP;
+    } else if (this.x === 95 && this.y === 10) {
+        // change left
+        this.move_animation = this.animations.left;
+        this.direction = Direction.LEFT;
+    } else if (this.x === 10 && this.y === 10) {
+        // change down
+        this.move_animation = this.animations.down;
+        this.direction = Direction.DOWN;
+    }
+    this.changeCoordinates();
 }
 
 Tile = function (id, passable, selectable) {
