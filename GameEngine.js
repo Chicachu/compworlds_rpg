@@ -82,7 +82,7 @@ GameEngine.prototype.init = function (context) {
     this.startInput();
     this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
-    this.environment = new Environment();
+    this.environment = new Environment(this);
 }
 
 GameEngine.prototype.startInput = function () {
@@ -243,7 +243,7 @@ Entity.prototype.changeLocation = function () {
   
     if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
-        this.changeCoordinates(.25, .25, .25, .25);
+        this.changeCoordinates(.5, .5, .5, .5);
     } else {
         this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
@@ -537,7 +537,8 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
 
-Environment = function () {
+Environment = function (game) {
+    this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 15, 17, 15, 0, 17, 0, 94, 0, 94, 94, 0, 94, 94, 94, 94, 62, 64, 3, 4, 3, 4, 62],
                 [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 18, 16, 18, 15, 16, 94, 95, 94, 95, 95, 94, 95, 95, 95, 95, 3, 4, 5, 6, 5, 6, 63],
@@ -565,6 +566,12 @@ Environment = function () {
                 [0, 0, 92, 93, 95, 95, 95, 95, 95, 5, 6, 5, 6, 64, 37, 38, 62, 62, 19, 62, 65, 5, 6, 29, 29, 0, 29, 62, 37, 38, 5, 6, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
     ];
     this.tileSheet = new Tilesheet("./imgs/tiles.png", 32, 26);
+    var firesheet1 = ASSET_MANAGER.getAsset("./imgs/fire.png");
+    var firesheet2 = ASSET_MANAGER.getAsset("./imgs/fire2.png");
+    this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.05, 9, true, false);
+    this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.05, 12, true, false);
+    this.flame1_locations = [[0,4],[1,4],[7,4],[14,4],[16,4]];
+    this.flame2_locations = [[2,1],[14,1],[1,2],[16,2]];
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
@@ -572,6 +579,7 @@ Environment.prototype.draw = function (context, scaleBy) {
     this.context = context; 
     var scaleBy = (scaleBy || 1);
 
+    //draw tiles
     for (var i = 0; i < this.map.length; i++) { // length of each row
         for (var j = 0; j < this.map[0].length; j++) { // length of each column
             var tile_index = this.map[i][j];
@@ -587,9 +595,24 @@ Environment.prototype.draw = function (context, scaleBy) {
                               x_start_clip, y_start_clip, // where to start clipping
                               amount_clip, amount_clip,  // how much to clip
                               x_coord, y_coord, // coordinates to start drawing to 
-                              draw_size, draw_size); // how big to draw.                          
+                              draw_size, draw_size); // how big to draw. 
         }
     }
+
+    // draw flames
+    for (var i = 0; i < this.flame1_locations.length; i++) {
+        var x = this.flame1_locations[i][0];
+        var y = this.flame1_locations[i][1];
+        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x, y);
+        
+    }
+    for (var i = 0; i < this.flame2_locations.length; i++) {
+        var x = this.flame2_locations[i][0];
+        var y = this.flame2_locations[i][1];
+        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x, y);
+        
+    }
+
 }
 
 Environment.prototype.update = function () {
