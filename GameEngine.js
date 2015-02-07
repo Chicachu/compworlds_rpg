@@ -268,6 +268,17 @@ Entity.prototype.reset = function () {
 
 }
 
+<<<<<<< HEAD
+=======
+Entity.prototype.fight = function (vs_player) {
+    this.fight_animation = this.animations.destroy;
+    this.attack_anim = true;
+    vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
+    vs_player.fight_animation = vs_player.animations.hit;
+
+    vs_player.attack_anim = true;
+}
+>>>>>>> origin/origin
 
 Statistics = function (health, attack, defense) {
     this.health = health;
