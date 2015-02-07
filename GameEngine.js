@@ -88,11 +88,11 @@ GameEngine.prototype.init = function (context) {
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    document.addEventListener('keypress' ) = function (e) {
+    document.addEventListener('keypress', function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
         }
-
+    });
     document.addEventListener('keydown', function (e) {
         if (e.which === 37
                    || e.which === 38
@@ -386,7 +386,7 @@ Hero.prototype.update = function () {
     this.game.queueAction(this, this.game.entities[1]);
     this.game.battleOver();
     
-
+    this.checkBoundaries();
     
 }
 
@@ -418,10 +418,12 @@ Hero.prototype.checkBoundaries = function () {
         }
     } else if (this.boundaryUp) {
         if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 1 && !this.game.map.curr_quadrant === 2) {
-            this.game.map.curr_quadrant += 1;
+            this.game.map.curr_quadrant -= 3;
         }
     } else if (this.boundaryDown) {
-
+        if (!this.game.map.curr_quadrant === 3 && !this.game.map.curr_quadrant === 4 && !this.game.map.curr_quadrant === 5) {
+            this.game.map.curr_quadrant += 3;
+        }
     }
 }
 
