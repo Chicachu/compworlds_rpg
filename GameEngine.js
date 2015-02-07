@@ -153,19 +153,21 @@ GameEngine.prototype.setBattle = function (player, foe) {
     foe.x = 100;
     foe.y = 250;
     this.menu.showMenu(true);
+    player.fight_animation = player.stopAnimation(fight_animation);
+    foe.fight_animation = foe.stopAnimation(fight_animation);
 }
 
 GameEngine.prototype.battleOver = function ()
 {
     if(this.is_battle)
     {
-        if(this.entities[0].stats.health <= 0)
+        if (this.entities[0].stats.health <= 0 && this.entities[0].fight_animation.looped && this.entities[1].fight_animation.looped)
         {
             this.is_battle = false;
             this.drawBackground("./imgs/desert.png");
             this.entities[0].stats.health = 50;
         }
-        else if(this.entities[1].stats.health <= 0)
+        else if (this.entities[1].stats.health <= 0 && this.entities[1].fight_animation.looped && this.entities[0].fight_animation.looped)
         {
             this.entities[1].stats.health = 1000;
             this.is_battle = false;
@@ -345,7 +347,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 999)
+    if (Math.round(Math.random() * 1000) >= 500)
     {
         return true;
     }
