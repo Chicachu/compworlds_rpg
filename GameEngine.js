@@ -88,10 +88,13 @@ GameEngine.prototype.init = function (context) {
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keypress' ) = function (e) {
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
-        } else if (e.which === 37
+        }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.which === 37
                    || e.which === 38
                    || e.which === 39
                    || e.which === 40) {
@@ -383,7 +386,43 @@ Hero.prototype.update = function () {
     this.game.queueAction(this, this.game.entities[1]);
     this.game.battleOver();
     
+
     
+}
+
+// Boundary detection
+Hero.prototype.boundaryRight = function () {
+    return this.x > this.game.context.canvas.width;
+}
+
+Hero.prototype.boundaryLeft = function () {
+    return this.x < 0; 
+}
+
+Hero.prototype.boundaryUp = function () {
+    return this.y < 0; 
+}
+
+Hero.prototype.boundaryDown = function () {
+    return this.y > this.game.context.canvas.height; 
+}
+
+Hero.prototype.checkBoundaries = function () {
+    if (this.boundaryRight) {
+        if (!this.game.map.curr_quadrant === 2 && !this.game.map.curr_quadrant === 5) {
+            this.game.map.curr_quadrant += 1;
+        }
+    } else if (this.boundaryLeft) {
+        if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 3) {
+            this.game.map.curr_quadrant -= 1;
+        }
+    } else if (this.boundaryUp) {
+        if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 1 && !this.game.map.curr_quadrant === 2) {
+            this.game.map.curr_quadrant += 1;
+        }
+    } else if (this.boundaryDown) {
+
+    }
 }
 
 Warrior = function (game, stats) {
@@ -399,7 +438,6 @@ Warrior = function (game, stats) {
     };
     this.x = 10;
     this.y = 224;
-    //var stats = new Statistics(50, 20, 10);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
@@ -487,23 +525,6 @@ NPC.prototype.draw = function (context) {
 }
 
 NPC.prototype.update = function () {
-    //if (this.x === 10 && this.y === 75) {
-    //    // change right
-    //    this.move_animation = this.animations.right;
-    //    this.direction = Direction.RIGHT; 
-    //} else if (this.x === 95 && this.y === 75) {
-    //    // change up
-    //    this.move_animation = this.animations.up;
-    //    this.direction = Direction.UP;
-    //} else if (this.x === 95 && this.y === 10) {
-    //    // change left
-    //    this.move_animation = this.animations.left;
-    //    this.direction = Direction.LEFT;
-    //} else if (this.x === 10 && this.y === 10) {
-    //    // change down
-    //    this.move_animation = this.animations.down;
-    //    this.direction = Direction.DOWN;
-    //}
     if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
         this.move_animation = this.animations.right;
         this.direction = Direction.RIGHT;
@@ -573,7 +594,9 @@ Environment = function (game) {
     this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.5, 9, true, false);
     this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.5, 4, true, false);
     this.flame1_locations = [[0,3],[1,3],[7,3],[14,3],[16,3]];
-    this.flame2_locations = [[2,1],[14,1],[1,2],[16,2]];
+    this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2]];
+    this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
+    this.curr_quadrant = 0;
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
@@ -582,15 +605,15 @@ Environment.prototype.draw = function (context, scaleBy) {
     var scaleBy = (scaleBy || 1);
 
     //draw tiles
-    for (var i = 0; i < this.map.length; i++) { // length of each row
-        for (var j = 0; j < this.map[0].length; j++) { // length of each column
+    for (var i = this.quadrants[this.curr_quadrant][1]; i <= this.quadrants[this.curr_quadrant][3]; i++) { // length of each row
+        for (var j = this.quadrants[this.curr_quadrant][0]; j <= this.quadrants[this.curr_quadrant][2]; j++) { // length of each column
             var tile_index = this.map[i][j];
 
             var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
             var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
             var amount_clip = this.tileSheet.tileSize;
-            var x_coord = this.tileSheet.tileSize * j;
-            var y_coord = this.tileSheet.tileSize * i;
+            var x_coord = (this.tileSheet.tileSize * j) - (this.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
+            var y_coord = (this.tileSheet.tileSize * i) - (this.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
             var draw_size = this.tileSheet.tileSize * scaleBy;
 
             this.context.drawImage(this.tileSheet.sheet,
