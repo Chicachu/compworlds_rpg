@@ -70,7 +70,8 @@ GameEngine = function () {
     this.space = null;
     this.curr_background = null;
     this.is_battle = false;
-    this.menu = null; 
+    this.menu = null;
+    this.environment = null; 
 }
 
 GameEngine.prototype.init = function (context) {
@@ -81,6 +82,7 @@ GameEngine.prototype.init = function (context) {
     this.startInput();
     this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
+    this.environment = new Environment();
 }
 
 GameEngine.prototype.startInput = function () {
@@ -119,9 +121,11 @@ GameEngine.prototype.addEntity = function (entity) {
 GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     this.context.save();
-    if (this.curr_background)
+    if (this.curr_background && this.is_battle)
     {
         this.context.drawImage(this.curr_background, 0, 0);
+    } else {
+        this.environment.draw(this.context, 1);
     }
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.context); 
@@ -250,16 +254,16 @@ Entity.prototype.changeLocation = function () {
 Entity.prototype.changeCoordinates = function () {
     switch (this.direction) {
         case Direction.DOWN:
-            this.y += 0.5;
+            this.y += 0.25;
             break;
         case Direction.UP:
-            this.y -= 0.5;
+            this.y -= 0.25;
             break;
         case Direction.LEFT:
-            this.x -= 0.5;
+            this.x -= 0.25;
             break;
         case Direction.RIGHT:
-            this.x += 0.5;
+            this.x += 0.25;
             break;
     }
 }
@@ -351,7 +355,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 500)
+    if (Math.round(Math.random() * 1000) >= 999)
     {
         return true;
     }
@@ -519,33 +523,44 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
 
-Background = function () {
+Environment = function () {
     // "Map" will be a double array of integer values. 
-    this.map = [[],
-                [],
-                [],
-                []]; 
-    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
+    this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 15, 17, 15, 0, 17, 0, 94, 0, 94, 94, 0, 94, 94, 94, 94, 62, 64, 3, 4, 3, 4, 62],
+                [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 18, 16, 18, 15, 16, 94, 95, 94, 95, 95, 94, 95, 95, 95, 95, 3, 4, 5, 6, 5, 6, 63],
+                [70, 71, 72, 95, 90, 91, 95, 70, 71, 72, 95, 90, 91, 95, 70, 71, 72, 94, 92, 93, 15, 17, 15, 18, 17, 95, 94, 95, 94, 0, 95, 3, 4, 3, 4, 5, 6, 28, 37, 38, 62, 20],
+                [73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 95, 0, 94, 18, 16, 18, 15, 16, 94, 95, 0, 95, 3, 4, 5, 6, 5, 6, 28, 28, 29, 3, 4, 0, 19],
+                [76, 76, 78, 95, 90, 91, 95, 76, 78, 76, 95, 90, 91, 95, 76, 78, 76, 0, 94, 95, 94, 1, 94, 18, 94, 95, 94, 94, 0, 5, 6, 28, 28, 63, 28, 29, 29, 0, 5, 6, 3, 4],
+                [77, 77, 79, 85, 92, 93, 85, 77, 79, 77, 87, 92, 93, 87, 77, 79, 77, 94, 95, 94, 95, 2, 95, 94, 95, 94, 95, 95, 3, 4, 28, 29, 29, 20, 29, 28, 3, 4, 3, 4, 5, 6],
+                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 95, 0, 95, 94, 94, 0, 95, 94, 95, 94, 0, 5, 6, 29, 28, 0, 19, 28, 29, 5, 6, 5, 6, 62, 64]];
+    this.tileSheet = new Tilesheet("./imgs/tiles.png", 32, 26);
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
-Background.prototype.draw = function (context, scaleBy) {
+Environment.prototype.draw = function (context, scaleBy) {
+    this.context = context; 
     var scaleBy = (scaleBy || 1);
 
-    for (var i = 0; i < this.map[0].length; i++) { // length of each row
-        for (var j = 0; j < this.map.length; j++) { // length of each column
+    for (var i = 0; i < this.map.length; i++) { // length of each row
+        for (var j = 0; j < this.map[0].length; j++) { // length of each column
             var tile_index = this.map[i][j];
 
-            context.drawImage(this.tileSheet,
-                              tile_index % this.tileSheet.sheetWidth, tile_index / this.tileSheet.sheetWidth, // where to start clipping
-                              this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
-                              this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
-                              this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
+            var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
+            var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
+            var amount_clip = this.tileSheet.tileSize;
+            var x_coord = this.tileSheet.tileSize * j;
+            var y_coord = this.tileSheet.tileSize * i;
+            var draw_size = this.tileSheet.tileSize * scaleBy;
+
+            this.context.drawImage(this.tileSheet.sheet,
+                              x_start_clip, y_start_clip, // where to start clipping
+                              amount_clip, amount_clip,  // how much to clip
+                              x_coord, y_coord, // coordinates to start drawing to 
+                              draw_size, draw_size); // how big to draw.                          
         }
     }
 }
 
-Background.prototype.update = function () {
+Environment.prototype.update = function () {
 
 }
 
