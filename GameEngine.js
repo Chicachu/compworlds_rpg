@@ -264,7 +264,7 @@ Entity.prototype.fight = function (vs_player) {
     vs_player.stats.health = vs_player.stats.health - ((this.stats.attack / vs_player.stats.defense) * (Math.random() * 10));
     vs_player.fight_animation = vs_player.animations.hit;
 
-    //vs_player.attack_anim = true;
+    vs_player.attack_anim = true;
 }
 
 Statistics = function (health, attack, defense) {
