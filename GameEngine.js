@@ -467,10 +467,10 @@ NPC = function (game) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     this.animations = {
-        down: new Animation(this.spriteSheet, 0, 6, 64, 64, 0.05, 8, true, false),
-        up: new Animation(this.spriteSheet, 0, 4, 64, 64, 0.05, 8, true, false),
-        left: new Animation(this.spriteSheet, 0, 5, 64, 64, 0.05, 8, true, false),
-        right: new Animation(this.spriteSheet, 0, 7, 64, 64, 0.05, 8, true, false)
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
     }
     this.x = 10;
     this.y = 10;
