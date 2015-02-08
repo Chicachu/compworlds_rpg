@@ -87,7 +87,31 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
 }
+    GameEngine.prototype.startInput = function () {
+        var that = this;
 
+GameEngine.prototype.startInput = function () {
+    var that = this;
+    
+    document.addEventListener('keydown', function (e) {
+
+        this.context.canvas.addEventListener('keydown', function (e) {
+           
+            if (String.fromCharCode(e.which) === ' ') {
+                that.space = true;
+            } else if (e.which === 37
+                       || e.which === 38
+                       || e.which === 39
+                       || e.which === 40) {
+                that.key = e.which;
+            }
+            e.preventDefault();
+        }, false);
+
+        this.context.canvas.addEventListener('keyup', function (e) {
+            that.key = 0;
+            that.space = 0;
+        }, false);
 
     GameEngine.prototype.start = function () {
 
@@ -124,8 +148,6 @@ GameEngine.prototype.init = function (context) {
                 }
                 this.context.restore();
             });
-        }
-    }
 
     GameEngine.prototype.update = function () {
         for (var i = 0; i < this.entities.length; i++) {
