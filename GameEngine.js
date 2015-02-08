@@ -35,13 +35,14 @@ Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
     } else if (this.isDone()) {
         return; 
     }
-    var index = 0;
+    var index = 5;
     var that = this;
     if (this.reverse) {
         index = that.frames - that.currentFrame() - 1; 
     } else {
         index = that.currentFrame();
     }
+    
 
     var locX = x;
     var locY = y;
@@ -237,23 +238,17 @@ GameEngine.prototype.fight = function (player, foe) {
 }
 
 GameEngine.prototype.queueAction = function (player, foe) {
-    if (player.fight_animation.looped) {
-        player.attack_anim = false;
-        player.fight_animation.looped = false;
-        foe.attack_anim = true;
+    if (this.is_battle) {
+        if (player.fight_animation.looped) {
+            player.attack_anim = false;
+            player.fight_animation.looped = false;
+            foe.attack_anim = true;
+        }
+        if (foe.fight_animation.looped && !this.battleOver(this, [player, foe])) {
+            foe.fight_animation.looped = false;
+            foe.attack_anim = false;
+        } 
     }
-    if (foe.fight_animation.looped && !this.battleOver(this, [player, foe])) {
-        foe.fight_animation.looped = false;
-        foe.attack_anim = false;
-        }
-        else if(foe.fight_animation.looped && this.battleOver(this, [player, foe]))
-            {
-            //foe.fight_animation.looped = false;
-            //foe.stop_move_animation = foe.stopAnimation(foe.death_animation);
-            //foe.fight_animation = foe.stopAnimation(foe.death_animation);
-            foe.stop_move_animation = foe.death_animation;
-            foe.fight_animation = foe.death_animation;
-        }
 }
 
 Timer = function () {
@@ -549,12 +544,15 @@ Enemy = function (game, stats) {
         left: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
         destroy: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
-        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.07, 5, true, false)
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.07, 5, true, false),
+        // TODO: Move stop_move_animation and death_animation to here and fight animations
     };
 
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
     this.stop_move_animation = this.stopAnimation(this.animations.right);
     this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .1, 1, true, false);
+    this.death_animation.elapsedTime = .5;
+    this.death_animation.totalTime = 2;
     this.direction = Direction.RIGHT;
 }
 
@@ -562,19 +560,22 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-    if (this.game.is_battle && this.attack_anim) {
-        this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-    }
-    else if (this.game.is_battle) {
-        this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    if (this.game.is_battle) {
+        if (this.attack_anim) {
+            this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        } else if (this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
+            this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        } else {
+            this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        }
     }
 }
 
 Enemy.prototype.update = function() {
     if (this.attack_anim && this.fight_animation.looped) {
-        this.fight_animation.looped = false;
+       // this.fight_animation.looped = false;
         this.attack_anim = false;
-        }
+    }
 }
 
 
