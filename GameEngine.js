@@ -71,7 +71,10 @@ GameEngine = function () {
     this.curr_background = null;
     this.is_battle = false;
     this.menu = null;
-    this.environment = null; 
+    this.ga = 1.0;
+    this.timerId = null;
+    this.timerId2 = null;
+    this.environment = null;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -84,34 +87,35 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
 }
-
 GameEngine.prototype.startInput = function () {
     var that = this;
 
-    document.addEventListener('keydown', function (e) {
+    this.context.canvas.addEventListener('keydown', function (e) {
+           
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
         } else if (e.which === 37
-                   || e.which === 38
-                   || e.which === 39
-                   || e.which === 40) {
-            that.key = e.which; 
+                    || e.which === 38
+                    || e.which === 39
+                    || e.which === 40) {
+            that.key = e.which;
         }
         e.preventDefault();
     }, false);
 
-    document.addEventListener('keyup', function (e) {
+    this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
     }, false);
 }
 
 GameEngine.prototype.start = function () {
+
     var that = this;
     (gameLoop = function () {
         that.loop();
         requestAnimationFrame(gameLoop, that.context.canvas);
-    })(); 
+    })();
 }
 
 GameEngine.prototype.addEntity = function (entity) {
@@ -121,85 +125,119 @@ GameEngine.prototype.addEntity = function (entity) {
 GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     this.context.save();
-    if (this.curr_background && this.is_battle)
-    {
+    if (this.curr_background && this.is_battle) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
         this.environment.draw(this.context, 1);
     }
     for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].draw(this.context); 
+        this.entities[i].draw(this.context);
     }
     if (drawCallBack) {
-        drawCallBack(this); 
+        drawCallBack(this);
     }
     this.context.restore();
 }
 
 GameEngine.prototype.update = function () {
     for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].update();         
+        this.entities[i].update();
     }
 }
- 
+
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
-    this.draw(); 
+    this.draw();
 }
 
-GameEngine.prototype.setBattle = function (player, foe) {
-    this.is_battle = true;
-    this.drawBackground("./imgs/woods.png");
-    player.x = 300;
-    player.y = 250;
-    player.direction = Direction.LEFT;
-    foe.x = 50;
-    foe.y = 250;
-    this.menu.showMenu(true);
-    player.attack_anim = false;
-    player.fight_animation.looped = false;
-    foe.attack_anim = false;
-    foe.fight_animation.looped = false;
-}
-
-GameEngine.prototype.battleOver = function ()
-{
-    if(this.is_battle)
-    {
-        if ((this.entities[0].stats.health <= 0 || this.entities[1].stats.health <= 0))
-        {
-            this.is_battle = false;
-            this.drawBackground("./imgs/desert.png");
-            this.entities[0].stats.health = 50;
-            this.entities[1].stats.health = 2000;
-            this.menu.showMenu(false);
+GameEngine.prototype.fadeOut = function (player, callback) {
+    var that = this;
+    this.timerId = setInterval(function () {
+        that.context.globalAlpha -= .05;
+        if (that.context.globalAlpha < .05) {
+            that.context.globalAlpha = 0;
+            clearInterval(that.timerId);
+            callback(that, [player, that.entities[1]]);
+            that.fadeIn(that);
         }
+    }, 50);
+}
+GameEngine.prototype.fadeIn = function (game) {
+    var that = game;
+    this.timerId2 = setInterval(function () {
+        that.context.globalAlpha += .05;
+        // console.log(that.context.globalAlpha);
+        if (that.context.globalAlpha > .95) {
+            that.context.globalAlpha = 1;
+            clearInterval(that.timerId2);
+        }
+    }, 50);
+}
+
+GameEngine.prototype.setBattle = function (game, players) {
+
+    players[0].game.is_battle = true;
+    game.drawBackground("./imgs/woods.png");
+    players[0].save_x = players[0].x;
+    players[0].save_y = players[0].y;
+    players[0].x = 300;
+    players[0].y = 250;
+    players[0].direction = Direction.LEFT;
+    players[1].x = 50;
+    players[1].y = 250;
+    game.menu.showMenu(true);
+    for (var i = 0; i < players.length; i++)
+    {
+        players[i].attack_anim = false;
+        players[i].fight_animation.looped = false;
+    }
+}
+    
+GameEngine.prototype.resetBattle = function (game, players)
+{
+    players[0].lock_coords = false;
+    game.is_battle = false;
+    game.drawBackground("./imgs/desert.png");
+    players[0].stats.health = 2000;
+    players[1].stats.health = 2000;
+    game.menu.showMenu(false);
+    players[0].x = players[0].save_x;
+    players[0].y = players[0].save_y;
+}
+GameEngine.prototype.battleOver = function (game, players) {
+    if (game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0)) {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
-GameEngine.prototype.fight = function(player, foe)
-{
+GameEngine.prototype.fight = function (player, foe) {
     player.fight_animation = player.animations.destroy;
     player.attack_anim = true;
+    foe.fight_animation = foe.animations.hit;
     foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
-GameEngine.prototype.queueAction = function(player, foe)
-{
-    if(player.fight_animation.looped)
-    {
+GameEngine.prototype.queueAction = function (player, foe) {
+    if (player.fight_animation.looped) {
         player.attack_anim = false;
         player.fight_animation.looped = false;
-        foe.fight_animation = foe.animations.hit;
         foe.attack_anim = true;
+    }
+    if (foe.fight_animation.looped) {
+        foe.fight_animation.looped = false;
+        foe.attack_anim = false;
     }
 }
 
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
-    this.lastTimeStep = 0; 
+    this.lastTimeStep = 0;
 }
 
 Timer.prototype.tick = function () {
@@ -208,7 +246,7 @@ Timer.prototype.tick = function () {
     this.lastTimeStep = wallCurrent;
 
     var gameDelta = Math.min(wallDelta, this.maxStep);
-    this.gameTime += gameDelta; 
+    this.gameTime += gameDelta;
     return gameDelta;
 }
 
@@ -221,15 +259,18 @@ var Direction = {
 Object.freeze(Direction);
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */
-Entity = function (game, x, y, spriteSheet, animations, stats) { 
+Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.game = game;
     this.x = x;
-    this.y = y; 
+    this.y = y;
+    this.save_x = x;
+    this.save_y = y;
     this.direction = Direction.DOWN;
     this.moving = false;
     this.spriteSheet = spriteSheet;
     this.stats = stats;
     this.attack_anim = false;
+    this.lock_coords = false;
     if (animations) {
         this.animations = animations;
         this.move_animation = this.animations.down;
@@ -239,16 +280,16 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 }
 
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
-Entity.prototype.changeLocation = function () { 
-  
-    if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
+Entity.prototype.changeLocation = function () {
+
+    if (this.game.key !== 0 && this.game.key !== null && !this.lock_coords) {
         this.moving = true;
         this.changeCoordinates(.5, .5, .5, .5);
     } else {
         this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
     }
-    
+
 }
 
 Entity.prototype.changeCoordinates = function (down, up, left, right) {
@@ -296,6 +337,8 @@ Statistics = function (health, attack, defense) {
 /* HERO and subclasses */
 Hero = function (game, x, y, spriteSheet, animations, stats) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
+    this.width = 43;
+    this.height = 64; 
 }
 
 Hero.prototype = new Entity();
@@ -355,35 +398,105 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
+<<<<<<< HEAD
     if (Math.round(Math.random() * 10000) >= 9999)
     {
+=======
+    if (Math.round(Math.random() * 1000) >= 999) {
+>>>>>>> origin/origin
         return true;
     }
-    else
-    {
+    else {
         return false;
     }
 }
 
 Hero.prototype.update = function () {
-    if (this.attack_anim && this.fight_animation.looped) {
-        //this.fight_animation.looped = false;
-        this.attack_anim = false;
-    }
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
     if (this.checkSurroundings() && this.moving) {
-        this.game.setBattle(this, this.game.entities[1]); 
+        this.lock_coords = true;
+        this.game.fadeOut(this, this.game.setBattle);
     }
     if (this.game.space) {
-        //console.log(this.game.entities[1].stats.health);
-        this.game.fight(this, this.game.entities[1]);
+        this.game.fight(this.game.entities[1], this);
+        if (this.game.battleOver(this.game, [this, this.game.entities[1]])) {
+
+            this.game.resetBattle(this.game, [this, this.game.entities[0]]);
+        }
     }
-    this.game.queueAction(this, this.game.entities[1]);
-    this.game.battleOver();
-    
-    
+        
+    this.game.queueAction(this.game.entities[1], this);
+    this.checkBoundaries();
+
+}
+
+Hero.prototype.changeCoordinates = function (down, up, left, right) {
+    switch (this.direction) {
+        case Direction.DOWN:
+            if (!this.boundaryDown()) {
+                this.y += down;
+            }
+            break;
+        case Direction.UP:
+            if (!this.boundaryUp()) {
+                this.y -= up;
+            }
+            break;
+        case Direction.LEFT:
+            if (!this.boundaryLeft()) {
+                this.x -= left;
+            }
+            break;
+        case Direction.RIGHT:
+            if (!this.boundaryRight()) {
+                this.x += right;
+            }
+            break;
+    }
+}
+
+// Boundary detection
+Hero.prototype.boundaryRight = function () {
+    return this.x + this.width > this.game.context.canvas.width;
+}
+
+Hero.prototype.boundaryLeft = function () {
+    return this.x + 20 < 0;
+}
+
+Hero.prototype.boundaryUp = function () {
+    return this.y + 12 < 0;
+}
+
+Hero.prototype.boundaryDown = function () {
+    return this.y + this.height > this.game.context.canvas.height;
+}
+
+Hero.prototype.checkBoundaries = function () {
+    var quadrant = this.game.environment.curr_quadrant;
+    if (this.boundaryRight()) {
+        if (quadrant !== 2 && quadrant !== 5) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
+            this.x -= 12 * 32; 
+        }
+    }  else if (this.boundaryLeft()) {
+        if (quadrant !== 0 && quadrant !== 3) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
+            this.x += 12 * 32; 
+        }
+    } else if (this.boundaryUp()) {
+        if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
+            this.y += 12 * 32; 
+        }
+    } else if (this.boundaryDown()) {
+        if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
+            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
+            this.y -= 12 * 32; 
+        }
+    }
 }
 
 Warrior = function (game, stats) {
@@ -395,7 +508,7 @@ Warrior = function (game, stats) {
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
         destroy: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
-        hit: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.05, 12, true, false)
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false)
     };
     this.x = 10;
     this.y = 224;
@@ -428,7 +541,7 @@ Enemy = function (game, stats) {
         destroy: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.07, 5, true, false)
     };
-    
+
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
     this.stop_move_animation = this.stopAnimation(this.animations.right);
     this.direction = Direction.RIGHT;
@@ -441,25 +554,21 @@ Enemy.prototype.draw = function (context) {
     if (this.game.is_battle && this.attack_anim) {
         this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
-    else if (this.game.is_battle)
-    {
+    else if (this.game.is_battle) {
         this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
 }
 
-Enemy.prototype.update = function ()
-{
-    if(this.attack_anim && this.fight_animation.looped)
-    {
+Enemy.prototype.update = function () {
+    if (this.attack_anim && this.fight_animation.looped) {
         this.fight_animation.looped = false;
         this.attack_anim = false;
     }
 }
 
 
-Enemy.prototype.hit = function ()
-{
-    
+Enemy.prototype.hit = function () {
+
 }
 
 /* NPC */
@@ -481,29 +590,12 @@ NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
 NPC.prototype.draw = function (context) {
-    if (!this.game.is_battle) {
+    if (!this.game.is_battle && this.game.environment.curr_quadrant === 0) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
 NPC.prototype.update = function () {
-    //if (this.x === 10 && this.y === 75) {
-    //    // change right
-    //    this.move_animation = this.animations.right;
-    //    this.direction = Direction.RIGHT; 
-    //} else if (this.x === 95 && this.y === 75) {
-    //    // change up
-    //    this.move_animation = this.animations.up;
-    //    this.direction = Direction.UP;
-    //} else if (this.x === 95 && this.y === 10) {
-    //    // change left
-    //    this.move_animation = this.animations.left;
-    //    this.direction = Direction.LEFT;
-    //} else if (this.x === 10 && this.y === 10) {
-    //    // change down
-    //    this.move_animation = this.animations.down;
-    //    this.direction = Direction.DOWN;
-    //}
     if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
         this.move_animation = this.animations.right;
         this.direction = Direction.RIGHT;
@@ -518,7 +610,7 @@ NPC.prototype.update = function () {
         this.direction = Direction.DOWN;
     }
     this.changeCoordinates(0, 0, 0.25, 0.25);
-    
+
 }
 
 Tile = function (id, passable, selectable) {
@@ -563,34 +655,34 @@ Environment = function (game) {
                 [36, 36, 47, 48, 94, 94, 54, 55, 56, 57, 53, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 29, 3, 4, 5, 6, 37, 38, 0, 62, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
                 [90, 91, 36, 36, 95, 95, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 64, 5, 6, 28, 0, 20, 3, 4, 62, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
                 [92, 93, 90, 91, 94, 94, 94, 94, 94, 3, 4, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 3, 4, 28, 28, 29, 28, 19, 5, 6, 3, 4, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
-                [0, 0, 92, 93, 95, 95, 95, 95, 95, 5, 6, 5, 6, 64, 37, 38, 62, 62, 19, 62, 65, 5, 6, 29, 29, 0, 29, 62, 37, 38, 5, 6, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]];
-
-
-
+                [0, 0, 92, 93, 95, 95, 95, 95, 95, 5, 6, 5, 6, 64, 37, 38, 62, 62, 19, 62, 65, 5, 6, 29, 29, 0, 29, 62, 37, 38, 5, 6, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
+    ];
     this.tileSheet = new Tilesheet("./imgs/tiles.png", 32, 26);
     var firesheet1 = ASSET_MANAGER.getAsset("./imgs/fire.png");
     var firesheet2 = ASSET_MANAGER.getAsset("./imgs/fire2.png");
     this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.5, 9, true, false);
     this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.5, 4, true, false);
-    this.flame1_locations = [[0,3],[1,3],[7,3],[14,3],[16,3]];
-    this.flame2_locations = [[2,1],[14,1],[1,2],[16,2]];
+    this.flame1_locations = [[0, 4], [1, 4], [7, 4], [14, 4], [16, 4]];
+    this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2]];
+    this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
+    this.curr_quadrant = 0;
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Environment.prototype.draw = function (context, scaleBy) {
-    this.context = context; 
+    this.context = context;
     var scaleBy = (scaleBy || 1);
 
     //draw tiles
-    for (var i = 0; i < this.map.length; i++) { // length of each row
-        for (var j = 0; j < this.map[0].length; j++) { // length of each column
+    for (var i = this.quadrants[this.curr_quadrant][1]; i <= this.quadrants[this.curr_quadrant][3]; i++) { // length of each row
+        for (var j = this.quadrants[this.curr_quadrant][0]; j <= this.quadrants[this.curr_quadrant][2]; j++) { // length of each column
             var tile_index = this.map[i][j];
 
             var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
             var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
             var amount_clip = this.tileSheet.tileSize;
-            var x_coord = this.tileSheet.tileSize * j;
-            var y_coord = this.tileSheet.tileSize * i;
+            var x_coord = (this.tileSheet.tileSize * j) - (this.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
+            var y_coord = (this.tileSheet.tileSize * i) - (this.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
             var draw_size = this.tileSheet.tileSize * scaleBy;
 
             this.context.drawImage(this.tileSheet.sheet,
@@ -602,28 +694,62 @@ Environment.prototype.draw = function (context, scaleBy) {
     }
 
     // draw flames
-    for (var i = 0; i < this.flame1_locations.length; i++) {
-        var x = this.flame1_locations[i][0];
-        var y = this.flame1_locations[i][1];
-        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-        
-    }
-    for (var i = 0; i < this.flame2_locations.length; i++) {
-        var x = this.flame2_locations[i][0];
-        var y = this.flame2_locations[i][1];
-        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-        
-    }
+    if (this.curr_quadrant === 0) {
+        for (var i = 0; i < this.flame1_locations.length; i++) {
+            var x = this.flame1_locations[i][0];
+            var y = this.flame1_locations[i][1];
+            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
 
+        }
+        for (var i = 0; i < this.flame2_locations.length; i++) {
+            var x = this.flame2_locations[i][0];
+            var y = this.flame2_locations[i][1];
+            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+
+        }
+    }
 }
 
 Environment.prototype.update = function () {
 
 }
 
+Environment.prototype.setQuadrant = function (number) {
+    this.curr_quadrant = number;
+}
 
-GameEngine.prototype.drawBackground = function(img)
-{
+Background = function () {
+    // "Map" will be a double array of integer values. 
+    this.map = [[],
+                [],
+                [],
+                []];
+    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
+}
+
+/* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
+Background.prototype.draw = function (context, scaleBy) {
+    var scaleBy = (scaleBy || 1);
+
+    for (var i = 0; i < this.map[0].length; i++) { // length of each row
+        for (var j = 0; j < this.map.length; j++) { // length of each column
+            var tile_index = this.map[i][j];
+
+            context.drawImage(this.tileSheet,
+                                tile_index % this.tileSheet.sheetWidth, tile_index / this.tileSheet.sheetWidth, // where to start clipping
+                                this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
+                                this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
+                                this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
+        }
+    }
+}
+
+Background.prototype.update = function () {
+
+}
+
+
+GameEngine.prototype.drawBackground = function (img) {
     this.curr_background = ASSET_MANAGER.getAsset(img);
 }
 
@@ -638,9 +764,9 @@ BattleMenu = function (menu_element) {
 
 BattleMenu.prototype.init = function () {
     var that = this;
-    
+
     this.attack.addEventListener("focus", function () {
-        that.attack.style.color = "white"; 
+        that.attack.style.color = "white";
     });
 }
 
@@ -649,8 +775,6 @@ BattleMenu.prototype.showMenu = function (flag) {
         this.menu.style.visibility = "visible";
         window.setTimeout("this.attack.focus();", 0);
     } else {
-        this.menu.style.visibility = "hidden"; 
+        this.menu.style.visibility = "hidden";
     }
 }
-
-
