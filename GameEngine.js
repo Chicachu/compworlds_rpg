@@ -694,7 +694,7 @@ Environment.prototype.draw = function (context, scaleBy) {
         for (var i = 0; i < this.flame1_locations.length; i++) {
             var x = this.flame1_locations[i][0];
             var y = this.flame1_locations[i][1];
-            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
 
         }
         for (var i = 0; i < this.flame2_locations.length; i++) {
