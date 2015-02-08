@@ -398,12 +398,8 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-<<<<<<< HEAD
-    if (Math.round(Math.random() * 10000) >= 9999)
-    {
-=======
     if (Math.round(Math.random() * 1000) >= 999) {
->>>>>>> origin/origin
+
         return true;
     }
     else {
