@@ -561,7 +561,7 @@ Enemy.prototype.draw = function (context) {
     if (this.game.is_battle) {
         if (this.attack_anim) {
             this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        } else if (this.game.is_battle && this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
+        } else if (this.game.is_battle && this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]]) && this.fight_animation.looped) {
             this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .05, 1, true, false);
             this.death_animation.elapsedTime = .25;
             this.death_animation.totalTime = .5;
