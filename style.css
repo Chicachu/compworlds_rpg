@@ -47,3 +47,9 @@
     outline: solid 1px #d8bca1;
     pointer-events: none;
 }
+
+#instructions {
+    width: 300px;
+    text-align: center; 
+    margin: 0 auto;
+}
