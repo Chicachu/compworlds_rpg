@@ -88,6 +88,7 @@ GameEngine.prototype.init = function (context) {
     this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
     this.environment = new Environment(this);
+    this.force_no_space = false;
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
@@ -95,10 +96,11 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keydown', function (e) {
            
         if (String.fromCharCode(e.which) === ' ') {
-            if(!that.space)
+            if(!that.space && !that.force_no_space)
             {
                 that.fight(that.entities[0], that.entities[1]);
-                if(that.battleOver(that, [that.entities[0], that.entities[1]])) {
+                if (that.battleOver(that, [that.entities[0], that.entities[1]])) { 
+                    that.force_no_space = true;
                     that.timerId3 = setTimeout(function () {
                         that.fadeOut(that.entities[0], that.resetBattle);
                         clearInterval(that.timerId3);
@@ -106,7 +108,7 @@ GameEngine.prototype.startInput = function () {
                     
                 }
             }
-            that.space = true;
+        that.space = true;
         } else if (e.which === 37
                     || e.which === 38
                     || e.which === 39
@@ -142,7 +144,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     if (this.curr_background && this.is_battle) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
-        this.environment.draw(this.context, 1);
+        this.environment.draw(1);
     }
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.context);
@@ -184,6 +186,7 @@ GameEngine.prototype.fadeIn = function (game) {
         that.context.globalAlpha += .05;
         // console.log(that.context.globalAlpha);
         if (that.context.globalAlpha > .95) {
+            that.force_no_space = false; 
             that.context.globalAlpha = 1;
             clearInterval(that.timerId2);
         }
@@ -221,13 +224,7 @@ GameEngine.prototype.resetBattle = function (game, players)
     players[0].y = players[0].save_y;
 }
 GameEngine.prototype.battleOver = function (game, players) {
-    if (game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0)) {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0);
 }
 
 GameEngine.prototype.fight = function (player, foe) {
@@ -299,7 +296,6 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () {
-
     if (this.game.key !== 0 && this.game.key !== null && !this.lock_coords) {
         this.moving = true;
         this.changeCoordinates(.5, .5, .5, .5);
@@ -307,7 +303,6 @@ Entity.prototype.changeLocation = function () {
         this.moving = false;
         this.stop_move_animation = this.stopAnimation(this.move_animation);
     }
-
 }
 
 Entity.prototype.changeCoordinates = function (down, up, left, right) {
@@ -332,6 +327,7 @@ Entity.prototype.changeCoordinates = function (down, up, left, right) {
 Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
+
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
 }
@@ -550,24 +546,31 @@ Enemy = function (game, stats) {
 
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
     this.stop_move_animation = this.stopAnimation(this.animations.right);
-    this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .1, 1, true, false);
-    this.death_animation.elapsedTime = .5;
-    this.death_animation.totalTime = 2;
+    
     this.direction = Direction.RIGHT;
+    this.done_as_all_hell = false;
 }
 
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
+    //if (this.game.is_battle && this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
+    //    this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    //} else 
     if (this.game.is_battle) {
         if (this.attack_anim) {
             this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        } else if (this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
+        } else if (this.game.is_battle && this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
+            this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .05, 1, true, false);
+            this.death_animation.elapsedTime = .25;
+            this.death_animation.totalTime = .5;
             this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        } else {
+        } else  {
             this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        }
+        } //else if (this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
+        //    this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        //}
     }
 }
 
@@ -681,10 +684,16 @@ Environment = function (game) {
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
-Environment.prototype.draw = function (context, scaleBy) {
-    this.context = context;
+Environment.prototype.draw = function (scaleBy) {
+    this.context = this.game.context;
     var scaleBy = (scaleBy || 1);
 
+    this.drawTiles(scaleBy);
+    this.drawFlames();
+    
+}
+
+Environment.prototype.drawTiles = function (scaleBy) {
     //draw tiles
     for (var i = this.quadrants[this.curr_quadrant][1]; i <= this.quadrants[this.curr_quadrant][3]; i++) { // length of each row
         for (var j = this.quadrants[this.curr_quadrant][0]; j <= this.quadrants[this.curr_quadrant][2]; j++) { // length of each column
@@ -704,7 +713,9 @@ Environment.prototype.draw = function (context, scaleBy) {
                               draw_size, draw_size); // how big to draw. 
         }
     }
+}
 
+Environment.prototype.drawFlames = function () {
     // draw flames
     if (this.curr_quadrant === 0) {
         for (var i = 0; i < this.flame1_locations.length; i++) {
