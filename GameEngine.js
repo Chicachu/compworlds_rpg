@@ -359,7 +359,7 @@ Statistics = function (health, attack, defense) {
 /* HERO and subclasses */
 Hero = function (game, x, y, spriteSheet, animations, stats) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
-    this.width = 64;
+    this.width = 43;
     this.height = 64; 
 }
 
@@ -421,6 +421,7 @@ Hero.prototype.draw = function (context) {
 Hero.prototype.checkSurroundings = function () {
     // return true or false
     if (Math.round(Math.random() * 1000) >= 999) {
+
         return true;
     }
     else {
@@ -441,17 +442,42 @@ Hero.prototype.update = function () {
 
 }
 
+Hero.prototype.changeCoordinates = function (down, up, left, right) {
+    switch (this.direction) {
+        case Direction.DOWN:
+            if (!this.boundaryDown()) {
+                this.y += down;
+            }
+            break;
+        case Direction.UP:
+            if (!this.boundaryUp()) {
+                this.y -= up;
+            }
+            break;
+        case Direction.LEFT:
+            if (!this.boundaryLeft()) {
+                this.x -= left;
+            }
+            break;
+        case Direction.RIGHT:
+            if (!this.boundaryRight()) {
+                this.x += right;
+            }
+            break;
+    }
+}
+
 // Boundary detection
 Hero.prototype.boundaryRight = function () {
     return this.x + this.width > this.game.context.canvas.width;
 }
 
 Hero.prototype.boundaryLeft = function () {
-    return this.x < 0;
+    return this.x + 20 < 0;
 }
 
 Hero.prototype.boundaryUp = function () {
-    return this.y < 0;
+    return this.y + 12 < 0;
 }
 
 Hero.prototype.boundaryDown = function () {
@@ -463,18 +489,22 @@ Hero.prototype.checkBoundaries = function () {
     if (this.boundaryRight()) {
         if (quadrant !== 2 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
+            this.x -= 12 * 32; 
         }
     }  else if (this.boundaryLeft()) {
         if (quadrant !== 0 && quadrant !== 3) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
+            this.x += 12 * 32; 
         }
     } else if (this.boundaryUp()) {
         if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
+            this.y += 12 * 32; 
         }
     } else if (this.boundaryDown()) {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
+            this.y -= 12 * 32; 
         }
     }
 }
@@ -571,7 +601,7 @@ NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
 NPC.prototype.draw = function (context) {
-    if (!this.game.is_battle) {
+    if (!this.game.is_battle && this.game.environment.curr_quadrant === 0) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
@@ -679,7 +709,7 @@ Environment.prototype.draw = function (context, scaleBy) {
         for (var i = 0; i < this.flame1_locations.length; i++) {
             var x = this.flame1_locations[i][0];
             var y = this.flame1_locations[i][1];
-            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
 
         }
         for (var i = 0; i < this.flame2_locations.length; i++) {
