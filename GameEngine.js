@@ -177,21 +177,21 @@ GameEngine.prototype.fadeIn = function (game) {
 
 GameEngine.prototype.setBattle = function (game, players) {
 
-        players[0].game.is_battle = true;
-        game.drawBackground("./imgs/woods.png");
-        players[0].save_x = players[0].x;
-        players[0].save_y = players[0].y;
-        players[0].x = 300;
-        players[0].y = 250;
-        players[0].direction = Direction.LEFT;
-        players[1].x = 50;
-        players[1].y = 250;
-        game.menu.showMenu(true);
-        for (var i = 0; i < players.length; i++)
-        {
-            players[i].attack_anim = false;
-            players[i].fight_animation.looped = false;
-        }
+    players[0].game.is_battle = true;
+    game.drawBackground("./imgs/woods.png");
+    players[0].save_x = players[0].x;
+    players[0].save_y = players[0].y;
+    players[0].x = 300;
+    players[0].y = 250;
+    players[0].direction = Direction.LEFT;
+    players[1].x = 50;
+    players[1].y = 250;
+    game.menu.showMenu(true);
+    for (var i = 0; i < players.length; i++)
+    {
+        players[i].attack_anim = false;
+        players[i].fight_animation.looped = false;
+    }
 }
     
 GameEngine.prototype.resetBattle = function (game, players)
@@ -282,7 +282,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () {
 
-    if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
+    if (this.game.key !== 0 && this.game.key !== null && !this.lock_coords) {
         this.moving = true;
         this.changeCoordinates(.5, .5, .5, .5);
     } else {
@@ -337,7 +337,7 @@ Statistics = function (health, attack, defense) {
 /* HERO and subclasses */
 Hero = function (game, x, y, spriteSheet, animations, stats) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
-    this.width = 64;
+    this.width = 43;
     this.height = 64; 
 }
 
@@ -427,17 +427,42 @@ Hero.prototype.update = function () {
 
 }
 
+Hero.prototype.changeCoordinates = function (down, up, left, right) {
+    switch (this.direction) {
+        case Direction.DOWN:
+            if (!this.boundaryDown()) {
+                this.y += down;
+            }
+            break;
+        case Direction.UP:
+            if (!this.boundaryUp()) {
+                this.y -= up;
+            }
+            break;
+        case Direction.LEFT:
+            if (!this.boundaryLeft()) {
+                this.x -= left;
+            }
+            break;
+        case Direction.RIGHT:
+            if (!this.boundaryRight()) {
+                this.x += right;
+            }
+            break;
+    }
+}
+
 // Boundary detection
 Hero.prototype.boundaryRight = function () {
     return this.x + this.width > this.game.context.canvas.width;
 }
 
 Hero.prototype.boundaryLeft = function () {
-    return this.x < 0;
+    return this.x + 20 < 0;
 }
 
 Hero.prototype.boundaryUp = function () {
-    return this.y < 0;
+    return this.y + 12 < 0;
 }
 
 Hero.prototype.boundaryDown = function () {
@@ -449,18 +474,22 @@ Hero.prototype.checkBoundaries = function () {
     if (this.boundaryRight()) {
         if (quadrant !== 2 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
+            this.x -= 12 * 32; 
         }
     }  else if (this.boundaryLeft()) {
         if (quadrant !== 0 && quadrant !== 3) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
+            this.x += 12 * 32; 
         }
     } else if (this.boundaryUp()) {
         if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
+            this.y += 12 * 32; 
         }
     } else if (this.boundaryDown()) {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
+            this.y -= 12 * 32; 
         }
     }
 }
@@ -556,7 +585,7 @@ NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
 NPC.prototype.draw = function (context) {
-    if (!this.game.is_battle) {
+    if (!this.game.is_battle && this.game.environment.curr_quadrant === 0) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }

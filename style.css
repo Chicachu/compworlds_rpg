@@ -13,7 +13,7 @@
     text-align: right; 
     position: relative;
     z-index: 2; 
-    top: -426px;
+    top: -443px;
     visibility: hidden;
     pointer-events: none;
 }
@@ -25,9 +25,9 @@
     font-size: 25px;
     background-image: url("./imgs/menu_background.png"); 
     text-align: center; 
-    height: 300px; 
+    height: 280px; 
     width: 100px; 
-    padding-top: 100px;
+    padding-top: 138px;
     pointer-events: none;
 }
 
