@@ -71,13 +71,7 @@ GameEngine = function () {
     this.curr_background = null;
     this.is_battle = false;
     this.menu = null;
-<<<<<<< HEAD
-    this.ga = 1.0;
-    this.timerId = null;
-    this.timerId2 = null;
-=======
     this.environment = null; 
->>>>>>> origin/origin
 }
 
 GameEngine.prototype.init = function (context) {
@@ -90,56 +84,11 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
 }
-    GameEngine.prototype.startInput = function () {
-        var that = this;
 
-<<<<<<< HEAD
 GameEngine.prototype.startInput = function () {
     var that = this;
-    
+
     document.addEventListener('keydown', function (e) {
-=======
-        this.context.canvas.addEventListener('keydown', function (e) {
-           
-            if (String.fromCharCode(e.which) === ' ') {
-                that.space = true;
-            } else if (e.which === 37
-                       || e.which === 38
-                       || e.which === 39
-                       || e.which === 40) {
-                that.key = e.which;
-            }
-            e.preventDefault();
-        }, false);
-
-        this.context.canvas.addEventListener('keyup', function (e) {
-            that.key = 0;
-            that.space = 0;
-        }, false);
-    }
-
-    GameEngine.prototype.start = function () {
-
-        var that = this;
-        (gameLoop = function () {
-            that.loop();
-            requestAnimationFrame(gameLoop, that.context.canvas);
-        })();
-    }
-
-    GameEngine.prototype.addEntity = function (entity) {
-        this.entities.push(entity);
-    }
-
-<<<<<<< HEAD
-    GameEngine.prototype.draw = function (drawCallBack) {
-        this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
-        this.context.save();
-        if (this.curr_background && this.is_battle) {
-            this.context.drawImage(this.curr_background, 0, 0);
-=======
-    document.addEventListener('keypress', function (e) {
->>>>>>> origin/origin
         if (String.fromCharCode(e.which) === ' ') {
             that.space = true;
         } else if (e.which === 37
@@ -147,23 +96,52 @@ GameEngine.prototype.startInput = function () {
                    || e.which === 39
                    || e.which === 40) {
             that.key = e.which; 
->>>>>>> origin/origin
         }
-        for (var i = 0; i < this.entities.length; i++) {
-            this.entities[i].draw(this.context);
-        }
-        if (drawCallBack) {
-            drawCallBack(this);
-        }
-        this.context.restore();
-    }
+        e.preventDefault();
+    }, false);
 
-    GameEngine.prototype.update = function () {
-        for (var i = 0; i < this.entities.length; i++) {
-            this.entities[i].update();
-        }
-    }
+    document.addEventListener('keyup', function (e) {
+        that.key = 0;
+        that.space = 0;
+    }, false);
+}
 
+GameEngine.prototype.start = function () {
+    var that = this;
+    (gameLoop = function () {
+        that.loop();
+        requestAnimationFrame(gameLoop, that.context.canvas);
+    })(); 
+}
+
+GameEngine.prototype.addEntity = function (entity) {
+    this.entities.push(entity);
+}
+
+GameEngine.prototype.draw = function (drawCallBack) {
+    this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+    this.context.save();
+    if (this.curr_background && this.is_battle)
+    {
+        this.context.drawImage(this.curr_background, 0, 0);
+    } else {
+        this.environment.draw(this.context, 1);
+    }
+    for (var i = 0; i < this.entities.length; i++) {
+        this.entities[i].draw(this.context); 
+    }
+    if (drawCallBack) {
+        drawCallBack(this); 
+    }
+    this.context.restore();
+}
+
+GameEngine.prototype.update = function () {
+    for (var i = 0; i < this.entities.length; i++) {
+        this.entities[i].update();         
+    }
+}
+ 
     GameEngine.prototype.loop = function () {
         this.clockTick = this.timer.tick();
         this.update();
@@ -194,37 +172,37 @@ GameEngine.prototype.startInput = function () {
         }, 50);
     }
 
-<<<<<<< HEAD
-    GameEngine.prototype.setBattle = function (game, players) {
+GameEngine.prototype.setBattle = function (game, players) {
 
-            players[0].game.is_battle = true;
-            game.drawBackground("./imgs/woods.png");
-            players[0].save_x = players[0].x;
-            players[0].save_y = players[0].y;
-            players[0].x = 300;
-            players[0].y = 250;
-            players[0].direction = Direction.LEFT;
-            players[1].x = 50;
-            players[1].y = 250;
-            game.menu.showMenu(true);
-            for (var i = 0; i < players.length; i++)
-            {
-                players[i].attack_anim = false;
-                players[i].fight_animation.looped = false;
-            }
-    }
-    
-    GameEngine.prototype.resetBattle = function (game, players)
+    players[0].game.is_battle = true;
+    game.drawBackground("./imgs/woods.png");
+    players[0].save_x = players[0].x;
+    players[0].save_y = players[0].y;
+    players[0].x = 300;
+    players[0].y = 250;
+    players[0].direction = Direction.LEFT;
+    players[1].x = 50;
+    players[1].y = 250;
+    game.menu.showMenu(true);
+    for (var i = 0; i < players.length; i++)
     {
-        players[0].lock_coords = false;
-        game.is_battle = false;
-        game.drawBackground("./imgs/desert.png");
-        players[0].stats.health = 2000;
-        players[1].stats.health = 2000;
-        game.menu.showMenu(false);
-        players[0].x = players[0].save_x;
-        players[0].y = players[0].save_y;
-=======
+        players[i].attack_anim = false;
+        players[i].fight_animation.looped = false;
+    }
+}
+    
+GameEngine.prototype.resetBattle = function (game, players)
+{
+    players[0].lock_coords = false;
+    game.is_battle = false;
+    game.drawBackground("./imgs/desert.png");
+    players[0].stats.health = 2000;
+    players[1].stats.health = 2000;
+    game.menu.showMenu(false);
+    players[0].x = players[0].save_x;
+    players[0].y = players[0].save_y;
+}
+
 GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     this.context.save();
@@ -233,7 +211,6 @@ GameEngine.prototype.draw = function (drawCallBack) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
         this.environment.draw(this.context, 1);
->>>>>>> origin/origin
     }
     GameEngine.prototype.battleOver = function (game, players) {
         if (game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0)) {
@@ -353,7 +330,6 @@ GameEngine.prototype.draw = function (drawCallBack) {
 
     }
 
-<<<<<<< HEAD
 
     Statistics = function (health, attack, defense) {
         this.health = health;
@@ -388,23 +364,22 @@ GameEngine.prototype.draw = function (drawCallBack) {
     }
 
     /* Tells the Entity which animation to use for the direction its moving in */
-    Hero.prototype.changeMoveAnimation = function () {
-        switch (this.direction) {
-            case Direction.DOWN:
-                this.move_animation = this.animations.down;
-                break;
-            case Direction.UP:
-                this.move_animation = this.animations.up;
-                break;
-            case Direction.LEFT:
-                this.move_animation = this.animations.left;
-                break;
-            case Direction.RIGHT:
-                this.move_animation = this.animations.right;
-                break;
-        }
+Hero.prototype.changeMoveAnimation = function () {
+    switch (this.direction) {
+        case Direction.DOWN:
+            this.move_animation = this.animations.down;
+            break;
+        case Direction.UP:
+            this.move_animation = this.animations.up;
+            break;
+        case Direction.LEFT:
+            this.move_animation = this.animations.left;
+            break;
+        case Direction.RIGHT:
+            this.move_animation = this.animations.right;
+            break;
     }
-=======
+}
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () { 
   
@@ -444,7 +419,7 @@ Entity.prototype.stopAnimation = function (animation) {
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
 }
->>>>>>> origin/origin
+
 
     Hero.prototype.draw = function (context) {
         if (this.game.key !== 0 && this.game.key !== null && this.moving) {
@@ -462,7 +437,7 @@ Entity.prototype.draw = function (context) {
         }
     }
 
-<<<<<<< HEAD
+
 Entity.prototype.update = function () {
     // code for NPCs and Enemies.
 }
@@ -481,8 +456,6 @@ Statistics = function (health, attack, defense) {
 /* HERO and subclasses */
 Hero = function (game, x, y, spriteSheet, animations, stats) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
-    this.width = 64; 
-    this.height = 64; 
 }
 
 Hero.prototype = new Entity();
@@ -493,12 +466,12 @@ Hero.prototype.changeDirection = function () {
     if (!this.game.is_battle) {
         if (this.game.space) {
             // code for selecting something with the space bar. I don't think this will be necessary for the prototype.
-=======
+
     Hero.prototype.checkSurroundings = function () {
         // return true or false
         if (Math.round(Math.random() * 1000) >= 999) {
             return true;
->>>>>>> origin/origin
+
         }
         else {
             return false;
@@ -584,17 +557,16 @@ Hero.prototype.changeDirection = function () {
         }
     }
 
-<<<<<<< HEAD
+
     Enemy.prototype.update = function () {
         if (this.attack_anim && this.fight_animation.looped) {
             this.fight_animation.looped = false;
             this.attack_anim = false;
         }
     }
-=======
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) === 1018939327848374)
+    if (Math.round(Math.random() * 1000) >= 999)
     {
         return true;
     }
@@ -628,7 +600,7 @@ Hero.prototype.update = function () {
 
 // Boundary detection
 Hero.prototype.boundaryRight = function () {
-    return this.x + this.width > this.game.context.canvas.width;
+    return this.x > this.game.context.canvas.width;
 }
 
 Hero.prototype.boundaryLeft = function () {
@@ -640,26 +612,25 @@ Hero.prototype.boundaryUp = function () {
 }
 
 Hero.prototype.boundaryDown = function () {
-    return this.y + this.height > this.game.context.canvas.height; 
+    return this.y > this.game.context.canvas.height; 
 }
 
 Hero.prototype.checkBoundaries = function () {
-    var quadrant = this.game.environment.curr_quadrant;
-    if (this.boundaryRight()) {
-        if (quadrant !== 2 && quadrant !== 5) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
+    if (this.boundaryRight) {
+        if (!this.game.map.curr_quadrant === 2 && !this.game.map.curr_quadrant === 5) {
+            this.game.map.curr_quadrant += 1;
         }
-    } else if (this.boundaryLeft()) {
-        if (quadrant !== 0 && quadrant !== 3) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
+    } else if (this.boundaryLeft) {
+        if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 3) {
+            this.game.map.curr_quadrant -= 1;
         }
-    } else if (this.boundaryUp()) {
-        if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
+    } else if (this.boundaryUp) {
+        if (!this.game.map.curr_quadrant === 0 && !this.game.map.curr_quadrant === 1 && !this.game.map.curr_quadrant === 2) {
+            this.game.map.curr_quadrant -= 3;
         }
-    } else if (this.boundaryDown()) {
-        if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
+    } else if (this.boundaryDown) {
+        if (!this.game.map.curr_quadrant === 3 && !this.game.map.curr_quadrant === 4 && !this.game.map.curr_quadrant === 5) {
+            this.game.map.curr_quadrant += 3;
         }
     }
 }
@@ -690,7 +661,6 @@ Warrior.prototype.draw = function (context) {
 Warrior.prototype.update = function () {
     Hero.prototype.update.call(this);
 }
->>>>>>> origin/origin
 
 
     Enemy.prototype.hit = function () {
@@ -711,8 +681,6 @@ Warrior.prototype.update = function () {
         this.y = 10;
         Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
     }
-<<<<<<< HEAD
-=======
 }
 
 
@@ -735,12 +703,11 @@ NPC = function (game) {
     this.y = 224;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
 }
->>>>>>> origin/origin
 
     NPC.prototype = new Entity();
     NPC.prototype.constructor = NPC;
 
-<<<<<<< HEAD
+
     NPC.prototype.draw = function (context) {
         if (this.game.is_battle) {
             //do nothing? (un-draw npc?)
@@ -753,7 +720,7 @@ NPC = function (game) {
     NPC.prototype.update = function () {
 
     }
-=======
+
 NPC.prototype.draw = function (context) {
     if (!this.game.is_battle) {
         this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
@@ -777,53 +744,54 @@ NPC.prototype.update = function () {
     this.changeCoordinates(0, 0, 0.25, 0.25);
     
 }
->>>>>>> origin/origin
 
-    Tile = function (id, passable, selectable) {
-        this.id = id;
-        this.passable = passable;
-        this.selectable = selectable;
+
+Tile = function (id, passable, selectable) {
+    this.id = id;
+    this.passable = passable;
+    this.selectable = selectable;
+}
+
+/* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
+Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
+    if (tileSheetPathName) {
+        this.sheet = ASSET_MANAGER.getAsset(tileSheetPathName);
     }
+    this.tileSize = tileSize;
+    this.sheetWidth = sheetWidth;
+    this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
+}
 
-    /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
-    Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
-        if (tileSheetPathName) {
-            this.sheet = ASSET_MANAGER.getAsset(tileSheetPathName);
+
+Background = function () {
+    // "Map" will be a double array of integer values. 
+    this.map = [[],
+                [],
+                [],
+                []];
+    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
+}
+
+/* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
+Background.prototype.draw = function (context, scaleBy) {
+    var scaleBy = (scaleBy || 1);
+
+    for (var i = 0; i < this.map[0].length; i++) { // length of each row
+        for (var j = 0; j < this.map.length; j++) { // length of each column
+            var tile_index = this.map[i][j];
+
+            context.drawImage(this.tileSheet,
+                                tile_index % this.tileSheet.sheetWidth, tile_index / this.tileSheet.sheetWidth, // where to start clipping
+                                this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
+                                this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
+                                this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
         }
-        this.tileSize = tileSize;
-        this.sheetWidth = sheetWidth;
-        this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
     }
+}
 
-<<<<<<< HEAD
-    Background = function () {
-        // "Map" will be a double array of integer values. 
-        this.map = [[],
-                    [],
-                    [],
-                    []];
-        this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
-    }
+Background.prototype.update = function () {
+}
 
-    /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
-    Background.prototype.draw = function (context, scaleBy) {
-        var scaleBy = (scaleBy || 1);
-
-        for (var i = 0; i < this.map[0].length; i++) { // length of each row
-            for (var j = 0; j < this.map.length; j++) { // length of each column
-                var tile_index = this.map[i][j];
-
-                context.drawImage(this.tileSheet,
-                                  tile_index % this.tileSheet.sheetWidth, tile_index / this.tileSheet.sheetWidth, // where to start clipping
-                                  this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
-                                  this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
-                                  this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
-            }
-        }
-    }
-
-    Background.prototype.update = function () {
-=======
 Environment = function (game) {
     this.game = game;
     // "Map" will be a double array of integer values. 
@@ -865,10 +833,6 @@ Environment = function (game) {
     this.curr_quadrant = 0;
 }
 
-Environment.prototype.setQuadrant = function (number) {
-    this.curr_quadrant = number;
-}
-
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Environment.prototype.draw = function (context, scaleBy) {
     this.context = context; 
@@ -895,26 +859,25 @@ Environment.prototype.draw = function (context, scaleBy) {
     }
 
     // draw flames
-    if (this.curr_quadrant === 0) {
-        for (var i = 0; i < this.flame1_locations.length; i++) {
-            var x = this.flame1_locations[i][0];
-            var y = this.flame1_locations[i][1];
-            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-
-        }
-        for (var i = 0; i < this.flame2_locations.length; i++) {
-            var x = this.flame2_locations[i][0];
-            var y = this.flame2_locations[i][1];
-            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-
-        }
+    for (var i = 0; i < this.flame1_locations.length; i++) {
+        var x = this.flame1_locations[i][0];
+        var y = this.flame1_locations[i][1];
+        this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+        
     }
+    for (var i = 0; i < this.flame2_locations.length; i++) {
+        var x = this.flame2_locations[i][0];
+        var y = this.flame2_locations[i][1];
+        this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+        
+    }
+
 }
 
 Environment.prototype.update = function () {
->>>>>>> origin/origin
 
-    }
+
+ }
 
 
     GameEngine.prototype.drawBackground = function (img) {
