@@ -74,6 +74,7 @@ GameEngine = function () {
     this.ga = 1.0;
     this.timerId = null;
     this.timerId2 = null;
+    this.timerId3 = null;
     this.environment = null;
 }
 
@@ -93,6 +94,17 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keydown', function (e) {
            
         if (String.fromCharCode(e.which) === ' ') {
+            if(!that.space)
+            {
+                that.fight(that.entities[0], that.entities[1]);
+                if(that.battleOver(that, [that.entities[0], that.entities[1]])) {
+                    that.timerId3 = setTimeout(function () {
+                        that.fadeOut(that.entities[0], that.resetBattle);
+                        clearInterval(that.timerId3);
+                    }, 2000);
+                    
+                }
+            }
             that.space = true;
         } else if (e.which === 37
                     || e.which === 38
@@ -106,7 +118,8 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
-    }, false);
+            }, false);
+
 }
 
 GameEngine.prototype.start = function () {
@@ -165,6 +178,7 @@ GameEngine.prototype.fadeOut = function (player, callback) {
 }
 GameEngine.prototype.fadeIn = function (game) {
     var that = game;
+
     this.timerId2 = setInterval(function () {
         that.context.globalAlpha += .05;
         // console.log(that.context.globalAlpha);
@@ -177,7 +191,7 @@ GameEngine.prototype.fadeIn = function (game) {
 
 GameEngine.prototype.setBattle = function (game, players) {
 
-        players[0].game.is_battle = true;
+        game.is_battle = true;
         game.drawBackground("./imgs/woods.png");
         players[0].save_x = players[0].x;
         players[0].save_y = players[0].y;
@@ -198,9 +212,9 @@ GameEngine.prototype.resetBattle = function (game, players)
 {
     players[0].lock_coords = false;
     game.is_battle = false;
-    game.drawBackground("./imgs/desert.png");
-    players[0].stats.health = 2000;
-    players[1].stats.health = 2000;
+   // game.drawBackground("./imgs/desert.png");
+    players[0].stats.health = 100;
+    players[1].stats.health = 75;
     game.menu.showMenu(false);
     players[0].x = players[0].save_x;
     players[0].y = players[0].save_y;
@@ -219,7 +233,7 @@ GameEngine.prototype.fight = function (player, foe) {
     player.fight_animation = player.animations.destroy;
     player.attack_anim = true;
     foe.fight_animation = foe.animations.hit;
-    foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
+    foe.stats.health = foe.stats.health -((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
 GameEngine.prototype.queueAction = function (player, foe) {
@@ -228,10 +242,18 @@ GameEngine.prototype.queueAction = function (player, foe) {
         player.fight_animation.looped = false;
         foe.attack_anim = true;
     }
-    if (foe.fight_animation.looped) {
+    if (foe.fight_animation.looped && !this.battleOver(this, [player, foe])) {
         foe.fight_animation.looped = false;
         foe.attack_anim = false;
-    }
+        }
+        else if(foe.fight_animation.looped && this.battleOver(this, [player, foe]))
+            {
+            //foe.fight_animation.looped = false;
+            //foe.stop_move_animation = foe.stopAnimation(foe.death_animation);
+            //foe.fight_animation = foe.stopAnimation(foe.death_animation);
+            foe.stop_move_animation = foe.death_animation;
+            foe.fight_animation = foe.death_animation;
+        }
 }
 
 Timer = function () {
@@ -271,6 +293,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.stats = stats;
     this.attack_anim = false;
     this.lock_coords = false;
+    this.death_animation = null;
     if (animations) {
         this.animations = animations;
         this.move_animation = this.animations.down;
@@ -282,7 +305,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () {
 
-    if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
+    if (this.game.key !== 0 && this.game.key !== null && !this.lock_coords) {
         this.moving = true;
         this.changeCoordinates(.5, .5, .5, .5);
     } else {
@@ -314,7 +337,6 @@ Entity.prototype.changeCoordinates = function (down, up, left, right) {
 Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
-
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
 }
@@ -414,15 +436,7 @@ Hero.prototype.update = function () {
         this.lock_coords = true;
         this.game.fadeOut(this, this.game.setBattle);
     }
-    if (this.game.space) {
-        this.game.fight(this.game.entities[1], this);
-        if (this.game.battleOver(this.game, [this, this.game.entities[1]])) {
-
-            this.game.resetBattle(this.game, [this, this.game.entities[0]]);
-        }
-    }
-        
-    this.game.queueAction(this.game.entities[1], this);
+    this.game.queueAction(this.game.entities[0], this.game.entities[1]);
     this.checkBoundaries();
 
 }
@@ -510,6 +524,7 @@ Enemy = function (game, stats) {
 
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
     this.stop_move_animation = this.stopAnimation(this.animations.right);
+    this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .1, 1, true, false);
     this.direction = Direction.RIGHT;
 }
 
@@ -525,11 +540,11 @@ Enemy.prototype.draw = function (context) {
     }
 }
 
-Enemy.prototype.update = function () {
+Enemy.prototype.update = function() {
     if (this.attack_anim && this.fight_animation.looped) {
         this.fight_animation.looped = false;
         this.attack_anim = false;
-    }
+        }
 }
 
 

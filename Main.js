@@ -17,7 +17,7 @@ ASSET_MANAGER.downloadAll(function () {
     var gameEngine = new GameEngine();
 
     var warrior = new Warrior(gameEngine, new Statistics(50, 20, 10));
-    var enemy = new Enemy(gameEngine, new Statistics(1000, 15, 5));
+    var enemy = new Enemy(gameEngine, new Statistics(50, 15, 5));
     var npc = new NPC(gameEngine);
 
     gameEngine.addEntity(warrior);
