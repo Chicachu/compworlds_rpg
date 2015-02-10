@@ -153,7 +153,7 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-//test comment
+//test comment another
 
 GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
