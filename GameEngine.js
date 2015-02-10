@@ -53,6 +53,10 @@ Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
                       this.frameWidth * scaleBy, this.frameHeight * scaleBy);
 }
 
+Animation.prototype.isLooped = function () {
+    return;
+}
+
 Animation.prototype.currentFrame = function () {
     return Math.floor(this.elapsedTime / this.frameDuration);
 }
@@ -77,6 +81,7 @@ GameEngine = function () {
     this.timerId2 = null;
     this.timerId3 = null;
     this.environment = null;
+    this.canControl = null; 
 }
 
 GameEngine.prototype.init = function (context) {
@@ -88,34 +93,39 @@ GameEngine.prototype.init = function (context) {
     this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
     this.environment = new Environment(this);
-    this.force_no_space = false;
+    this.canControl = true;
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
 
     this.context.canvas.addEventListener('keydown', function (e) {
-           
-        if (String.fromCharCode(e.which) === ' ') {
-            if(!that.space && !that.force_no_space)
-            {
-                that.fight(that.entities[0], that.entities[1]);
-                if (that.battleOver(that, [that.entities[0], that.entities[1]])) { 
-                    that.force_no_space = true;
-                    that.timerId3 = setTimeout(function () {
-                        that.fadeOut(that.entities[0], that.resetBattle);
-                        clearInterval(that.timerId3);
-                    }, 2000);
-                    
+        if (that.canControl) {
+            if (String.fromCharCode(e.which) === ' ') {
+                if (!that.space) {
+                    that.fight(that.entities[0], that.entities[1]);
+                    if (that.battleOver([that.entities[0], that.entities[1]])) {
+                        that.canControl = false;
+                        that.timerId3 = setTimeout(function () {
+                            that.fadeOut(that, that.entities[0], that.resetBattle);
+                            clearInterval(that.timerId3);
+                        }, 2000);
+
+                    }
                 }
+
+                that.space = true;
+
+            } else if (e.which === 37
+                        || e.which === 38
+                        || e.which === 39
+                        || e.which === 40) {
+                that.key = e.which;
             }
-        that.space = true;
-        } else if (e.which === 37
-                    || e.which === 38
-                    || e.which === 39
-                    || e.which === 40) {
-            that.key = e.which;
+            e.preventDefault();
+        } else {
+            that.key = 0;
+            that.space = 0; 
         }
-        e.preventDefault();
     }, false);
 
     this.context.canvas.addEventListener('keyup', function (e) {
@@ -125,8 +135,11 @@ GameEngine.prototype.startInput = function () {
 
 }
 
-GameEngine.prototype.start = function () {
+GameEngine.prototype.setBackground = function (img) {
+    this.curr_background = ASSET_MANAGER.getAsset(img);
+}
 
+GameEngine.prototype.start = function () {
     var that = this;
     (gameLoop = function () {
         that.loop();
@@ -167,14 +180,14 @@ GameEngine.prototype.loop = function () {
     this.draw();
 }
 
-GameEngine.prototype.fadeOut = function (player, callback) {
-    var that = this;
-    this.timerId = setInterval(function () {
+GameEngine.prototype.fadeOut = function (game, player, callback) {
+    var that = game;
+    that.timerId = setInterval(function () {
         that.context.globalAlpha -= .05;
         if (that.context.globalAlpha < .05) {
             that.context.globalAlpha = 0;
             clearInterval(that.timerId);
-            callback(that, [player, that.entities[1]]);
+            callback([player, that.entities[1]]);
             that.fadeIn(that);
         }
     }, 50);
@@ -186,17 +199,18 @@ GameEngine.prototype.fadeIn = function (game) {
         that.context.globalAlpha += .05;
         // console.log(that.context.globalAlpha);
         if (that.context.globalAlpha > .95) {
-            that.force_no_space = false; 
             that.context.globalAlpha = 1;
             clearInterval(that.timerId2);
+            that.canControl = true; 
         }
     }, 50);
 }
 
-GameEngine.prototype.setBattle = function (game, players) {
+GameEngine.prototype.setBattle = function (players) {
 
-        game.is_battle = true;
-        game.drawBackground("./imgs/woods.png");
+    players[0].game.is_battle = true;
+    players[0].game.setBackground("./imgs/woods.png");
+        //this.curr_background = ASSET_MANAGER.getAsset("./imgs/woods.png");
         players[0].save_x = players[0].x;
         players[0].save_y = players[0].y;
         players[0].x = 300;
@@ -204,7 +218,7 @@ GameEngine.prototype.setBattle = function (game, players) {
         players[0].direction = Direction.LEFT;
         players[1].x = 50;
         players[1].y = 250;
-        game.menu.showMenu(true);
+        players[0].game.menu.showMenu(true);
         for (var i = 0; i < players.length; i++)
         {
             players[i].attack_anim = false;
@@ -212,19 +226,19 @@ GameEngine.prototype.setBattle = function (game, players) {
         }
 }
     
-GameEngine.prototype.resetBattle = function (game, players)
+GameEngine.prototype.resetBattle = function (players)
 {
-    players[0].lock_coords = false;
-    game.is_battle = false;
+    //this.canControl= false;
+    players[0].game.is_battle = false;
    // game.drawBackground("./imgs/desert.png");
     players[0].stats.health = 100;
     players[1].stats.health = 75;
-    game.menu.showMenu(false);
+    players[0].game.menu.showMenu(false);
     players[0].x = players[0].save_x;
     players[0].y = players[0].save_y;
 }
-GameEngine.prototype.battleOver = function (game, players) {
-    return game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0);
+GameEngine.prototype.battleOver = function (players) {
+    return this.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0);
 }
 
 GameEngine.prototype.fight = function (player, foe) {
@@ -241,7 +255,7 @@ GameEngine.prototype.queueAction = function (player, foe) {
             player.fight_animation.looped = false;
             foe.attack_anim = true;
         }
-        if (foe.fight_animation.looped && !this.battleOver(this, [player, foe])) {
+        if (foe.fight_animation.looped && !this.battleOver([player, foe])) {
             foe.fight_animation.looped = false;
             foe.attack_anim = false;
         } 
@@ -284,7 +298,6 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.spriteSheet = spriteSheet;
     this.stats = stats;
     this.attack_anim = false;
-    this.lock_coords = false;
     this.death_animation = null;
     if (animations) {
         this.animations = animations;
@@ -296,7 +309,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () {
-    if (this.game.key !== 0 && this.game.key !== null && !this.lock_coords) {
+    if (this.game.key !== 0 && this.game.key !== null) {
         this.moving = true;
         this.changeCoordinates(.5, .5, .5, .5);
     } else {
@@ -424,14 +437,21 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     Entity.prototype.changeLocation.call(this);
-    if (this.checkSurroundings() && this.moving) {
-        this.lock_coords = true;
-        this.game.fadeOut(this, this.game.setBattle);
-    }
+    this.preBattle();
     this.game.queueAction(this.game.entities[0], this.game.entities[1]);
     this.checkBoundaries();
 
 }
+
+Hero.prototype.preBattle = function () {
+    if (this.moving && this.checkSurroundings()) {
+        this.game.canControl = false;
+        // lock user input controls here.
+        this.game.fadeOut(this.game, this, this.game.setBattle);
+    }
+}
+
+
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
     switch (this.direction) {
@@ -561,7 +581,11 @@ Enemy.prototype.draw = function (context) {
     if (this.game.is_battle) {
         if (this.attack_anim) {
             this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+<<<<<<< HEAD
         } else if (this.game.is_battle && this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]]) && this.fight_animation.looped) {
+=======
+        } else if (this.game.is_battle && this.game.battleOver([this.game.entities[0], this.game.entities[1]])) {
+>>>>>>> origin/origin
             this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .05, 1, true, false);
             this.death_animation.elapsedTime = .25;
             this.death_animation.totalTime = .5;
@@ -771,10 +795,6 @@ Background.prototype.update = function () {
 
 }
 
-
-GameEngine.prototype.drawBackground = function (img) {
-    this.curr_background = ASSET_MANAGER.getAsset(img);
-}
 
 BattleMenu = function (menu_element) {
     this.menu = menu_element;
