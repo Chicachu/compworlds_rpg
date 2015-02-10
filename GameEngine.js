@@ -195,7 +195,7 @@ GameEngine.prototype.fadeOut = function (game, player, callback) {
 GameEngine.prototype.fadeIn = function (game) {
     var that = game;
 
-    this.timerId2 = setInterval(function () {
+    that.timerId2 = setInterval(function () {
         that.context.globalAlpha += .05;
         // console.log(that.context.globalAlpha);
         if (that.context.globalAlpha > .95) {
@@ -228,7 +228,6 @@ GameEngine.prototype.setBattle = function (players) {
     
 GameEngine.prototype.resetBattle = function (players)
 {
-    //this.canControl= false;
     players[0].game.is_battle = false;
    // game.drawBackground("./imgs/desert.png");
     players[0].stats.health = 100;
