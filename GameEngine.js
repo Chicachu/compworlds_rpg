@@ -119,7 +119,9 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 38
                         || e.which === 39
                         || e.which === 40) {
-                that.key = e.which;
+                if (!that.is_battle) {
+                    that.key = e.which;
+                }
             }
             e.preventDefault();
         } else {
