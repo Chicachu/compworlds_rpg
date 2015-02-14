@@ -465,7 +465,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 999) {
+    if (Math.round(Math.random() * 1000) >= 1001) {
 
         return true;
     }
@@ -550,12 +550,12 @@ Hero.prototype.checkBoundaries = function () {
     } else if (this.boundaryUp()) {
         if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
-            this.y += 12 * 32; 
+            this.y += 11 * 32; 
         }
     } else if (this.boundaryDown()) {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
-            this.y -= 12 * 32; 
+            this.y -= 11 * 32; 
         }
     }
 }
@@ -593,17 +593,6 @@ Enemy = function (game, stats, anims, loop_while_standing) {
     this.spriteSheet = anims.destroy.spriteSheet;
     this.x = 50;
     this.y = 225;
-    //this.animations = {
-    //    down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
-    //    up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
-    //    left: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
-    //    right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
-    //    destroy: new Animation(this.spriteSheet, 0, 19, 64, 64, 0.05, 13, true, false),
-    //    hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.07, 5, true, false),
-    //    death: new Animation(this.spriteSheet, 6, 20, 64, 64, .1, 1, true, false)
-    //    // TODO: Move stop_move_animation and death_animation to here and fight animations
-    //};
-    
     this.animations = {
         down: anims.down,
         up: anims.up,
