@@ -798,12 +798,12 @@ NPC = function (game, dialogue, anims, path, pause) {
     this.next_point = null;
     this.pause_timer = null;
     this.animations = anims;
+    this.x = this.path[0].getX();
+    this.y = this.path[0].getY();
     this.path.push(this.path.shift());
 
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
-    this.x = this.path[0].getX();
-    this.y = this.path[0].getY();
-
+    
     // next few variables used for NPC interaction and dialogue. 
     this.interacting = false;
     this.dialogue = dialogue;

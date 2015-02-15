@@ -44,7 +44,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
-                                            null, null, null), [new Point(160, 200)], true);
+                                            null, null, null), [new Point(160, 200), new Point(280, 220)], true);
     var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
