@@ -129,6 +129,9 @@ GameEngine.prototype.startInput = function () {
         if (String.fromCharCode(e.which) === ' ' && text_box.style.visibility === "visible") {
             that.next = true; 
         }
+        if (e.which == 9) {
+            e.preventDefault();
+        }
     }, false);
 
     text_box.addEventListener("keyup", function (e) {
@@ -786,6 +789,7 @@ NPC.prototype.update = function () {
         }
         this.changeCoordinates(0, 0, 0.25, 0.25);
     } else {
+        this.move_animation = this.stopAnimation(this.move_animation);
         this.updateDialogue(); 
     }
 }
