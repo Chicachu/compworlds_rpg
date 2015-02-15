@@ -574,8 +574,8 @@ Hero.prototype.changeCoordinates = function (down, up, left, right) {
 // used for map collision detection
 Hero.prototype.canMove = function (direction) {
     // default is for Direction.DOWN.
-    var index_low = { x: this.x + 20, y: this.y + 64 };
-    var index_high = { x: this.x + 46, y: this.y + 64 };
+    var index_low = { x: this.x + 20, y: this.y + 62 };
+    var index_high = { x: this.x + 46, y: this.y + 62 };
 
     // change if not default.
     switch (direction) {
@@ -584,8 +584,8 @@ Hero.prototype.canMove = function (direction) {
             index_high.y = this.y + 45;
             break;
         case Direction.DOWN:
-            index_low.y = this.y + 70;
-            index_high.y = this.y + 70;
+            index_low.y = this.y + 67;
+            index_high.y = this.y + 67;
             break;
         case Direction.LEFT:
             index_low.y = this.y + 50;
@@ -608,7 +608,7 @@ Hero.prototype.canMove = function (direction) {
     var x2 = Math.floor(index_high.x / 32);
     var y1 = Math.floor(index_low.y / 32);
     var y2 = Math.floor(index_high.y / 32);
-    return this.isPassable(this.getTile(x1, y1)) && this.isPassable(this.getTile(x2, y2));
+    return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
 }
 
 // changes x and/or y coordinates based on which quadrant of the map the character is in. Used for map collision detection
@@ -681,8 +681,16 @@ Hero.prototype.getTile = function (x, y) {
     return this.game.environment.map[y][x];
 }
 
-Hero.prototype.isPassable = function (tile) {
-    return (tile === 0 || (tile >= 7 && tile <= 14));
+Hero.prototype.isPassable = function (tile, index) {
+    if (this.game.environment.level === 1) {
+        if (tile === 0 || (tile >= 7 && tile <= 14) || tile === 80) {
+            return true;
+        } else if (tile === 66) {
+            if (index.y < 304) {
+                return true;
+            }
+        }
+    }
 }
 
 
@@ -894,6 +902,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
 
 Environment = function (game) {
     this.game = game;
+    this.level = 1;
     // "Map" will be a double array of integer values. 
     this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 15, 17, 15, 0, 17, 0, 94, 0, 94, 94, 0, 94, 94, 94, 94, 62, 64, 3, 4, 3, 4, 62],
                 [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 18, 16, 18, 15, 16, 94, 95, 94, 95, 95, 94, 95, 95, 95, 95, 3, 4, 5, 6, 5, 6, 63],
