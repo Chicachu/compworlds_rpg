@@ -100,7 +100,7 @@ GameEngine.prototype.startInput = function () {
             if (String.fromCharCode(e.which) === ' ') {
                 if (!that.space) {
                     //calls fight and then checks if battle is over
-                    that.fight(that.entities[0], that.entities[0].fiends[0]);
+                    that.fight(that.entities[0], that.entities[1]);
                     that.battleOver([that.entities[0], that.entities[0].fiends[0]]);
                 }
                 that.space = true;
@@ -159,6 +159,20 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
+GameEngine.prototype.clearEntities = function()
+{
+    for(var i = 1; i < this.entities.length; i++)
+    {
+        this.auxillary_sprites.push(this.entities.pop());
+    }
+}
+GameEngine.prototype.reLoadEntities = function()
+{
+    for(var i = 0; i < this.auxillary_sprites.length; i++)
+    {
+        this.entities.push(this.auxillary_sprites.pop());
+    }
+}
 GameEngine.prototype.addAuxillaryEntity = function(entity)
 {
     this.auxillary_sprites.push(entity);
@@ -239,7 +253,8 @@ GameEngine.prototype.setBattle = function (player) {
     player.x = 300;
     player.y = 250;
     player.direction = Direction.LEFT;
-    player.game.environment.generateFiend(player.fiends);
+    player.game.environment.generateFiend(player.game, player.fiends);
+    player.game.clearEntities();
     for (var i = 0; i < player.fiends.length; i++) {
         if (i > 0) {
             player.fiends[i].y = 225 - player.fiends[i - 1].y;
@@ -263,6 +278,8 @@ GameEngine.prototype.endBattle = function (player)
     player.x = player.save_x;
     player.y = player.save_y;
     player.direction = player.save_direction;
+    player.game.clearEntities();
+    player.game.reLoadEntities();
 }
 /**
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
@@ -739,7 +756,7 @@ Enemy = function (game, stats, anims, loop_while_standing) {
     this.game = game;
     this.spriteSheet = anims.destroy.spriteSheet;
     this.x = 50;
-    this.y = 225;
+    this.y = 100;
     this.animations = {
         down: anims.down,
         up: anims.up,
@@ -1006,11 +1023,30 @@ Environment = function (game) {
     this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2]];
     this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
     this.curr_quadrant = 0;
-    this.fiends = [];
+    
     this.interactables = [];
     this.initInteractables();
-    this.fiends.push(this.game.auxillary_sprites[0]);
-    this.fiends.push(this.game.auxillary_sprites[1]);
+
+    this.fiends = [];
+    this.initSpriteSets();
+}
+
+Environment.prototype.initSpriteSets = function()
+{
+    var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
+    var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
+    this.fiends.push(new SpriteSet(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
+        new Animation(skeleton_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
+        new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
+        new Animation(skeleton_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
+        new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
+        new Animation(skeleton_sprites, 0, 20, 64, 64, 0.07, 5, true, false),
+        new Animation(skeleton_sprites, 6, 20, 64, 64, .1, 1, true, false)));
+    this.fiends.push(new SpriteSet(null, null, null, new Animation(malboro_sprites, 0, 0, 71, 91, .15, 3, true, false),
+        new Animation(malboro_sprites, 0, 1, 71, 91, .12, 6, true, false),
+        new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
+        new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
+        ));
 }
 
 Environment.prototype.initInteractables = function () {
@@ -1055,13 +1091,13 @@ Door.prototype.startInteraction = function () {
 }
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
-Environment.prototype.generateFiend = function (f)
+Environment.prototype.generateFiend = function (game, f)
 {
-    var fiend_number = Math.floor(Math.random() * (1 - 0) + 0);
     var number_of_fiends = Math.floor(Math.random() * (3 - 1)) + 1;
     for (var i = 0; i < number_of_fiends; i++) {
-        fiend_number = Math.floor(Math.random() * (1 - 0) + 0);
-        f.push(this.fiends[(Math.floor(Math.random() * (2 - 0)) + 0)]);
+        var fiend_number = Math.floor(Math.random() * (this.fiends.length - 0) + 0);
+        var fiend = this.fiends[fiend_number];
+        f.push(new Enemy(game, new Statistics(100, 15, 5), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
     }
 }
 
