@@ -79,6 +79,7 @@ GameEngine = function () {
     this.animation_queue = [];
     this.event = null;
     this.auxillary_sprites = [];
+    this.next = false; // used to detect space when advancing dialogue with NPCs.
 }
 
 GameEngine.prototype.init = function (context) {
@@ -120,8 +121,21 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
-            }, false);
+    }, false);
 
+    var text_box = document.getElementById("dialogue_box");
+
+    text_box.addEventListener("keydown", function (e) {
+        if (String.fromCharCode(e.which) === ' ' && text_box.style.visibility === "visible") {
+            that.next = true; 
+        }
+    }, false);
+
+    text_box.addEventListener("keyup", function (e) {
+        if (String.fromCharCode(e.which) === ' ' && text_box.style.visibility === "visible") {
+            that.next = false;
+        }
+    }, false);
 }
 
 GameEngine.prototype.setBackground = function (img) {
@@ -265,11 +279,11 @@ GameEngine.prototype.battleOver = function (players) {
     the foes hit animation. also does a damage calculation for the hit target
 */
 GameEngine.prototype.fight = function (player, foe) {
-    player.game.animation_queue.push(new Event(player, player.animations.destroy));
-    player.game.animation_queue.push(new Event(player, player.stop_move_animation));
-    foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
-    foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation));
-    foe.stats.health = foe.stats.health -((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
+    //player.game.animation_queue.push(new Event(player, player.animations.destroy));
+    //player.game.animation_queue.push(new Event(player, player.stop_move_animation));
+    //foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
+    //foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation));
+    //foe.stats.health = foe.stats.health -((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
 Timer = function () {
@@ -390,10 +404,32 @@ Hero = function (game, x, y, spriteSheet, animations, stats) {
     this.width = 43;
     this.height = 64;
     this.fiends = [];
+    this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
+                        // pick up on any interaction. 
 }
 
 Hero.prototype = new Entity();
 Hero.prototype.constructor = Hero;
+
+// returns reference to the npc or item closest to the hero.
+Hero.prototype.checkForUserInteraction = function () {
+    var min_distance = Math.sqrt(Math.pow(this.sight, 2) + Math.pow(this.sight, 2));
+    var min_index = null;
+    for (var i = 1; i < this.game.entities.length; i++) {
+        var ent_x_difference = Math.abs(this.game.entities[i].x - this.x); 
+        var ent_y_difference = Math.abs(this.game.entities[i].y - this.y); 
+        var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
+        if (ent_distance < min_distance) {
+            min_distance = ent_distance;
+            min_index = i;
+        }
+    }
+    if (min_index) {
+        return this.game.entities[min_index];
+    } else {
+        return null;
+    }
+}
 
 /* Tells the entity what direction they should face depending on what key was pressed. */
 Hero.prototype.changeDirection = function () {
@@ -480,7 +516,15 @@ Hero.prototype.update = function () {
     Entity.prototype.changeLocation.call(this);
     this.preBattle();
     this.checkBoundaries();
-
+    if (!this.game.is_battle) {
+        if (this.game.space) {
+            var interactable = this.checkForUserInteraction();
+            if (interactable) {
+                interactable.startInteraction();
+                this.game.space = false;
+            }
+        }
+    }
 }
 
 Hero.prototype.preBattle = function () {
@@ -540,12 +584,20 @@ Hero.prototype.checkBoundaries = function () {
     if (this.boundaryRight()) {
         if (quadrant !== 2 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
-            this.x -= 12 * 32; 
+            if (quadrant === 1 || quadrant === 4) {
+                this.x -= 12 * 32;
+            } else {
+                this.x -= 11 * 32;
+            }
         }
     }  else if (this.boundaryLeft()) {
         if (quadrant !== 0 && quadrant !== 3) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
-            this.x += 12 * 32; 
+            if (quadrant === 2 || quadrant === 5) {
+                this.x += 12 * 32;
+            } else {
+                this.x += 11 * 32;
+            }
         }
     } else if (this.boundaryUp()) {
         if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
@@ -636,7 +688,7 @@ Enemy.prototype.hit = function () {
 }
 
 /* NPC */
-NPC = function (game) {
+NPC = function (game, dialogue) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     this.animations = {
@@ -648,6 +700,11 @@ NPC = function (game) {
     this.x = 160;
     this.y = 224;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
+
+    // next few variables used for NPC interaction and dialogue. 
+    this.interacting = false;
+    this.dialogue = dialogue;
+    this.dialogue_index = 0;
 }
 
 NPC.prototype = new Entity();
@@ -660,21 +717,59 @@ NPC.prototype.draw = function (context) {
 }
 
 NPC.prototype.update = function () {
-    if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
-        this.move_animation = this.animations.right;
-        this.direction = Direction.RIGHT;
-    } else if (this.x === 288 && this.y === 224 && this.direction === Direction.RIGHT) {
-        this.move_animation = this.animations.up;
-        this.direction = Direction.UP;
-    } else if (this.x === 288 && this.y === 224 && this.direction === Direction.UP) {
-        this.move_animation = this.animations.left;
-        this.direction = Direction.LEFT;
-    } else if (this.x === 160 && this.y === 224 && this.direction === Direction.LEFT) {
-        this.move_animation = this.animations.down;
-        this.direction = Direction.DOWN;
+    if (!this.interacting) {
+        if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
+            this.move_animation = this.animations.right;
+            this.direction = Direction.RIGHT;
+        } else if (this.x === 288 && this.y === 224 && this.direction === Direction.RIGHT) {
+            this.move_animation = this.animations.up;
+            this.direction = Direction.UP;
+        } else if (this.x === 288 && this.y === 224 && this.direction === Direction.UP) {
+            this.move_animation = this.animations.left;
+            this.direction = Direction.LEFT;
+        } else if (this.x === 160 && this.y === 224 && this.direction === Direction.LEFT) {
+            this.move_animation = this.animations.down;
+            this.direction = Direction.DOWN;
+        }
+        this.changeCoordinates(0, 0, 0.25, 0.25);
+    } else {
+        this.updateDialogue(); 
     }
-    this.changeCoordinates(0, 0, 0.25, 0.25);
+}
 
+NPC.prototype.updateDialogue = function () {
+    if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = text_box.childNodes[1];
+            if (this.dialogue_index < this.dialogue.length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.dialogue_index];
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                this.game.canControl = true;
+                this.interacting = false;
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+// loops through dialogue for the given NPC.
+NPC.prototype.startInteraction = function () {
+    var text_box = document.getElementById("dialogue_box");
+    text_box.style.visibility = "visible";
+    this.game.context.canvas.tabIndex = 2;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true; 
+    var text = text_box.childNodes[1];
+    this.game.canControl = false;
+    text.innerHTML = this.dialogue[this.dialogue_index];
 }
 /*
 An object that is passed in when creating a new enemy that has a full map of its animations.
