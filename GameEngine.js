@@ -118,6 +118,8 @@ GameEngine.prototype.startInput = function () {
         }
     }, false);
 
+   
+
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
@@ -517,11 +519,20 @@ Hero.prototype.update = function () {
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
             if (interactable) {
+                this.reposition(interactable);
                 interactable.startInteraction();
                 this.game.space = false;
                 this.game.key = 0;
             }
         }
+    }
+}
+
+Hero.prototype.reposition = function (other) {
+    if (this.x < other.x && this.direction !== Direction.RIGHT) {
+        this.direction = Direction.RIGHT; 
+    } else if (this.x > other.x && this.direction !== Direction.LEFT) {
+        this.direction = Direction.LEFT;
     }
 }
 
@@ -560,24 +571,31 @@ Hero.prototype.changeCoordinates = function (down, up, left, right) {
     }
 }
 
+// used for map collision detection
 Hero.prototype.canMove = function (direction) {
     // default is for Direction.DOWN.
-    var index_low = { x: this.x + 20, y: this.y + 62 };
-    var index_high = { x: this.x + 46, y: this.y + 62 };
+    var index_low = { x: this.x + 20, y: this.y + 64 };
+    var index_high = { x: this.x + 46, y: this.y + 64 };
 
     // change if not default.
     switch (direction) {
         case Direction.UP:
-            index_low.y = this.y + 55;
-            index_high.y = this.y + 55;
+            index_low.y = this.y + 45;
+            index_high.y = this.y + 45;
+            break;
+        case Direction.DOWN:
+            index_low.y = this.y + 70;
+            index_high.y = this.y + 70;
             break;
         case Direction.LEFT:
             index_low.y = this.y + 50;
-            index_high.x = this.x + 20;
+            index_high.x = this.x + 15;
+            index_low.x = this.x + 15;
             break;
         case Direction.RIGHT:
             index_low.y = this.y + 50;
-            index_low.x = this.x + 46;
+            index_low.x = this.x + 51;
+            index_high.x = this.x + 51;
     }
 
     // change x and/or y according to quadrant.
@@ -680,7 +698,7 @@ Warrior = function (game, stats) {
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false)
     };
     this.x = 10;
-    this.y = 224;
+    this.y = 215;
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
@@ -754,7 +772,8 @@ NPC = function (game, dialogue) {
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
     }
     this.x = 160;
-    this.y = 224;
+    this.y = 215;
+   // this.move_animation = this.animations.right;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
 
     // next few variables used for NPC interaction and dialogue. 
@@ -774,16 +793,16 @@ NPC.prototype.draw = function (context) {
 
 NPC.prototype.update = function () {
     if (!this.interacting) {
-        if (this.x === 160 && this.y === 224 && this.direction === Direction.DOWN) {
+        if (this.x === 160 && this.direction === Direction.DOWN) {
             this.move_animation = this.animations.right;
             this.direction = Direction.RIGHT;
-        } else if (this.x === 288 && this.y === 224 && this.direction === Direction.RIGHT) {
+        } else if (this.x === 288  && this.direction === Direction.RIGHT) {
             this.move_animation = this.animations.up;
             this.direction = Direction.UP;
-        } else if (this.x === 288 && this.y === 224 && this.direction === Direction.UP) {
+        } else if (this.x === 288  && this.direction === Direction.UP) {
             this.move_animation = this.animations.left;
             this.direction = Direction.LEFT;
-        } else if (this.x === 160 && this.y === 224 && this.direction === Direction.LEFT) {
+        } else if (this.x === 160  && this.direction === Direction.LEFT) {
             this.move_animation = this.animations.down;
             this.direction = Direction.DOWN;
         }
@@ -828,7 +847,7 @@ NPC.prototype.startInteraction = function () {
     this.reposition(); 
     var text_box = document.getElementById("dialogue_box");
     text_box.style.visibility = "visible";
-    this.game.context.canvas.tabIndex = 2;
+    this.game.context.canvas.tabIndex = 0;
     text_box.tabIndex = 1;
     text_box.focus();
     this.interacting = true; 
@@ -838,7 +857,13 @@ NPC.prototype.startInteraction = function () {
 }
 
 NPC.prototype.reposition = function () {
-
+    if (this.x > this.game.entities[0].x && this.direction !== Direction.LEFT) {
+        this.direction = Direction.LEFT;
+        this.move_animation = this.animations.left; 
+    } else if (this.x < this.game.entities[0].x && this.direction !== Direction.RIGHT) {
+        this.direction = Direction.RIGHT;
+        this.move_animation = this.animations.right;
+    }
 }
 /*
 An object that is passed in when creating a new enemy that has a full map of its animations.
