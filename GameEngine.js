@@ -408,7 +408,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats) {
     this.width = 43;
     this.height = 64;
     this.fiends = [];
-    this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
+    this.sight = 20; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
                         // pick up on any interaction. 
 }
 
@@ -430,8 +430,8 @@ Hero.prototype.checkForUserInteraction = function () {
         }
     }
     for (var i = 0; i < this.game.environment.interactables.length; i++) {
-        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x - 15) - this.x);
-        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y - 15) - this.y);
+        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 15));
+        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 40));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
         if (ent_distance < min_distance) {
             min_distance = ent_distance;
@@ -529,7 +529,7 @@ Hero.prototype.update = function () {
     if (!this.game.is_battle) {
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
-            if (interactable) {
+            if (interactable.ent) {
                 if (interactable.reposition) {
                     this.reposition(interactable);
                 }
