@@ -317,7 +317,6 @@ Event = function(entity, animation)
     this.entity = entity;
     this.animation = animation;
 }
-Object.freeze(Direction);
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */
 Entity = function (game, x, y, spriteSheet, animations, stats) {
@@ -501,19 +500,14 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    if (Math.round(Math.random() * 1000) >= 1001) {
-
-        return true;
-    }
-    else {
-        return false;
-    }
+    return Math.round(Math.random() * 1000) >= 1001;
 }
 
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
-    Entity.prototype.changeLocation.call(this);
+    this.changeLocation();
+    
     this.preBattle();
     this.checkBoundaries();
     if (!this.game.is_battle) {
@@ -522,6 +516,7 @@ Hero.prototype.update = function () {
             if (interactable) {
                 interactable.startInteraction();
                 this.game.space = false;
+                this.game.key = 0;
             }
         }
     }
@@ -535,34 +530,82 @@ Hero.prototype.preBattle = function () {
     }
 }
 
-
-
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
-    switch (this.direction) {
-        case Direction.DOWN:
-            if (!this.boundaryDown()) {
-                this.y += down;
-            }
-            break;
-        case Direction.UP:
-            if (!this.boundaryUp()) {
-                this.y -= up;
-            }
-            break;
-        case Direction.LEFT:
-            if (!this.boundaryLeft()) {
-                this.x -= left;
-            }
-            break;
-        case Direction.RIGHT:
-            if (!this.boundaryRight()) {
-                this.x += right;
-            }
-            break;
+    if (this.canMove(this.direction)) {
+        switch (this.direction) {
+            case Direction.DOWN:
+                if (!this.boundaryDown()) {
+                    this.y += down;
+                }
+                break;
+            case Direction.UP:
+                if (!this.boundaryUp()) {
+                    this.y -= up;
+                }
+                break;
+            case Direction.LEFT:
+                if (!this.boundaryLeft()) {
+                    this.x -= left;
+                }
+                break;
+            case Direction.RIGHT:
+                if (!this.boundaryRight()) {
+                    this.x += right;
+                }
+                break;
+        }
     }
 }
 
-// Boundary detection
+Hero.prototype.canMove = function (direction) {
+    // default is for Direction.DOWN.
+    var index_low = { x: this.x + 20, y: this.y + 62 };
+    var index_high = { x: this.x + 46, y: this.y + 62 };
+
+    // change if not default.
+    switch (direction) {
+        case Direction.UP:
+            index_low.y = this.y + 55;
+            index_high.y = this.y + 55;
+            break;
+        case Direction.LEFT:
+            index_low.y = this.y + 50;
+            index_high.x = this.x + 20;
+            break;
+        case Direction.RIGHT:
+            index_low.y = this.y + 50;
+            index_low.x = this.x + 46;
+    }
+
+    // change x and/or y according to quadrant.
+    if (this.game.environment.curr_quadrant !== 0) {
+        this.changeBound(index_low);
+        this.changeBound(index_high);
+    }
+
+    var x1 = Math.floor(index_low.x / 32);
+    var x2 = Math.floor(index_high.x / 32);
+    var y1 = Math.floor(index_low.y / 32);
+    var y2 = Math.floor(index_high.y / 32);
+    return this.isPassable(this.getTile(x1, y1)) && this.isPassable(this.getTile(x2, y2));
+}
+
+// changes x and/or y coordinates based on which quadrant of the map the character is in. Used for map collision detection
+Hero.prototype.changeBound = function (index_object) {
+    if (this.game.environment.curr_quadrant !== 0) {
+        if (this.game.environment.curr_quadrant >= 3) {
+            index_object.y += 11 * 32;
+        }
+        if (this.game.environment.curr_quadrant === 1 || this.game.environment.curr_quadrant === 4) {
+            index_object.x += 11 * 32;
+        } else if (this.game.environment.curr_quadrant === 2 || this.game.environment.curr_quadrant === 5) {
+            index_object.x += 23 * 32;
+        }
+    }
+}
+
+
+// Boundary detection (for map transition)
 Hero.prototype.boundaryRight = function () {
     return this.x + this.width > this.game.context.canvas.width;
 }
@@ -611,6 +654,16 @@ Hero.prototype.checkBoundaries = function () {
         }
     }
 }
+
+// returns the number associated with the tile that the hero is standing on. used for collision purposes.
+Hero.prototype.getTile = function (x, y) {
+    return this.game.environment.map[y][x];
+}
+
+Hero.prototype.isPassable = function (tile) {
+    return (tile === 0 || (tile >= 7 && tile <= 14));
+}
+
 
 Warrior = function (game, stats) {
     this.game = game;
@@ -759,8 +812,16 @@ NPC.prototype.updateDialogue = function () {
     }
 }
 
+// when setting changes or a quest completes, change what the NPC says with this function
+NPC.prototype.changeDialogue = function () {
+    this.dialogue = ["",
+                     "",
+                     ""];
+}
+
 // loops through dialogue for the given NPC.
 NPC.prototype.startInteraction = function () {
+    this.reposition(); 
     var text_box = document.getElementById("dialogue_box");
     text_box.style.visibility = "visible";
     this.game.context.canvas.tabIndex = 2;
@@ -770,6 +831,10 @@ NPC.prototype.startInteraction = function () {
     var text = text_box.childNodes[1];
     this.game.canControl = false;
     text.innerHTML = this.dialogue[this.dialogue_index];
+}
+
+NPC.prototype.reposition = function () {
+
 }
 /*
 An object that is passed in when creating a new enemy that has a full map of its animations.
@@ -785,11 +850,8 @@ Animations = function(down, up, left, right, destroy, hit, death)
     this.hit = hit;
     this.death = death;
 }
-Tile = function (id, passable, selectable) {
-    this.id = id;
-    this.passable = passable;
-    this.selectable = selectable;
-}
+
+
 
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
 Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
@@ -815,7 +877,7 @@ Environment = function (game) {
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 0, 3, 4, 5, 6, 29, 28, 62, 5, 6, 65, 5, 6, 0, 29, 20, 5, 6],
                 [0, 66, 0, 0, 94, 90, 91, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 5, 6, 20, 28, 62, 29, 62, 63, 3, 4, 0, 28, 3, 4, 19, 0, 28],
                 [67, 68, 69, 94, 95, 92, 93, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 19, 29, 37, 38, 3, 4, 5, 6, 28, 29, 5, 6, 3, 4, 29],
-                [70, 71, 72, 95, 90, 91, 90, 91, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 8, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 3, 4, 29, 20, 3, 4, 5, 6, 65],
+                [70, 71, 72, 95, 90, 91, 90, 91, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 3, 4, 29, 20, 3, 4, 5, 6, 65],
                 [73, 74, 75, 94, 92, 93, 92, 93, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 28, 5, 6, 64, 19, 5, 6, 65, 30, 30],
                 [76, 78, 76, 95, 94, 90, 91, 94, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 29, 28, 3, 4, 65, 32, 63, 32, 31, 31],
                 [77, 79, 77, 0, 95, 92, 93, 95, 0, 77, 79, 77, 0, 95, 95, 92, 93, 95, 9, 10, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 81, 82, 0, 29, 5, 6, 63, 33, 30, 33, 65, 65],
