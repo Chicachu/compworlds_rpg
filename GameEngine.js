@@ -419,6 +419,7 @@ Hero.prototype.constructor = Hero;
 Hero.prototype.checkForUserInteraction = function () {
     var min_distance = Math.sqrt(Math.pow(this.sight, 2) + Math.pow(this.sight, 2));
     var min_index = null;
+    var array = 0;
     for (var i = 1; i < this.game.entities.length; i++) {
         var ent_x_difference = Math.abs(this.game.entities[i].x - this.x); 
         var ent_y_difference = Math.abs(this.game.entities[i].y - this.y); 
@@ -428,10 +429,20 @@ Hero.prototype.checkForUserInteraction = function () {
             min_index = i;
         }
     }
-    if (min_index) {
-        return this.game.entities[min_index];
+    for (var i = 0; i < this.game.environment.interactables.length; i++) {
+        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x - 15) - this.x);
+        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y - 15) - this.y);
+        var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
+        if (ent_distance < min_distance) {
+            min_distance = ent_distance;
+            min_index = i;
+            array = 1;
+        }
+    }
+    if (array === 0) {
+        return { ent: this.game.entities[min_index], reposition: true };
     } else {
-        return null;
+        return { ent: this.game.environment.interactables[min_index] }
     }
 }
 
@@ -519,8 +530,10 @@ Hero.prototype.update = function () {
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
             if (interactable) {
-                this.reposition(interactable);
-                interactable.startInteraction();
+                if (interactable.reposition) {
+                    this.reposition(interactable);
+                }
+                interactable.ent.startInteraction();
                 this.game.space = false;
                 this.game.key = 0;
             }
@@ -575,7 +588,7 @@ Hero.prototype.changeCoordinates = function (down, up, left, right) {
 Hero.prototype.canMove = function (direction) {
     // default is for Direction.DOWN.
     var index_low = { x: this.x + 20, y: this.y + 62 };
-    var index_high = { x: this.x + 46, y: this.y + 62 };
+    var index_high = { x: this.x + 44, y: this.y + 62 };
 
     // change if not default.
     switch (direction) {
@@ -594,8 +607,8 @@ Hero.prototype.canMove = function (direction) {
             break;
         case Direction.RIGHT:
             index_low.y = this.y + 50;
-            index_low.x = this.x + 51;
-            index_high.x = this.x + 51;
+            index_low.x = this.x + 49;
+            index_high.x = this.x + 49;
     }
 
     // change x and/or y according to quadrant.
@@ -685,7 +698,7 @@ Hero.prototype.isPassable = function (tile, index) {
     if (this.game.environment.level === 1) {
         if (tile === 0 || (tile >= 7 && tile <= 14) || tile === 80) {
             return true;
-        } else if (tile === 66) {
+        } else if (tile === 66 || tile === 105) {
             if (index.y < 304) {
                 return true;
             }
@@ -888,8 +901,6 @@ Animations = function(down, up, left, right, destroy, hit, death)
     this.death = death;
 }
 
-
-
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
 Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     if (tileSheetPathName) {
@@ -910,7 +921,7 @@ Environment = function (game) {
                 [73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 95, 0, 94, 18, 16, 18, 15, 16, 94, 95, 0, 95, 3, 4, 5, 6, 5, 6, 28, 28, 29, 3, 4, 0, 19],
                 [76, 76, 78, 95, 90, 91, 95, 76, 78, 76, 95, 90, 91, 95, 76, 78, 76, 0, 94, 95, 94, 1, 94, 18, 94, 95, 94, 94, 0, 5, 6, 28, 28, 63, 28, 29, 29, 0, 5, 6, 3, 4],
                 [77, 77, 79, 85, 92, 93, 85, 77, 79, 77, 87, 92, 93, 87, 77, 79, 77, 94, 95, 94, 95, 2, 95, 94, 95, 94, 95, 95, 3, 4, 28, 29, 29, 20, 29, 28, 3, 4, 3, 4, 5, 6],
-                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 95, 0, 95, 94, 94, 0, 95, 94, 95, 94, 0, 5, 6, 29, 28, 0, 19, 28, 29, 5, 6, 5, 6, 62, 64],
+                [0, 0, 80, 87, 86, 85, 87, 89, 80, 0, 86, 85, 87, 85, 0, 80, 0, 95, 0, 95, 94, 94, 0, 95, 94, 95, 94, 0, 5, 6, 29, 28, 0, 19, 28, 29, 5, 6, 5, 6, 62, 64],
                 [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 95, 0, 95, 3, 4, 28, 0, 29, 3, 4, 29, 3, 4, 0, 28, 0, 3, 4],
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 0, 3, 4, 5, 6, 29, 28, 62, 5, 6, 65, 5, 6, 0, 29, 20, 5, 6],
                 [0, 66, 0, 0, 94, 90, 91, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 5, 6, 20, 28, 62, 29, 62, 63, 3, 4, 0, 28, 3, 4, 19, 0, 28],
@@ -939,10 +950,52 @@ Environment = function (game) {
     this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
     this.curr_quadrant = 0;
     this.fiends = [];
+    this.interactables = [];
+    this.initInteractables();
     this.fiends.push(this.game.auxillary_sprites[0]);
     this.fiends.push(this.game.auxillary_sprites[1]);
 }
 
+Environment.prototype.initInteractables = function () {
+    this.interactables.push(new Door(2 * 32, 6 * 32, 0, this.game)); // door 1
+    this.interactables.push(new Door(8 * 32, 6 * 32, 0, this.game)); // door 2 
+    this.interactables.push(new Interactable(7 * 32, 6 * 32, 0, this.game)); // sign in front of store
+    this.interactables.push(new Door(15 * 32, 6 * 32, 0, this.game)); // door 3
+}
+
+Interactable = function (x, y, quad, game) {
+    this.x = x;
+    this.y = y;
+    this.quad = quad;
+    this.game = game;
+}
+
+Interactable.prototype.startInteraction = function () { }
+
+Door = function (x, y, quad, game) {
+    this.is_closed = true;
+    Interactable.call(this, x, y, quad, game);
+}
+
+Door.prototype = new Interactable();
+Door.prototype.constructor = Door;
+
+Door.prototype.startInteraction = function () {
+    var y = this.y / 32;
+    var x = this.x / 32;
+    if (this.is_closed) {
+        // close door
+        this.game.environment.map[y][x] = 105;
+        this.game.environment.map[y - 1][x] = 102;
+        this.game.environment.map[y - 2][x] = 101;
+    } else {
+        // open door
+        this.game.environment.map[y][x] = 80;
+        this.game.environment.map[y - 1][x] = 79;
+        this.game.environment.map[y - 2][x] = 78;
+    }
+    this.is_closed = !this.is_closed;
+}
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
 Environment.prototype.generateFiend = function (f)
@@ -1040,7 +1093,7 @@ Background.prototype.draw = function (context, scaleBy) {
 }
 
 Background.prototype.update = function () {
-
+    
 }
 
 
