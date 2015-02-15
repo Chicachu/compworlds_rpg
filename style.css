@@ -6,6 +6,27 @@
     z-index: -1;
 }
 
+#dialogue_box {
+    margin: 0 auto;
+    width: 500px; 
+    height: 75px;
+    text-align: center; 
+    position: relative;
+    z-index: 2; 
+    top: -525px;
+    pointer-events: none;
+    background-image: url("./imgs/menu_background.png"); 
+    border-radius: 25px;
+    visibility: hidden;
+}
+
+#dialogue_box p {
+    color: #d8bca1;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+    display: inline-block;
+    vertical-align: middle; 
+}
+
 #battle_menu {
     margin: 0 auto;
     width: 608px; 

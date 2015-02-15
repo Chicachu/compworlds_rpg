@@ -35,13 +35,19 @@ ASSET_MANAGER.downloadAll(function () {
         );
     var warrior = new Warrior(gameEngine, new Statistics(50, 20, 10));
     var skeleton = new Enemy(gameEngine, new Statistics(50, 15, 5), skeleton_anims);
-    var npc = new NPC(gameEngine);
+    var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
+                                        "The village has been destroyed by an evil dragon, everyone... they are gone.",
+                                        "We must do something! I saw the dragon fly to the southeast *points determindly*",
+                                        "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
+                                        "And by rebuild, I mean repopulate. *wink wink*"]);
     var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
+    // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
+        // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
     gameEngine.addAuxillaryEntity(mal);
     gameEngine.addAuxillaryEntity(skeleton);
-    gameEngine.addEntity(npc);
+    gameEngine.addEntity(girl_npc);
 
     gameEngine.init(context);
     
