@@ -782,55 +782,97 @@ Enemy.prototype.hit = function () {
 
 }
 
-/* NPC */
-NPC = function (game, dialogue) {
+/* NPC 
+game : the game engine
+dialogue : array of strings which will be used as the NPC's dialogue
+anims : a SpriteSet object with the characters full set of animations
+path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
+pause : whether the NPC will rest for 1 second once it reaches one of its points*/
+NPC = function (game, dialogue, anims, path, pause) {
     this.game = game;
-    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
-    this.animations = {
-        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
-        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
-        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
-        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false)
-    }
-    this.x = 160;
-    this.y = 215;
-   // this.move_animation = this.animations.right;
+    this.spriteSheet = anims.right.spriteSheet;
+
+    //next variables for the npc's path
+    this.path = path;
+    this.pause = pause;
+    this.next_point = null;
+    this.pause_timer = null;
+    this.animations = anims;
+    this.path.push(this.path.shift());
+
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
+    this.x = this.path[0].getX();
+    this.y = this.path[0].getY();
 
     // next few variables used for NPC interaction and dialogue. 
     this.interacting = false;
     this.dialogue = dialogue;
     this.dialogue_index = 0;
+    this.setNextCoords();
 }
 
 NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
+NPC.prototype.setNextCoords = function()
+{
+        this.next_point = this.path.shift();
+        this.path.push(this.next_point);
+}
 NPC.prototype.draw = function (context) {
     if (!this.game.is_battle && this.game.environment.curr_quadrant === 0) {
-        this.move_animation.drawFrame(this.game.clockTick, context, this.x, this.y);
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
 NPC.prototype.update = function () {
-    if (!this.interacting) {
-        if (this.x === 160 && this.direction === Direction.DOWN) {
-            this.move_animation = this.animations.right;
+    if (!this.interacting)
+    {
+        if (this.next_point.getX() > this.x)
+        {
+            this.curr_anim = this.animations.right;
             this.direction = Direction.RIGHT;
-        } else if (this.x === 288  && this.direction === Direction.RIGHT) {
-            this.move_animation = this.animations.up;
-            this.direction = Direction.UP;
-        } else if (this.x === 288  && this.direction === Direction.UP) {
-            this.move_animation = this.animations.left;
-            this.direction = Direction.LEFT;
-        } else if (this.x === 160  && this.direction === Direction.LEFT) {
-            this.move_animation = this.animations.down;
-            this.direction = Direction.DOWN;
+            this.changeCoordinates(0, 0, 0, 0.25);
         }
-        this.changeCoordinates(0, 0, 0.25, 0.25);
-    } else {
-        this.move_animation = this.stopAnimation(this.move_animation);
-        this.updateDialogue(); 
+        else if (this.next_point.getX() < this.x)
+        {
+            this.curr_anim = this.animations.left;
+            this.direction = Direction.LEFT;
+            this.changeCoordinates(0, 0, 0.25, 0);
+        }
+        else if (this.next_point.getY() > this.y)
+        {
+            this.curr_anim = this.animations.down;
+            this.direction = Direction.DOWN;
+            this.changeCoordinates(0.25, 0, 0, 0);
+        }
+        else if (this.next_point.getY() < this.y)
+        {
+            this.curr_anim = this.animations.up;
+            this.direction = Direction.UP;
+            this.changeCoordinates(0, 0.25, 0, 0);
+        }
+        else {
+            if (!this.pause_timer && this.pause) {
+                var that = this;
+                this.curr_anim = this.stopAnimation(this.curr_anim);
+                this.pause_timer = setTimeout(function () {
+                    that.setNextCoords();
+                    that.hanging = false;
+                    clearInterval(that.pause_timer);
+                    that.pause_timer = null;
+                }, 1000);
+            }
+            else if(!this.pause)
+            {
+                this.setNextCoords();
+            }
+        }
+            
+    }
+    else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
     }
 }
 
@@ -865,13 +907,13 @@ NPC.prototype.changeDialogue = function () {
 
 // loops through dialogue for the given NPC.
 NPC.prototype.startInteraction = function () {
-    this.reposition(); 
+    this.reposition();
     var text_box = document.getElementById("dialogue_box");
     text_box.style.visibility = "visible";
     this.game.context.canvas.tabIndex = 0;
     text_box.tabIndex = 1;
     text_box.focus();
-    this.interacting = true; 
+    this.interacting = true;
     var text = text_box.childNodes[1];
     this.game.canControl = false;
     text.innerHTML = this.dialogue[this.dialogue_index];
@@ -880,17 +922,32 @@ NPC.prototype.startInteraction = function () {
 NPC.prototype.reposition = function () {
     if (this.x > this.game.entities[0].x && this.direction !== Direction.LEFT) {
         this.direction = Direction.LEFT;
-        this.move_animation = this.animations.left; 
+        this.curr_anim = this.animations.left;
     } else if (this.x < this.game.entities[0].x && this.direction !== Direction.RIGHT) {
         this.direction = Direction.RIGHT;
-        this.move_animation = this.animations.right;
+        this.curr_anim = this.animations.right;
     }
 }
+
+Point = function(x, y)
+{
+    this.x = x;
+    this.y = y;
+}
+Point.prototype.getX = function()
+{
+    return this.x;
+}
+Point.prototype.getY = function()
+{
+    return this.y;
+}
+
 /*
-An object that is passed in when creating a new enemy that has a full map of its animations.
+An object that is passed in when creating a new enemy/NPC/Hero that has a full map of its animations.
 If a certain animation does not exist, pass in null.
 */
-Animations = function(down, up, left, right, destroy, hit, death)
+SpriteSet = function(down, up, left, right, destroy, hit, death)
 {
     this.down = down;
     this.up = up;

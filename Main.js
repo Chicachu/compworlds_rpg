@@ -19,8 +19,9 @@ ASSET_MANAGER.downloadAll(function () {
     
     var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
+    var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
 
-    var skeleton_anims = new Animations(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false), 
+    var skeleton_anims = new SpriteSet(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false), 
         new Animation(skeleton_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
         new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
         new Animation(skeleton_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
@@ -28,7 +29,7 @@ ASSET_MANAGER.downloadAll(function () {
         new Animation(skeleton_sprites, 0, 20, 64, 64, 0.07, 5, true, false),
         new Animation(skeleton_sprites, 6, 20, 64, 64, .1, 1, true, false));
 
-    var malboro_anims = new Animations(null, null, null, new Animation(malboro_sprites, 0, 0, 71, 91, .15, 3, true, false),
+    var malboro_anims = new SpriteSet(null, null, null, new Animation(malboro_sprites, 0, 0, 71, 91, .15, 3, true, false),
         new Animation(malboro_sprites, 0, 1, 71, 91, .12, 6, true, false),
         new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
         new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
@@ -39,7 +40,11 @@ ASSET_MANAGER.downloadAll(function () {
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "We must do something! I saw the dragon fly to the southeast *points determindly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
-                                        "And by rebuild, I mean repopulate. *wink wink*"]);
+                                        "And by rebuild, I mean repopulate. *wink wink*"], new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
+                                            new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
+                                            new Animation(npc_sprites, 0, 9, 64, 64, 0.05, 9, true, false),
+                                            new Animation(npc_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
+                                            null, null, null), [new Point(160, 200)], true);
     var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
