@@ -158,13 +158,19 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-GameEngine.prototype.clearEntities = function()
+GameEngine.prototype.clearEntities = function(save_entities)
 {
     for(var i = 1; i < this.entities.length; i++)
     {
-        this.auxillary_sprites.push(this.entities.pop());
+        if (save_entities) {
+            this.auxillary_sprites.push(this.entities.pop());
+        }
+        else {
+            this.entities.pop();
+        }
     }
 }
+
 GameEngine.prototype.reLoadEntities = function()
 {
     for(var i = 0; i < this.auxillary_sprites.length; i++)
@@ -253,7 +259,7 @@ GameEngine.prototype.setBattle = function (player) {
     player.y = 200;
     player.direction = Direction.LEFT;
     player.fiends = player.game.environment.generateFiend(player.game, player.fiends).splice(0);
-    player.game.clearEntities();
+    player.game.clearEntities(true);
     var space_out = ((player.game.height / 2) / player.fiends.length) * 1.2;
     var next_y = space_out;
     for (var i = 0; i < player.fiends.length; i++) {
@@ -278,8 +284,12 @@ GameEngine.prototype.endBattle = function (player)
     player.x = player.save_x;
     player.y = player.save_y;
     player.direction = player.save_direction;
-    player.game.clearEntities();
+    player.game.clearEntities(false);
     player.game.reLoadEntities();
+    for(var i = 0; i <= player.fiends.length; i ++)
+    {
+        player.fiends.pop();
+    }
 }
 /**
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
@@ -289,9 +299,9 @@ GameEngine.prototype.battleOver = function (players) {
     if (players[0].game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0)) {
         players[0].game.canControl = false;
         players[1].game.animation_queue.push(new Event(players[1], players[1].animations.death));
-        player.game.timerId2 = setTimeout(function () {
-            player.game.fadeOut(player.game, player.game.entities[0], player.game.endBattle);
-            clearInterval(player.game.timerId2);
+        players[0].game.timerId2 = setTimeout(function () {
+            players[0].game.fadeOut(players[0].game, players[0], players[0].game.endBattle);
+            clearInterval(players[0].game.timerId2);
         }, 2000);
     }
 }
@@ -849,25 +859,25 @@ NPC.prototype.update = function () {
         {
             this.curr_anim = this.animations.right;
             this.direction = Direction.RIGHT;
-            this.changeCoordinates(0, 0, 0, 0.25);
+            this.changeCoordinates(0, 0, 0, 0.5);
         }
         else if (this.next_point.getX() < this.x)
         {
             this.curr_anim = this.animations.left;
             this.direction = Direction.LEFT;
-            this.changeCoordinates(0, 0, 0.25, 0);
+            this.changeCoordinates(0, 0, 0.5, 0);
         }
         else if (this.next_point.getY() > this.y)
         {
             this.curr_anim = this.animations.down;
             this.direction = Direction.DOWN;
-            this.changeCoordinates(0.25, 0, 0, 0);
+            this.changeCoordinates(0.5, 0, 0, 0);
         }
         else if (this.next_point.getY() < this.y)
         {
             this.curr_anim = this.animations.up;
             this.direction = Direction.UP;
-            this.changeCoordinates(0, 0.25, 0, 0);
+            this.changeCoordinates(0, 0.5, 0, 0);
         }
         else {
             if (!this.pause_timer && this.pause) {
