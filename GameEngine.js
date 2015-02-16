@@ -118,7 +118,6 @@ GameEngine.prototype.startInput = function () {
         }
     }, false);
 
-   
 
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
@@ -251,14 +250,15 @@ GameEngine.prototype.setBattle = function (player) {
     player.save_y = player.y;
     player.save_direction = player.direction;
     player.x = 300;
-    player.y = 250;
+    player.y = 200;
     player.direction = Direction.LEFT;
-    player.game.environment.generateFiend(player.game, player.fiends);
+    player.fiends = player.game.environment.generateFiend(player.game, player.fiends).splice(0);
     player.game.clearEntities();
+    var space_out = ((player.game.height / 2) / player.fiends.length) * 1.2;
+    var next_y = space_out;
     for (var i = 0; i < player.fiends.length; i++) {
-        if (i > 0) {
-            player.fiends[i].y = 225 - player.fiends[i - 1].y;
-        }
+        player.fiends[i].y = next_y;
+        next_y += space_out;
         player.game.addEntity(player.fiends[i]);
     }
     player.game.menu.showMenu(true);
@@ -301,11 +301,11 @@ GameEngine.prototype.battleOver = function (players) {
     the foes hit animation. also does a damage calculation for the hit target
 */
 GameEngine.prototype.fight = function (player, foe) {
-    //player.game.animation_queue.push(new Event(player, player.animations.destroy));
-    //player.game.animation_queue.push(new Event(player, player.stop_move_animation));
-    //foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
-    //foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation));
-    //foe.stats.health = foe.stats.health -((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
+    player.game.animation_queue.push(new Event(player, player.animations.destroy));
+    player.game.animation_queue.push(new Event(player, player.stop_move_animation));
+    foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
+    foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation));
+    foe.stats.health = foe.stats.health -((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
 Timer = function () {
@@ -533,7 +533,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 1000) >= 1001;
+    return Math.round(Math.random() * 1000) >= 999;
 }
 
 Hero.prototype.update = function () {
@@ -756,7 +756,7 @@ Enemy = function (game, stats, anims, loop_while_standing) {
     this.game = game;
     this.spriteSheet = anims.destroy.spriteSheet;
     this.x = 50;
-    this.y = 100;
+    this.y = 150;
     this.animations = {
         down: anims.down,
         up: anims.up,
@@ -1093,12 +1093,14 @@ Door.prototype.startInteraction = function () {
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
 Environment.prototype.generateFiend = function (game, f)
 {
-    var number_of_fiends = Math.floor(Math.random() * (3 - 1)) + 1;
+    var number_of_fiends = Math.floor(Math.random() * (4 - 1)) + 1;
+    var fiend_array = [];
     for (var i = 0; i < number_of_fiends; i++) {
         var fiend_number = Math.floor(Math.random() * (this.fiends.length - 0) + 0);
         var fiend = this.fiends[fiend_number];
-        f.push(new Enemy(game, new Statistics(100, 15, 5), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
+        fiend_array.push(new Enemy(game, new Statistics(100, 15, 5), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
     }
+    return fiend_array;
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
