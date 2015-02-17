@@ -441,27 +441,6 @@ Hero = function (game, x, y, spriteSheet, animations, stats) {
     this.items = [];
 }
 
-Hero.prototype.deductCoin = function (amount) {
-    if (this.coin >= amount) {
-        this.coin -= amount;
-        return true;
-    } else {
-        return false; 
-    }
-}
-
-Hero.prototype.addCoin = function (amount) {
-    this.coint += amount;
-}
-
-Hero.prototype.receiveItem = function (item) {
-    if (this.items[item.name]) {
-        this.items[item.name].increaseQty(item.qty);
-    } else {
-        this.items[item.name] = item;
-    }
-}
-
 Hero.prototype = new Entity();
 Hero.prototype.constructor = Hero;
 
@@ -756,6 +735,43 @@ Hero.prototype.isPassable = function (tile, index) {
     }
 }
 
+Hero.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Hero.prototype.addCoin = function (amount) {
+    this.coint += amount;
+}
+
+Hero.prototype.recieveItem = function (item) {
+    if (this.items[item.name]) {
+        this.items[item.name].increaseQty(item.qty);
+    } else {
+        this.items[item.name] = item;
+    }
+}
+
+Hero.prototype.giveItem = function (item_name, qty) {
+    var item = null; 
+    if (this.items[item_name] && this.items[item_name].qty >= qty) {
+        if (this.items[item_name].qty === qty) {
+            item = this.items[item_name];
+            this.items.splice(item_name, 1);
+        } else {
+            item = this.items[item_name];
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty);
+            this.items[item_name].decreaseQty(qty);
+        }
+        _item = item;
+        this.items.splice(item.name, 1);
+    }
+}
 
 Warrior = function (game, stats) {
     this.game = game;
@@ -987,9 +1003,18 @@ Storekeeper = function (game, dialogue, anims, path, pause, name) {
 Storekeeper.prototype = new NPC();
 Storekeeper.prototype.constructor = Storekeeper;
 
-Storekeeper.prototype.requestSale = function (buyer, item) {
+Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
+    var item = null;
     if (buyer.deductCoin()) {
-        this.items.splice(item.name, 1);
+        item = this.items[item_name];
+        if (this.items[item_name].qty === qty) {
+            this.items.splice(item_name, 1);
+        } else {
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty); 
+            this.items[item_name].decreaseQty(qty);
+        }
+        buyer.recieveItem(item); 
     } else {
         // TODO make shopkeeper say something about not having enough money to buy the item. 
     }
