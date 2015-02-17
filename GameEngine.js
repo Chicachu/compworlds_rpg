@@ -436,7 +436,30 @@ Hero = function (game, x, y, spriteSheet, animations, stats) {
     this.height = 64;
     this.fiends = [];
     this.sight = 20; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
-                        // pick up on any interaction. 
+    // pick up on any interaction. 
+    this.coin = 500;
+    this.items = [];
+}
+
+Hero.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false; 
+    }
+}
+
+Hero.prototype.addCoin = function (amount) {
+    this.coint += amount;
+}
+
+Hero.prototype.receiveItem = function (item) {
+    if (this.items[item.name]) {
+        this.items[item.name].increaseQty(item.qty);
+    } else {
+        this.items[item.name] = item;
+    }
 }
 
 Hero.prototype = new Entity();
@@ -953,6 +976,44 @@ NPC.prototype.reposition = function () {
     } else if (this.x < this.game.entities[0].x && this.direction !== Direction.RIGHT) {
         this.direction = Direction.RIGHT;
         this.curr_anim = this.animations.right;
+    }
+}
+
+Storekeeper = function (game, dialogue, anims, path, pause, name) {
+    this.name = name;
+    NPC.call(this, game, dialogue, anims, path, pause); 
+}
+
+Storekeeper.prototype = new NPC();
+Storekeeper.prototype.constructor = Storekeeper;
+
+Storekeeper.prototype.requestSale = function (buyer, item) {
+    if (buyer.deductCoin()) {
+        this.items.splice(item.name, 1);
+    } else {
+        // TODO make shopkeeper say something about not having enough money to buy the item. 
+    }
+}
+
+Storekeeper.prototype.initializeItems = function (items) {
+    for (var i = 0; i < items.length; i++) {
+        this.items[items[i].name] = items[i];
+    }
+}
+
+Item = function (name, price, qty) {
+    this.name = name;
+    this.price = price;
+    this.qty = qty; 
+}
+
+Item.prototype.increaseQty = function (amount) {
+    this.qty += amount; 
+}
+
+Item.prototype.decreaseQty = function (amount) {
+    if (this.qty >= amount) {
+        this.qty -= amount; 
     }
 }
 
