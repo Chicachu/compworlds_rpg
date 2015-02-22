@@ -763,10 +763,7 @@ Hero.prototype.giveItem = function (item_name, qty) {
             item = this.items[item_name];
             this.items.splice(item_name, 1);
         } else {
-            item = this.items[item_name];
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
+            item = this.items[item_name].splitStack(qty);
         }
         _item = item;
         this.items.splice(item.name, 1);
@@ -1010,9 +1007,7 @@ Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
         if (this.items[item_name].qty === qty) {
             this.items.splice(item_name, 1);
         } else {
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty); 
-            this.items[item_name].decreaseQty(qty);
+            item = this.items[item_name].splitStack(qty);
         }
         buyer.recieveItem(item); 
     } else {
@@ -1040,6 +1035,14 @@ Item.prototype.decreaseQty = function (amount) {
     if (this.qty >= amount) {
         this.qty -= amount; 
     }
+}
+
+Item.prototype.splitStack = function (new_stack_qty) {
+    if (this.qty > new_stack_qty) {
+        var new_stack = new Item(this.name, this.price, new_stack_qty);
+        this.decreaseQty(new_stack_qty);
+        return new_stack;
+    } 
 }
 
 Point = function(x, y)
@@ -1079,6 +1082,10 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.tileSize = tileSize;
     this.sheetWidth = sheetWidth;
     this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
+}
+
+Environment = function (game, level, tilesheet, other_tilesheets, ) {
+
 }
 
 Environment = function (game) {
@@ -1125,6 +1132,23 @@ Environment = function (game) {
 
     this.fiends = [];
     this.initSpriteSets();
+
+    this.house_floor = [[], 
+                        [],
+                        [],
+                        []];
+    this.house_interior = [[], 
+                           [],
+                           [],
+                           []];
+    this.house_floor2 = [[], 
+                         [],
+                         [],
+                         []];
+    this.house_interior2 = [[], 
+                           [],
+                           [],
+                           []];
 }
 
 Environment.prototype.initSpriteSets = function()
