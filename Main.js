@@ -16,7 +16,6 @@ ASSET_MANAGER.downloadAll(function () {
     var context = canvas.getContext("2d");
 
     var gameEngine = new GameEngine();
-    
     //var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
