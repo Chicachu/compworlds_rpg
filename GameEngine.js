@@ -1084,9 +1084,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
 
-Environment = function (game, level, tilesheet, other_tilesheets, ) {
 
-}
 
 Environment = function (game) {
     this.game = game;
