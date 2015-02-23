@@ -194,6 +194,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     } else {
         this.environment.draw(1);
     }
+    this.queueActions();
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.context);
     }
@@ -203,6 +204,33 @@ GameEngine.prototype.draw = function (drawCallBack) {
     this.context.restore();
 }
 
+GameEngine.prototype.queueActions = function()
+{
+if(this.is_battle) {
+    //Logic to calculate when to time the next animation event
+        var event = this.event;
+    //if event is null and there is an animation in the queue, set animation to the first item in the queue
+    if (!event && this.animation_queue.length > 0) {
+        event = this.animation_queue[0];
+        event.entity.setAnimation(event.animation);
+    }
+    //If event is not null, check if the current event has gone through a full loop
+    if(event){
+        if (event.entity.curr_anim.looped) {
+            if (this.animation_queue.length >= 0) {
+                //if loop has been made, dequeue off the queue and set it to event
+                event = this.animation_queue.shift();
+                //Sets the events entitiy's animation
+                event.entity.setAnimation(event.animation);
+                event.entity.curr_anim.looped = false;
+            }
+            else {
+                event.entity.setAnimation(event.entity.stop_move_animation);
+            }
+        }
+    }
+}
+}
 GameEngine.prototype.update = function () {
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].update();
@@ -521,28 +549,6 @@ Hero.prototype.draw = function (context) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
     else {
-        //Logic to calculate when to time the next animation event
-        var event = this.game.event;
-        //if event is null and there is an animation in the queue, set animation to the first item in the queue
-        if (!event && this.game.animation_queue.length > 0) {
-            event = this.game.animation_queue[0];
-            event.entity.setAnimation(event.animation);
-        }
-        //If event is not null, check if the current event has gone through a full loop
-        if(event){
-            if (event.entity.curr_anim.looped) {
-                if (this.game.animation_queue.length >= 0) {
-                    //if loop has been made, dequeue off the queue and set it to event
-                    event = this.game.animation_queue.shift();
-                    //Sets the events entitiy's animation
-                    event.entity.setAnimation(event.animation);
-                    event.entity.curr_anim.looped = false;
-                }
-                else {
-                    event.entity.setAnimation(event.entity.stop_move_animation);
-                }
-            }
-        }
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
 }
