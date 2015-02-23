@@ -40,15 +40,6 @@
     pointer-events: none;
 }
 
-#attack_sub {
-    display: block; 
-    margin: 0 auto; 
-    position: relative; 
-    visibility: hidden; 
-    top: -581px;    
-    left: 214px;
-}
-
 #battle_menu ul, #attack_sub ul {
     list-style-type: none;
     display: inline-block;
@@ -87,17 +78,11 @@
 }
 
 #esc_menu {
-    visibility: hidden; 
-}
-
-#attack_sub {
+    height: 200px; 
+    width: 250px;
     list-style-type: none;
     display: inline-block;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
-    font-size: 25px;
-    text-align: center; 
-    height: 280px; 
-    width: 100px; 
-    padding-top: 138px;
-    pointer-events: none;
 }
+
+

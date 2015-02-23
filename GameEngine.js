@@ -1334,9 +1334,8 @@ BattleMenu.prototype.init = function () {
         } else if (String.fromCharCode(e.which) === ' ') {
             // opens attack sub_menu
             that.changeTabIndex("main", false);
-            that.menu.style.display = "none";
+
             that.changeTabIndex("attack", true); 
-            that.attack_menu.style.display = "block"; 
 
             window.setTimeout(that.single_attack.focus(), 0);
         }
@@ -1387,9 +1386,7 @@ BattleMenu.prototype.init = function () {
             window.setTimeout(that.aoe_attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.changeTabIndex("attack", false);
-            that.attack_menu.style.display = "none";
             that.changeTabIndex("main", true);
-            that.menu.style.display = "block";
             window.setTimeout(that.attack.focus(), 0);
         }
         e.preventDefault();
@@ -1403,12 +1400,14 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
         case "main":
             if (bool) {
                 that.menu.style.visibility = "visible";
+                that.menu.style.display = "block"; 
                 that.menu.tabIndex = 1;
                 that.attack.tabIndex = 1;
                 that.use_item.tabIndex = 1;
                 that.flee.tabIndex = 1;
             } else {
                 that.menu.style.visibility = "hidden";
+                that.menu.style.display = "none";
                 that.menu.tabIndex = 0;
                 that.attack.tabIndex = 0;
                 that.use_item.tabIndex = 0;
@@ -1418,12 +1417,14 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
         case "attack":
             if (bool) {
                 that.attack_menu.style.visibility = "visible";
+                that.attack.style.display = "block";
                 that.attack_menu.tabIndex = 1;
                 that.single_attack.tabIndex = 1;
                 that.aoe_attack.tabIndex = 1;
                 that.back.tabIndex = 1;
             } else {
                 that.attack_menu.style.visibility = "hidden";
+                that.attack.style.display = "none";
                 that.attack_menu.tabIndex = 0;
                 that.single_attack.tabIndex = 0;
                 that.aoe_attack.tabIndex = 0;
