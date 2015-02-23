@@ -69,6 +69,7 @@ GameEngine = function () {
     this.timer = null;
     this.key = null; 
     this.space = null;
+    this.esc = null; 
     this.curr_background = null;
     this.is_battle = false;
     this.menu = null;
@@ -88,7 +89,7 @@ GameEngine.prototype.init = function (context) {
     this.height = this.context.canvas.height;
     this.timer = new Timer();
     this.startInput();
-    this.menu = new BattleMenu(document.getElementById("battle_menu"));
+    this.menu = new BattleMenu(document.getElementById("battle_menu"), this);
     this.context.canvas.focus();
     this.environment = new Environment(this);
 }
@@ -110,11 +111,14 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 39
                         || e.which === 40) {
                 that.key = e.which;
+            } else if (e.which === 27) {
+                that.esc = true; 
             }
             e.preventDefault();
         } else {
             that.key = 0;
-            that.space = 0; 
+            that.space = 0;
+            that.esc = 0; 
         }
     }, false);
 
@@ -122,6 +126,7 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
+        that.esc = 0; 
     }, false);
 
     var text_box = document.getElementById("dialogue_box");
@@ -250,8 +255,8 @@ GameEngine.prototype.fadeOut = function (game, args, callback) {
         if (that.context.globalAlpha < .05) {
             that.context.globalAlpha = 0;
             clearInterval(that.timerId);
-            callback(args);
             that.fadeIn(that);
+            callback(args);
         }
     }, 50);
 }
@@ -270,6 +275,7 @@ GameEngine.prototype.fadeIn = function (game) {
             that.canControl = true; 
         }
     }, 50);
+
 }
 
 /*
@@ -295,7 +301,7 @@ GameEngine.prototype.setBattle = function (player) {
         next_y += space_out;
         player.game.addEntity(player.fiends[i]);
     }
-    player.game.menu.showMenu(true);
+    window.setTimeout(player.game.menu.showMenu(true), 5000); 
 }
     
 /*
@@ -308,7 +314,7 @@ GameEngine.prototype.endBattle = function (player)
     player.game.is_battle = false;
     player.stats.health = 100;
     player.stats.health = 75;
-    player.game.menu.showMenu(false);
+    window.setTimeout(player.game.menu.showMenu(false), 5000);
     player.x = player.save_x;
     player.y = player.save_y;
     player.direction = player.save_direction;
@@ -1209,19 +1215,19 @@ Background.prototype.update = function () {
 }
 
 
-BattleMenu = function (menu_element) {
+BattleMenu = function (menu_element, game) {
+    this.game = game; 
     this.menu = menu_element;
-    if (this.menu) {
-        this.attack = document.getElementById("attack");
-        this.use_item = document.getElementById("use_item");
-        this.flee = document.getElementById("flee");
-    }
+    this.attack = document.getElementById("attack");
+    this.use_item = document.getElementById("use_item");
+    this.flee = document.getElementById("flee");
+    
 }
 
 BattleMenu.prototype.init = function () {
     var that = this;
 
-    this.attack.addEventListener("focus", function () {
+    this.attack.addEventListener("focus", function (e) {
         that.attack.style.color = "white";
     });
 }
@@ -1229,8 +1235,19 @@ BattleMenu.prototype.init = function () {
 BattleMenu.prototype.showMenu = function (flag) {
     if (flag) {
         this.menu.style.visibility = "visible";
-        window.setTimeout("this.attack.focus();", 0);
+        this.game.context.canvas.tabIndex = 0;
+        this.menu.tabIndex = 1;
+        this.attack.tabIndex = 1;
+        this.use_item.tabIndex = 1;
+        this.flee.tabIndex = 1;
+        this.attack.focus();
     } else {
         this.menu.style.visibility = "hidden";
+        this.game.context.canvas.tabIndex = 2;
+        this.menu.tabIndex = 0;
+        this.menu.attack.tabIndex = 0;
+        this.menu.use_item.tabIndex = 0;
+        this.menu.flee.tabIndex = 0;
+        this.game.context.canvas.focus();
     }
 }

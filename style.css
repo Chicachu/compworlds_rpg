@@ -74,5 +74,9 @@
     width: 300px;
     text-align: center; 
     margin: 0 auto;
-    top: -415px;
+    top: -465px;
+}
+
+#esc_menu {
+    visibility: hidden; 
 }
