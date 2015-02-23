@@ -69,14 +69,13 @@ GameEngine = function () {
     this.timer = null;
     this.key = null; 
     this.space = null;
-    this.esc = null;
     this.curr_background = null;
     this.is_battle = false;
+    this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
     this.environment = null;
     this.canControl = true;
-    this.menu = null; 
     this.animation_queue = [];
     this.event = null;
     this.auxillary_sprites = [];
@@ -89,9 +88,9 @@ GameEngine.prototype.init = function (context) {
     this.height = this.context.canvas.height;
     this.timer = new Timer();
     this.startInput();
+    this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
     this.environment = new Environment(this);
-    this.menu = new BattleMenu(document.getElementById("battle_menu"), this);
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
@@ -111,14 +110,11 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 39
                         || e.which === 40) {
                 that.key = e.which;
-            } else if (e.which === 27) {
-                that.esc = true; 
             }
             e.preventDefault();
         } else {
-            that.key = false;
-            that.space = false;
-            that.esc = false;
+            that.key = 0;
+            that.space = 0; 
         }
     }, false);
 
@@ -468,9 +464,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats) {
     this.height = 64;
     this.fiends = [];
     this.sight = 20; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
-    // pick up on any interaction. 
-    this.coin = 500;
-    this.items = [];
+                        // pick up on any interaction. 
 }
 
 Hero.prototype = new Entity();
@@ -745,40 +739,6 @@ Hero.prototype.isPassable = function (tile, index) {
     }
 }
 
-Hero.prototype.deductCoin = function (amount) {
-    if (this.coin >= amount) {
-        this.coin -= amount;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-Hero.prototype.addCoin = function (amount) {
-    this.coint += amount;
-}
-
-Hero.prototype.recieveItem = function (item) {
-    if (this.items[item.name]) {
-        this.items[item.name].increaseQty(item.qty);
-    } else {
-        this.items[item.name] = item;
-    }
-}
-
-Hero.prototype.giveItem = function (item_name, qty) {
-    var item = null; 
-    if (this.items[item_name] && this.items[item_name].qty >= qty) {
-        if (this.items[item_name].qty === qty) {
-            item = this.items[item_name];
-            this.items.splice(item_name, 1);
-        } else {
-            item = this.items[item_name].splitStack(qty);
-        }
-        _item = item;
-        this.items.splice(item.name, 1);
-    }
-}
 
 Warrior = function (game, stats) {
     this.game = game;
@@ -1002,59 +962,6 @@ NPC.prototype.reposition = function () {
     }
 }
 
-Storekeeper = function (game, dialogue, anims, path, pause, name) {
-    this.name = name;
-    NPC.call(this, game, dialogue, anims, path, pause); 
-}
-
-Storekeeper.prototype = new NPC();
-Storekeeper.prototype.constructor = Storekeeper;
-
-Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
-    var item = null;
-    if (buyer.deductCoin()) {
-        item = this.items[item_name];
-        if (this.items[item_name].qty === qty) {
-            this.items.splice(item_name, 1);
-        } else {
-            item = this.items[item_name].splitStack(qty);
-        }
-        buyer.recieveItem(item); 
-    } else {
-        // TODO make shopkeeper say something about not having enough money to buy the item. 
-    }
-}
-
-Storekeeper.prototype.initializeItems = function (items) {
-    for (var i = 0; i < items.length; i++) {
-        this.items[items[i].name] = items[i];
-    }
-}
-
-Item = function (name, price, qty) {
-    this.name = name;
-    this.price = price;
-    this.qty = qty; 
-}
-
-Item.prototype.increaseQty = function (amount) {
-    this.qty += amount; 
-}
-
-Item.prototype.decreaseQty = function (amount) {
-    if (this.qty >= amount) {
-        this.qty -= amount; 
-    }
-}
-
-Item.prototype.splitStack = function (new_stack_qty) {
-    if (this.qty > new_stack_qty) {
-        var new_stack = new Item(this.name, this.price, new_stack_qty);
-        this.decreaseQty(new_stack_qty);
-        return new_stack;
-    } 
-}
-
 Point = function(x, y)
 {
     this.x = x;
@@ -1093,8 +1000,6 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
     this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
-
-
 
 Environment = function (game) {
     this.game = game;
@@ -1140,23 +1045,6 @@ Environment = function (game) {
 
     this.fiends = [];
     this.initSpriteSets();
-
-    this.house_floor = [[], 
-                        [],
-                        [],
-                        []];
-    this.house_interior = [[], 
-                           [],
-                           [],
-                           []];
-    this.house_floor2 = [[], 
-                         [],
-                         [],
-                         []];
-    this.house_interior2 = [[], 
-                           [],
-                           [],
-                           []];
 }
 
 Environment.prototype.initSpriteSets = function()
@@ -1289,6 +1177,15 @@ Environment.prototype.setQuadrant = function (number) {
     this.curr_quadrant = number;
 }
 
+Background = function () {
+    // "Map" will be a double array of integer values. 
+    this.map = [[],
+                [],
+                [],
+                []];
+    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
+}
+
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Background.prototype.draw = function (context, scaleBy) {
     var scaleBy = (scaleBy || 1);
@@ -1306,9 +1203,13 @@ Background.prototype.draw = function (context, scaleBy) {
     }
 }
 
-BattleMenu = function (menu, game) {
-    this.game = game; 
-    this.menu = menu;
+Background.prototype.update = function () {
+    
+}
+
+
+BattleMenu = function (menu_element) {
+    this.menu = menu_element;
     if (this.menu) {
         this.attack = document.getElementById("attack");
         this.use_item = document.getElementById("use_item");
@@ -1327,19 +1228,8 @@ BattleMenu.prototype.init = function () {
 BattleMenu.prototype.showMenu = function (flag) {
     if (flag) {
         this.menu.style.visibility = "visible";
-        this.game.context.canvas.tabIndex = 0;
-        this.menu.tabIndex = 1;
-        this.menu.attack.tabIndex = 1;
-        this.menu.use_item.tabIndex = 1;
-        this.menu.flee.tabIndex = 1; 
-        this.menu.attack.focus(); 
+        window.setTimeout("this.attack.focus();", 0);
     } else {
         this.menu.style.visibility = "hidden";
-        this.game.context.canvas.tabIndex = 1;
-        this.menu.tabIndex = 0;
-        this.menu.attack.tabIndex = 0;
-        this.menu.use_item.tabIndex = 0;
-        this.menu.flee.tabIndex = 0;
-        this.game.context.canvas.focus(); 
     }
 }
