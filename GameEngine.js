@@ -80,6 +80,8 @@ GameEngine = function () {
     this.animation_queue = [];
     this.event = null;
     this.auxillary_sprites = [];
+    this.fight_queue = [];
+    this.fiends = [];
     this.next = false; // used to detect space when advancing dialogue with NPCs.
 }
 
@@ -102,8 +104,8 @@ GameEngine.prototype.startInput = function () {
             if (String.fromCharCode(e.which) === ' ') {
                 if (!that.space) {
                     //calls fight and then checks if battle is over
-                    that.fight(that.entities[0], that.entities[1]);
-                    that.battleOver([that.entities[0], that.entities[0].fiends[0]]);
+                    that.performAction(that.entities[0], that.entities[1]);
+                    that.battleOver([that.entities[0], that.entities[0].game.fiends[0]]);
                 }
                 that.space = true;
 
@@ -166,15 +168,15 @@ GameEngine.prototype.addEntity = function (entity) {
 
 GameEngine.prototype.clearEntities = function(save_entities)
 {
-    for(var i = 1; i < this.entities.length; i++)
-    {
+    //for(var i = 1; i < this.entities.length; i++)
+    //{
         if (save_entities) {
-            this.auxillary_sprites.push(this.entities.pop());
+            this.auxillary_sprites = this.entities.splice(1, this.entities.length - 1);
         }
         else {
-            this.entities.pop();
+            this.entities = [this.entities[0]];
         }
-    }
+    //}
 }
 
 GameEngine.prototype.reLoadEntities = function()
@@ -293,14 +295,14 @@ GameEngine.prototype.setBattle = function (player) {
     player.x = 300;
     player.y = 200;
     player.direction = Direction.LEFT;
-    player.fiends = player.game.environment.generateFiend(player.game, player.fiends).splice(0);
+    player.game.fiends = player.game.environment.generateFiend(player.game, player.game.fiends).splice(0);
     player.game.clearEntities(true);
-    var space_out = ((player.game.height / 2) / player.fiends.length) * 1.2;
+    var space_out = ((player.game.height / 2) / player.game.fiends.length) * 1.2;
     var next_y = space_out;
-    for (var i = 0; i < player.fiends.length; i++) {
-        player.fiends[i].y = next_y;
+    for (var i = 0; i < player.game.fiends.length; i++) {
+        player.game.fiends[i].y = next_y;
         next_y += space_out;
-        player.game.addEntity(player.fiends[i]);
+        player.game.addEntity(player.game.fiends[i]);
     }
     window.setTimeout(player.game.menu.showMenu(true), 5000); 
 }
@@ -321,10 +323,7 @@ GameEngine.prototype.endBattle = function (player)
     player.direction = player.save_direction;
     player.game.clearEntities(false);
     player.game.reLoadEntities();
-    for(var i = 0; i <= player.fiends.length; i ++)
-    {
-        player.fiends.pop();
-    }
+    player.game.fiends = [];
 }
 /**
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
@@ -345,12 +344,12 @@ GameEngine.prototype.battleOver = function (players) {
     Takes in two players as parameters, pushes the players attack animation to the queue and 
     the foes hit animation. also does a damage calculation for the hit target
 */
-GameEngine.prototype.fight = function (player, foe) {
+GameEngine.prototype.performAction = function (player, foe) {
     player.game.animation_queue.push(new Event(player, player.animations.destroy));
     player.game.animation_queue.push(new Event(player, player.stop_move_animation));
     foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
     foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation));
-    foe.stats.health = foe.stats.health -((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
+    foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
 Timer = function () {
@@ -469,7 +468,6 @@ Hero = function (game, x, y, spriteSheet, animations, stats) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
     this.width = 43;
     this.height = 64;
-    this.fiends = [];
     this.sight = 20; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
                         // pick up on any interaction. 
 }
@@ -748,7 +746,6 @@ Hero.prototype.isPassable = function (tile, index) {
     }
 }
 
-
 Warrior = function (game, stats) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/warrior.png");
@@ -757,8 +754,9 @@ Warrior = function (game, stats) {
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
-        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false)
+        destroy : new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false),
+        special : {anim: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false), seed: 10}
     };
     this.x = 10;
     this.y = 215;
@@ -775,6 +773,34 @@ Warrior.prototype.draw = function (context) {
 Warrior.prototype.update = function () {
     Hero.prototype.update.call(this);
 }
+
+Warrior.prototype.setAction = function(action, target)
+{
+    switch(action)
+    {
+        case "Spiral Cut":
+            this.game.animation_queue.push(new Event(this, this.animations.destroy));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation));
+            target[0].stats.health = foe.stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.random() * 10));
+            break;
+        case "Divine Sword":
+            this.game.animation_queue.push(new Event(this, this.animations.special));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            for(var i = 0; i < target.length; i++)
+            {
+                target[i].game.animation_queue.push(new Event(target[i], target[i].animations.hit));
+                target[i].game.animation_queue.push(new Event(target[i], target[i].stop_move_animation));
+                target[i].stats.health = foe.stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
+            }
+    }
+}
+Warrior.prototype.getActions = function()
+{
+    return ["Spiral Cut", "Divine Sword"];
+}
+
 
 /* ENEMY and subclasses */
 Enemy = function (game, stats, anims, loop_while_standing) {
@@ -811,9 +837,7 @@ Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
      
-    if (this.game.is_battle) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-    }
 }
 
 Enemy.prototype.update = function() {
@@ -862,7 +886,7 @@ NPC.prototype.setNextCoords = function()
         this.path.push(this.next_point);
 }
 NPC.prototype.draw = function (context) {
-    if (!this.game.is_battle && this.game.environment.curr_quadrant === 0) {
+    if (this.game.environment.curr_quadrant === 0) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
@@ -1134,10 +1158,10 @@ Environment.prototype.initSpriteSets = function()
         new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
         new Animation(skeleton_sprites, 0, 20, 64, 64, 0.07, 5, true, false),
         new Animation(skeleton_sprites, 6, 20, 64, 64, .1, 1, true, false)));
-    this.fiends.push(new SpriteSet(null, null, null, new Animation(malboro_sprites, 0, 0, 71, 91, .15, 3, true, false),
-        new Animation(malboro_sprites, 0, 1, 71, 91, .12, 6, true, false),
-        new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
-        new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
+    this.fiends.push(new SpriteSet(null, null, null, new Animation(malboro_sprites, 0, 0, 82, 91, .15, 3, true, false),
+        new Animation(malboro_sprites, 0, 1, 82, 91, .12, 6, true, false),
+        new Animation(malboro_sprites, 0, 2, 82, 91, .15, 3, true, false),
+        new Animation(malboro_sprites, 0, 2, 82, 91, .08, 6, true, false)
         ));
 }
 
@@ -1183,14 +1207,14 @@ Door.prototype.startInteraction = function () {
 }
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
-Environment.prototype.generateFiend = function (game, f)
+Environment.prototype.generateFiend = function (game)
 {
     var number_of_fiends = Math.floor(Math.random() * (4 - 1)) + 1;
     var fiend_array = [];
     for (var i = 0; i < number_of_fiends; i++) {
         var fiend_number = Math.floor(Math.random() * (this.fiends.length - 0) + 0);
         var fiend = this.fiends[fiend_number];
-        fiend_array.push(new Enemy(game, new Statistics(100, 15, 5), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
+        fiend_array.push(new Enemy(this.game, new Statistics(100, 15, 5), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
     }
     return fiend_array;
 }
@@ -1422,3 +1446,4 @@ BattleMenu.prototype.showMenu = function (flag) {
         this.game.context.canvas.focus();
     }
 }
+
