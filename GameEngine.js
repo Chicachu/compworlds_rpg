@@ -843,56 +843,6 @@ Warrior.prototype.giveItem = function (item_name, qty) {
     }
 }
 
-Storekeeper = function (game, dialogue, anims, path, pause, name) {
-    this.name = name;
-    NPC.call(this, game, dialogue, anims, path, pause);
-}
-
-Storekeeper.prototype = new NPC();
-Storekeeper.prototype.constructor = Storekeeper;
-
-Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
-    var item = null;
-    if (buyer.deductCoin()) {
-        this.items.splice(item.name, 1);
-        item = this.items[item_name];
-        if (this.items[item_name].qty === qty) {
-            this.items.splice(item_name, 1);
-        } else {
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
-        }
-        buyer.recieveItem(item);
-    } else {
-        // TODO make shopkeeper say something about not having enough money to buy the item. 
-    }
-}
-
-Storekeeper.prototype.initializeItems = function (items) {
-    for (var i = 0; i < items.length; i++) {
-        this.items[items[i].name] = items[i];
-    }
-}
-
-Item = function (name, price, qty) {
-    this.name = name;
-    this.price = price;
-    this.qty = qty;
-}
-
-Item.prototype.increaseQty = function (amount) {
-    this.qty += amount;
-}
-
-Item.prototype.decreaseQty = function (amount) {
-    if (this.qty >= amount) {
-        this.qty -= amount;
-    }
-}
-
-
-
 /* ENEMY and subclasses */
 Enemy = function (game, stats, anims, loop_while_standing) {
     this.game = game;
@@ -1083,6 +1033,54 @@ NPC.prototype.reposition = function () {
     } else if (this.x < this.game.entities[0].x && this.direction !== Direction.RIGHT) {
         this.direction = Direction.RIGHT;
         this.curr_anim = this.animations.right;
+    }
+}
+
+Storekeeper = function (game, dialogue, anims, path, pause, name) {
+    this.name = name;
+    NPC.call(this, game, dialogue, anims, path, pause);
+}
+
+Storekeeper.prototype = new NPC();
+Storekeeper.prototype.constructor = Storekeeper;
+
+Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
+    var item = null;
+    if (buyer.deductCoin()) {
+        this.items.splice(item.name, 1);
+        item = this.items[item_name];
+        if (this.items[item_name].qty === qty) {
+            this.items.splice(item_name, 1);
+        } else {
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty);
+            this.items[item_name].decreaseQty(qty);
+        }
+        buyer.recieveItem(item);
+    } else {
+        // TODO make shopkeeper say something about not having enough money to buy the item. 
+    }
+}
+
+Storekeeper.prototype.initializeItems = function (items) {
+    for (var i = 0; i < items.length; i++) {
+        this.items[items[i].name] = items[i];
+    }
+}
+
+Item = function (name, price, qty) {
+    this.name = name;
+    this.price = price;
+    this.qty = qty;
+}
+
+Item.prototype.increaseQty = function (amount) {
+    this.qty += amount;
+}
+
+Item.prototype.decreaseQty = function (amount) {
+    if (this.qty >= amount) {
+        this.qty -= amount;
     }
 }
 
