@@ -80,8 +80,8 @@
 #esc_menu {
     height: 200px; 
     width: 250px;
-    list-style-type: none;
     display: inline-block;
+    visibility: hidden; 
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
 
