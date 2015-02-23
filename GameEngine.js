@@ -103,11 +103,6 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keydown', function (e) {
         if (that.canControl) {
             if (String.fromCharCode(e.which) === ' ') {
-                if (!that.space) {
-                    //calls fight and then checks if battle is over
-                    that.performAction(that.entities[0], that.entities[1]);
-                    that.battleOver([that.entities[0], that.entities[0].game.fiends[0]]);
-                }
                 that.space = true;
 
             } else if (e.which === 37
@@ -286,27 +281,27 @@ GameEngine.prototype.fadeIn = function (game) {
 Takes the main player as a parameter. Sets up the battle by setting is_battle to true,
 setting the battle background, saving coordinates, and also generating a list or random fiends for the hero
 */
-GameEngine.prototype.setBattle = function (player) {
-
-    player.game.is_battle = true;
-    player.game.setBackground("./imgs/woods.png");
-    player.save_x = player.x;
-    player.save_y = player.y;
-    player.save_direction = player.direction;
-    player.x = 300;
-    player.y = 200;
-    player.direction = Direction.LEFT;
-    player.game.fiends = player.game.environment.generateFiend(player.game, player.game.fiends).splice(0);
-    player.game.clearEntities(true);
-    var space_out = ((player.game.height / 2) / player.game.fiends.length) * 1.2;
+GameEngine.prototype.setBattle = function (game) {
+    game.fight_queue[0] = game.entities[0];
+    game.is_battle = true;
+    game.setBackground("./imgs/woods.png");
+    game.entities[0].save_x = game.entities[0].x;
+    game.entities[0].save_y = game.entities[0].y;
+    game.entities[0].save_direction = game.entities[0].direction;
+    game.entities[0].x = 300;
+    game.entities[0].y = 200;
+    game.entities[0].direction = Direction.LEFT;
+    game.fiends = game.environment.generateFiend(game, game.fiends).splice(0);
+    game.clearEntities(true);
+    var space_out = ((game.height / 2) / game.fiends.length) * 1.2;
     var next_y = space_out;
-    for (var i = 0; i < player.game.fiends.length; i++) {
-        player.game.fiends[i].y = next_y;
+    for (var i = 0; i < game.fiends.length; i++) {
+        game.fiends[i].y = next_y;
         next_y += space_out;
-        player.game.addEntity(player.game.fiends[i]);
+        game.addEntity(game.fiends[i]);
     }
-    window.setTimeout(player.game.menu.showMenu(true), 5000);
-    window.setTimeout(player.game.esc_menu.showMenu(false), 5000);
+    window.setTimeout(game.menu.showMenu(true), 5000);
+    window.setTimeout(game.esc_menu.showMenu(false), 5000);
 }
     
 /*
@@ -314,31 +309,36 @@ GameEngine.prototype.setBattle = function (player) {
     putting the player back to original position, 
     and for now resets the players health.
 */
-GameEngine.prototype.endBattle = function (player)
+GameEngine.prototype.endBattle = function (game)
 {
-    player.game.is_battle = false;
-    player.stats.health = 100;
-    player.stats.health = 75;
-    window.setTimeout(player.game.menu.showMenu(false), 5000);
-    player.x = player.save_x;
-    player.y = player.save_y;
-    player.direction = player.save_direction;
-    player.game.clearEntities(false);
-    player.game.reLoadEntities();
-    player.game.fiends = [];
+    game.is_battle = false;
+    window.setTimeout(game.menu.showMenu(false), 5000);
+    game.entities[0].x = game.entities[0].save_x;
+    game.entities[0].y = game.entities[0].save_y;
+    game.entities[0].direction = game.entities[0].save_direction;
+    game.clearEntities(false);
+    game.reLoadEntities();
+    game.fiends = [];
 }
 /**
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
     reset the hero to the world map
 */
-GameEngine.prototype.battleOver = function (players) {
-    if (players[0].game.is_battle && (players[0].stats.health <= 0 || players[1].stats.health <= 0)) {
-        players[0].game.canControl = false;
-        players[1].game.animation_queue.push(new Event(players[1], players[1].animations.death));
-        players[0].game.timerId2 = setTimeout(function () {
-            players[0].game.fadeOut(players[0].game, players[0], players[0].game.endBattle);
-            clearInterval(players[0].game.timerId2);
-        }, 2000);
+GameEngine.prototype.battleOver = function (game) {
+    var net_health_1 = 0;
+    for (var i = 0 ; i < game.fiends.length; i++) {
+        net_health_1 += game.fiends[i].stats.health;
+
+        net_health_1 = game.fiends[0].stats.health;
+        if (net_health_1 <= 0) {
+            game.canControl = false;
+            //players[1].game.animation_queue.push(new Event(players[1], players[1].animations.death));
+            game.timerId2 = setTimeout(function () {
+                game.fadeOut(game, game, game.endBattle);
+                clearInterval(game.timerId2);
+            }, 2000);
+        }
+
     }
 }
 
@@ -595,7 +595,7 @@ Hero.prototype.preBattle = function () {
         this.game.key = 0;
         this.game.space = 0; 
         // lock user input controls here.
-        this.game.fadeOut(this.game, this, this.game.setBattle);
+        this.game.fadeOut(this.game, this.game, this.game.setBattle);
     }
 }
 
@@ -758,7 +758,7 @@ Warrior = function (game, stats) {
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
         destroy : new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false),
-        special : {anim: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false), seed: 10}
+        special : new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false)
     };
     this.x = 10;
     this.y = 215;
@@ -781,24 +781,28 @@ Warrior.prototype.setAction = function(action, target)
 {
     switch(action)
     {
-        case "Spiral Cut":
+        case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
             target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit));
             target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation));
-            target[0].stats.health = foe.stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.random() * 10));
+            target[0].stats.health = target[0].stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.random() * 10));
             break;
-        case "Divine Sword":
+        case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.special));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
             for(var i = 0; i < target.length; i++)
             {
                 target[i].game.animation_queue.push(new Event(target[i], target[i].animations.hit));
                 target[i].game.animation_queue.push(new Event(target[i], target[i].stop_move_animation));
-                target[i].stats.health = foe.stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
+                target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
             }
     }
+    if (this.game.is_battle) {
+        this.game.battleOver(this.game);
+    }
 }
+<<<<<<< HEAD
 Warrior.prototype.getActions = function()
 {
     return ["Spiral Cut", "Divine Sword"];
@@ -808,6 +812,44 @@ Inventory = function (coin, max_items) {
     this.items = [];
     this.max_items = max_items;
     this.coin = coin;
+=======
+Warrior.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Warrior.prototype.addCoin = function (amount) {
+    this.coint += amount;
+}
+
+Warrior.prototype.recieveItem = function (item) {
+    if (this.items[item.name]) {
+        this.items[item.name].increaseQty(item.qty);
+    } else {
+        this.items[item.name] = item;
+    }
+}
+
+Warrior.prototype.giveItem = function (item_name, qty) {
+    var item = null;
+    if (this.items[item_name] && this.items[item_name].qty >= qty) {
+        if (this.items[item_name].qty === qty) {
+            item = this.items[item_name];
+            this.items.splice(item_name, 1);
+        } else {
+            item = this.items[item_name];
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty);
+            this.items[item_name].decreaseQty(qty);
+        }
+        _item = item;
+        this.items.splice(item.name, 1);
+    }
+>>>>>>> origin/origin
 }
 
 /* ENEMY and subclasses */
@@ -1003,37 +1045,6 @@ NPC.prototype.reposition = function () {
     }
 }
 
-Storekeeper = function (game, dialogue, anims, path, pause, name) {
-    this.name = name;
-    NPC.call(this, game, dialogue, anims, path, pause);
-}
-
-Storekeeper.prototype = new NPC();
-Storekeeper.prototype.constructor = Storekeeper;
-
-Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
-    var item = null;
-    if (buyer.deductCoin()) {
-        this.items.splice(item.name, 1);
-        item = this.items[item_name];
-        if (this.items[item_name].qty === qty) {
-            this.items.splice(item_name, 1);
-        } else {
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
-        }
-        buyer.recieveItem(item);
-    } else {
-        // TODO make shopkeeper say something about not having enough money to buy the item. 
-    }
-}
-
-Storekeeper.prototype.initializeItems = function (items) {
-    for (var i = 0; i < items.length; i++) {
-        this.items[items[i].name] = items[i];
-    }
-}
 
 Item = function (name, price, qty) {
     this.name = name;
@@ -1051,6 +1062,7 @@ Item.prototype.decreaseQty = function (amount) {
     }
 }
 
+<<<<<<< HEAD
 Warrior.prototype.deductCoin = function (amount) {
     if (this.coin >= amount) {
         this.coin -= amount;
@@ -1091,15 +1103,16 @@ Warrior.prototype.giveItem = function (item_name, qty) {
 
 Point = function(x, y)
 {
+=======
+Point = function (x, y) {
+>>>>>>> origin/origin
     this.x = x;
     this.y = y;
 }
-Point.prototype.getX = function()
-{
+Point.prototype.getX = function () {
     return this.x;
 }
-Point.prototype.getY = function()
-{
+Point.prototype.getY = function () {
     return this.y;
 }
 
@@ -1116,7 +1129,6 @@ SpriteSet = function (down, up, left, right, destroy, hit, death) {
     this.hit = hit;
     this.death = death;
 }
-
 
 
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
@@ -1417,6 +1429,7 @@ BattleMenu = function (menu_element, game) {
     this.aoe_attack = document.getElementById("aoe_attack");
     this.back = document.getElementById("back");
     
+    this.target_queue = [];
 }
 
 BattleMenu.prototype.init = function () {
@@ -1460,6 +1473,13 @@ BattleMenu.prototype.init = function () {
             window.setTimeout(that.aoe_attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             // stuff to make character do a single attack 
+            if (that.game.canControl) {
+                that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+            }
+            //that.attack_queue.push(that.attack_queue.shift());
+            that.changeTabIndex("attack", false);
+            that.changeTabIndex("main", true);
+            window.setTimeout(that.attack.focus(), 0);
         }
         e.preventDefault();
     });
@@ -1532,6 +1552,9 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
 }
 
 BattleMenu.prototype.showMenu = function (flag) {
+    for (var i = 0; i < this.game.fiends.length; i++) {
+        this.target_queue.push(this.game.fiends[i])
+    }
     if (flag) {
         this.game.context.canvas.tabIndex = 0;
         this.changeTabIndex("main", true);
@@ -1617,3 +1640,34 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
+Storekeeper = function (game, dialogue, anims, path, pause, name) {
+    this.name = name;
+    NPC.call(this, game, dialogue, anims, path, pause);
+}
+
+Storekeeper.prototype = new NPC();
+Storekeeper.prototype.constructor = Storekeeper;
+
+Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
+    var item = null;
+    if (buyer.deductCoin()) {
+        this.items.splice(item.name, 1);
+        item = this.items[item_name];
+        if (this.items[item_name].qty === qty) {
+            this.items.splice(item_name, 1);
+        } else {
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty);
+            this.items[item_name].decreaseQty(qty);
+        }
+        buyer.recieveItem(item);
+    } else {
+        // TODO make shopkeeper say something about not having enough money to buy the item. 
+    }
+}
+
+Storekeeper.prototype.initializeItems = function (items) {
+    for (var i = 0; i < items.length; i++) {
+        this.items[items[i].name] = items[i];
+    }
+}
