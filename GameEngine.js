@@ -980,8 +980,7 @@ Point.prototype.getY = function()
 An object that is passed in when creating a new enemy/NPC/Hero that has a full map of its animations.
 If a certain animation does not exist, pass in null.
 */
-SpriteSet = function(down, up, left, right, destroy, hit, death)
-{
+SpriteSet = function (down, up, left, right, destroy, hit, death) {
     this.down = down;
     this.up = up;
     this.left = left;
@@ -990,6 +989,8 @@ SpriteSet = function(down, up, left, right, destroy, hit, death)
     this.hit = hit;
     this.death = death;
 }
+
+
 
 /* BACKGROUND : sheetWidth being how many tiles wide the sheet is. */
 Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
