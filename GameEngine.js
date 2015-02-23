@@ -95,6 +95,7 @@ GameEngine.prototype.init = function (context) {
     this.menu.init();
     this.context.canvas.focus();
     this.environment = new Environment(this);
+    this.esc_menu = new GeneralMenu(this);
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
@@ -115,7 +116,7 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 40) {
                 that.key = e.which;
             } else if (e.which === 27) {
-                that.esc = true; 
+                that.esc_menu.showMenu(true); 
             }
         } else {
             that.key = 0;
@@ -304,7 +305,8 @@ GameEngine.prototype.setBattle = function (player) {
         next_y += space_out;
         player.game.addEntity(player.game.fiends[i]);
     }
-    window.setTimeout(player.game.menu.showMenu(true), 5000); 
+    window.setTimeout(player.game.menu.showMenu(true), 5000);
+    window.setTimeout(player.game.esc_menu.showMenu(false), 5000);
 }
     
 /*
@@ -760,6 +762,7 @@ Warrior = function (game, stats) {
     };
     this.x = 10;
     this.y = 215;
+    this.inventory = [];
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
@@ -800,6 +803,93 @@ Warrior.prototype.getActions = function()
 {
     return ["Spiral Cut", "Divine Sword"];
 }
+
+
+Warrior.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Warrior.prototype.addCoin = function (amount) {
+    this.coint += amount;
+}
+
+Warrior.prototype.recieveItem = function (item) {
+    if (this.items[item.name]) {
+        this.items[item.name].increaseQty(item.qty);
+    } else {
+        this.items[item.name] = item;
+    }
+}
+
+Warrior.prototype.giveItem = function (item_name, qty) {
+    var item = null;
+    if (this.items[item_name] && this.items[item_name].qty >= qty) {
+        if (this.items[item_name].qty === qty) {
+            item = this.items[item_name];
+            this.items.splice(item_name, 1);
+        } else {
+            item = this.items[item_name];
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty);
+            this.items[item_name].decreaseQty(qty);
+        }
+        _item = item;
+        this.items.splice(item.name, 1);
+    }
+}
+
+Storekeeper = function (game, dialogue, anims, path, pause, name) {
+    this.name = name;
+    NPC.call(this, game, dialogue, anims, path, pause);
+}
+
+Storekeeper.prototype = new NPC();
+Storekeeper.prototype.constructor = Storekeeper;
+
+Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
+    var item = null;
+    if (buyer.deductCoin()) {
+        this.items.splice(item.name, 1);
+        item = this.items[item_name];
+        if (this.items[item_name].qty === qty) {
+            this.items.splice(item_name, 1);
+        } else {
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty); 
+            this.items[item_name].decreaseQty(qty);
+        }
+        buyer.recieveItem(item); 
+    } else {
+        // TODO make shopkeeper say something about not having enough money to buy the item. 
+    }
+
+Storekeeper.prototype.initializeItems = function (items) {
+    for (var i = 0; i < items.length; i++) {
+        this.items[items[i].name] = items[i];
+    }
+}
+
+Item = function (name, price, qty) {
+    this.name = name;
+    this.price = price;
+    this.qty = qty;
+}
+
+Item.prototype.increaseQty = function (amount) {
+    this.qty += amount;
+}
+
+Item.prototype.decreaseQty = function (amount) {
+    if (this.qty >= amount) {
+        this.qty -= amount;
+    }
+}
+
 
 
 /* ENEMY and subclasses */
@@ -1446,6 +1536,80 @@ BattleMenu.prototype.showMenu = function (flag) {
         this.game.context.canvas.tabIndex = 2;
         this.changeTabIndex("main", false);
         this.game.context.canvas.focus();
+    }
+}
+
+// menu accessed by pressing "esc" 
+GeneralMenu = function (game) {
+    this.game = game;
+    this.menu = document.getElementById("esc_menu");
+    this.inventory = document.getElementById("inventory");
+    this.save = document.getElementById("save_game");
+    this.load = document.getElementById("load_game");
+    this.return = document.getElementById("return");
+    this.init();
+}
+
+GeneralMenu.prototype.init = function () {
+    var that = this; 
+    this.inventory.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.save.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // opens inventory
+        }
+        e.preventDefault();
+    });
+    this.save.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.load.focus(), 0);
+        } else if (e.which === 38) {
+            window.setTimeout(that.inventory.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // opens save interface
+        }
+        e.preventDefault();
+    });
+    this.load.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.return.focus(), 0);
+        } else if (e.which === 38) {
+            window.setTimeout(that.save.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // opens load interface
+        }
+        e.preventDefault();
+    });
+    this.return.addEventListener("keydown", function (e) {
+        if (e.which === 38) {
+            window.setTimeout(that.load.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            that.showMenu(false); 
+        }
+        e.preventDefault();
+    });
+}
+
+GeneralMenu.prototype.showMenu = function (flag) {
+    if (flag) {
+        this.game.context.canvas.tabIndex = 0;
+        this.menu.style.visibility = "visible";
+        this.menu.style.display = "block";
+        this.menu.tabIndex = 1;
+        this.save.tabIndex = 1;
+        this.load.tabIndex = 1;
+        this.inventory.tabIndex = 1;
+        this.return.tabIndex = 1; 
+        this.inventory.focus(); 
+    } else {
+        this.menu.style.visibility = "hidden";
+        this.menu.style.display = "none";
+        this.menu.tabIndex = 0;
+        this.save.tabIndex = 0;
+        this.load.tabIndex = 0;
+        this.inventory.tabIndex = 0;
+        this.return.tabIndex = 0; 
+        this.game.context.canvas.tabIndex = 1;
     }
 }
 

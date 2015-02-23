@@ -1,4 +1,7 @@
-﻿#gameworld {   
+﻿::-webkit-scrollbar { 
+    width: 0; 
+}
+#gameworld {   
     border: 1px solid black; 
     display: block; 
     margin: auto; 
@@ -28,7 +31,7 @@
 }
 
 #battle_menu, #attack_sub {
-    display: block; 
+    display: none; 
     margin: 0 auto;
     width: 608px; 
     height: 417px;
@@ -63,25 +66,50 @@
     pointer-events: none;
 }
 
-#battle_menu a:focus, #attack_sub a:focus {
+#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus {
     color: white;
     outline: solid 1px #d8bca1;
     pointer-events: none;
 }
 
 #instructions {
-    position: relative; 
+    position: fixed; 
     width: 300px;
     text-align: center; 
-    margin: 0 auto;
-    top: -465px;
+    left: 50%;
+    top: 420px;
+    margin-left: -150px;
 }
 
 #esc_menu {
-    height: 200px; 
-    width: 250px;
+    position: relative;
+    z-index: 2; 
     visibility: hidden; 
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+    display: none;
+    margin: 0 auto;
+    width: 608px; 
+    height: 417px;
+    top: -400px;
+    text-align: center; 
+}
+
+#esc_menu ul{
+    list-style-type: none;
+    display: inline-block;
+    height: 180px; 
+    width: 150px;
+    background-image: url("./imgs/menu_background.png"); 
+    text-align: center; 
+    font-size: 25px;
+}
+
+#esc_menu li {
+    position: relative;
+    width: 120px; 
+    height: auto;
+    color: #d8bca1; 
+    margin: 10px;
+    right: 13px;
 }
 
 
