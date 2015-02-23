@@ -1417,14 +1417,14 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
         case "attack":
             if (bool) {
                 that.attack_menu.style.visibility = "visible";
-                that.attack.style.display = "block";
+                that.attack_menu.style.display = "block";
                 that.attack_menu.tabIndex = 1;
                 that.single_attack.tabIndex = 1;
                 that.aoe_attack.tabIndex = 1;
                 that.back.tabIndex = 1;
             } else {
                 that.attack_menu.style.visibility = "hidden";
-                that.attack.style.display = "none";
+                that.attack_menu.style.display = "none";
                 that.attack_menu.tabIndex = 0;
                 that.single_attack.tabIndex = 0;
                 that.aoe_attack.tabIndex = 0;
