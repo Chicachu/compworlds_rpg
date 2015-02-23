@@ -11,6 +11,18 @@ ASSET_MANAGER.queueDownload("./imgs/fire.png");
 ASSET_MANAGER.queueDownload("./imgs/fire2.png");
 ASSET_MANAGER.queueDownload("./imgs/malboro.png");
 
+// items
+ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
+ASSET_MANAGER.queueDownload("./imgs/items/amulet1.png");
+ASSET_MANAGER.queueDownload("./imgs/items/amulet2.png");
+ASSET_MANAGER.queueDownload("./imgs/items/armor1.png");
+ASSET_MANAGER.queueDownload("./imgs/items/armor2.png");
+ASSET_MANAGER.queueDownload("./imgs/items/leather_armor1.png");
+ASSET_MANAGER.queueDownload("./imgs/items/pendant.png");
+ASSET_MANAGER.queueDownload("./imgs/items/sword1.png");
+ASSET_MANAGER.queueDownload("./imgs/items/shield1.png");
+ASSET_MANAGER.queueDownload("./imgs/items/shield2.png");
+
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
     var context = canvas.getContext("2d");

@@ -762,7 +762,7 @@ Warrior = function (game, stats) {
     };
     this.x = 10;
     this.y = 215;
-    this.inventory = [];
+    this.inventory = new Inventory(100);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
@@ -804,43 +804,10 @@ Warrior.prototype.getActions = function()
     return ["Spiral Cut", "Divine Sword"];
 }
 
-
-Warrior.prototype.deductCoin = function (amount) {
-    if (this.coin >= amount) {
-        this.coin -= amount;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-Warrior.prototype.addCoin = function (amount) {
-    this.coint += amount;
-}
-
-Warrior.prototype.recieveItem = function (item) {
-    if (this.items[item.name]) {
-        this.items[item.name].increaseQty(item.qty);
-    } else {
-        this.items[item.name] = item;
-    }
-}
-
-Warrior.prototype.giveItem = function (item_name, qty) {
-    var item = null;
-    if (this.items[item_name] && this.items[item_name].qty >= qty) {
-        if (this.items[item_name].qty === qty) {
-            item = this.items[item_name];
-            this.items.splice(item_name, 1);
-        } else {
-            item = this.items[item_name];
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
-        }
-        _item = item;
-        this.items.splice(item.name, 1);
-    }
+Inventory = function (coin, max_items) {
+    this.items = [];
+    this.max_items = max_items;
+    this.coin = coin;
 }
 
 /* ENEMY and subclasses */
@@ -1081,6 +1048,44 @@ Item.prototype.increaseQty = function (amount) {
 Item.prototype.decreaseQty = function (amount) {
     if (this.qty >= amount) {
         this.qty -= amount;
+    }
+}
+
+Warrior.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Warrior.prototype.addCoin = function (amount) {
+    this.coint += amount;
+}
+
+Warrior.prototype.recieveItem = function (item) {
+    if (this.items[item.name]) {
+        this.items[item.name].increaseQty(item.qty);
+    } else {
+        this.items[item.name] = item;
+    }
+}
+
+Warrior.prototype.giveItem = function (item_name, qty) {
+    var item = null;
+    if (this.items[item_name] && this.items[item_name].qty >= qty) {
+        if (this.items[item_name].qty === qty) {
+            item = this.items[item_name];
+            this.items.splice(item_name, 1);
+        } else {
+            item = this.items[item_name];
+            item.decreaseQty(item.qty);
+            item.increaseQty(qty);
+            this.items[item_name].decreaseQty(qty);
+        }
+        _item = item;
+        this.items.splice(item.name, 1);
     }
 }
 
