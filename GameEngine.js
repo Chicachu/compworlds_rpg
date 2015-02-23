@@ -69,13 +69,14 @@ GameEngine = function () {
     this.timer = null;
     this.key = null; 
     this.space = null;
+    this.esc = null;
     this.curr_background = null;
     this.is_battle = false;
-    this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
     this.environment = null;
     this.canControl = true;
+    this.menu = null; 
     this.animation_queue = [];
     this.event = null;
     this.auxillary_sprites = [];
@@ -88,9 +89,9 @@ GameEngine.prototype.init = function (context) {
     this.height = this.context.canvas.height;
     this.timer = new Timer();
     this.startInput();
-    this.menu = new BattleMenu(document.getElementById("battle_menu"));
     this.context.canvas.focus();
     this.environment = new Environment(this);
+    this.menu = new BattleMenu(document.getElementById("battle_menu"), this);
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
@@ -110,11 +111,14 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 39
                         || e.which === 40) {
                 that.key = e.which;
+            } else if (e.which === 27) {
+                that.esc = true; 
             }
             e.preventDefault();
         } else {
-            that.key = 0;
-            that.space = 0; 
+            that.key = false;
+            that.space = false;
+            that.esc = false;
         }
     }, false);
 
@@ -1279,15 +1283,6 @@ Environment.prototype.setQuadrant = function (number) {
     this.curr_quadrant = number;
 }
 
-Background = function () {
-    // "Map" will be a double array of integer values. 
-    this.map = [[],
-                [],
-                [],
-                []];
-    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
-}
-
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
 Background.prototype.draw = function (context, scaleBy) {
     var scaleBy = (scaleBy || 1);
@@ -1305,13 +1300,9 @@ Background.prototype.draw = function (context, scaleBy) {
     }
 }
 
-Background.prototype.update = function () {
-    
-}
-
-
-BattleMenu = function (menu_element) {
-    this.menu = menu_element;
+BattleMenu = function (menu, game) {
+    this.game = game; 
+    this.menu = menu;
     if (this.menu) {
         this.attack = document.getElementById("attack");
         this.use_item = document.getElementById("use_item");
@@ -1330,8 +1321,19 @@ BattleMenu.prototype.init = function () {
 BattleMenu.prototype.showMenu = function (flag) {
     if (flag) {
         this.menu.style.visibility = "visible";
-        window.setTimeout("this.attack.focus();", 0);
+        this.game.context.canvas.tabIndex = 0;
+        this.menu.tabIndex = 1;
+        this.menu.attack.tabIndex = 1;
+        this.menu.use_item.tabIndex = 1;
+        this.menu.flee.tabIndex = 1; 
+        this.menu.attack.focus(); 
     } else {
         this.menu.style.visibility = "hidden";
+        this.game.context.canvas.tabIndex = 1;
+        this.menu.tabIndex = 0;
+        this.menu.attack.tabIndex = 0;
+        this.menu.use_item.tabIndex = 0;
+        this.menu.flee.tabIndex = 0;
+        this.game.context.canvas.focus(); 
     }
 }
