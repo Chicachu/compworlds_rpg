@@ -90,6 +90,7 @@ GameEngine.prototype.init = function (context) {
     this.timer = new Timer();
     this.startInput();
     this.menu = new BattleMenu(document.getElementById("battle_menu"), this);
+    this.menu.init();
     this.context.canvas.focus();
     this.environment = new Environment(this);
 }
@@ -114,12 +115,12 @@ GameEngine.prototype.startInput = function () {
             } else if (e.which === 27) {
                 that.esc = true; 
             }
-            e.preventDefault();
         } else {
             that.key = 0;
             that.space = 0;
             that.esc = 0; 
         }
+        e.preventDefault();
     }, false);
 
 
@@ -591,6 +592,8 @@ Hero.prototype.reposition = function (other) {
 Hero.prototype.preBattle = function () {
     if (this.moving && this.checkSurroundings()) {
         this.game.canControl = false;
+        this.game.key = 0;
+        this.game.space = 0; 
         // lock user input controls here.
         this.game.fadeOut(this.game, this, this.game.setBattle);
     }
@@ -1218,36 +1221,138 @@ Background.prototype.update = function () {
 BattleMenu = function (menu_element, game) {
     this.game = game; 
     this.menu = menu_element;
+    this.attack_menu = document.getElementById("attack_sub");
+
+    // battlemenu main controls
     this.attack = document.getElementById("attack");
     this.use_item = document.getElementById("use_item");
     this.flee = document.getElementById("flee");
+
+    // attack menu controls
+    this.single_attack = document.getElementById("single_attack");
+    this.aoe_attack = document.getElementById("aoe_attack");
+    this.back = document.getElementById("back");
     
 }
 
 BattleMenu.prototype.init = function () {
     var that = this;
 
-    this.attack.addEventListener("focus", function (e) {
-        that.attack.style.color = "white";
+    this.attack.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.use_item.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // opens attack sub_menu
+            that.changeTabIndex("main", false);
+            that.menu.style.display = "none";
+            that.changeTabIndex("attack", true); 
+
+            window.setTimeout(that.single_attack.focus(), 0);
+        }
+        e.preventDefault();
     });
+    this.use_item.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.flee.focus(), 0);
+        } else if (e.which === 38) {
+            window.setTimeout(that.attack.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // opens item sub_menu
+        }
+        e.preventDefault();
+    });
+    this.flee.addEventListener("keydown", function (e) {
+        if (e.which === 38) {
+            window.setTimeout(that.use_item.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // characters flee
+        }
+        e.preventDefault();
+    });
+
+    // ATTACK MENU CONTROLS 
+    this.single_attack.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.aoe_attack.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // stuff to make character do a single attack 
+        }
+        e.preventDefault();
+    });
+
+    this.aoe_attack.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            window.setTimeout(that.back.focus(), 0);
+        } else if (e.which === 38) {
+            window.setTimeout(that.single_attack.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // stuff to make character do an aoe attack
+        }
+        e.preventDefault();
+    });
+
+    this.back.addEventListener("keydown", function (e) {
+        if (e.which === 38) {
+            window.setTimeout(that.aoe_attack.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            that.changeTabIndex("attack", false);
+            that.attack_menu.style.display = "none";
+            that.changeTabIndex("main", true);
+            that.menu.style.display = "block";
+            window.setTimeout(that.attack.focus(), 0);
+        }
+        e.preventDefault();
+    });
+}
+
+
+BattleMenu.prototype.changeTabIndex = function (option, bool) {
+    var that = this; 
+    switch (option) {
+        case "main":
+            if (bool) {
+                that.menu.style.visibility = "visible";
+                that.menu.tabIndex = 1;
+                that.attack.tabIndex = 1;
+                that.use_item.tabIndex = 1;
+                that.flee.tabIndex = 1;
+            } else {
+                that.menu.style.visibility = "hidden";
+                that.menu.tabIndex = 0;
+                that.attack.tabIndex = 0;
+                that.use_item.tabIndex = 0;
+                that.flee.tabIndex = 0;
+            }
+            break;
+        case "attack":
+            if (bool) {
+                that.attack_menu.style.visibility = "visible";
+                that.attack_menu.tabIndex = 1;
+                that.single_attack.tabIndex = 1;
+                that.aoe_attack.tabIndex = 1;
+                that.back.tabIndex = 1;
+            } else {
+                that.attack_menu.style.visibility = "hidden";
+                that.attack_menu.tabIndex = 0;
+                that.single_attack.tabIndex = 0;
+                that.aoe_attack.tabIndex = 0;
+                that.back.tabIndex = 0;
+            }
+            break;
+        case "item":
+            break;
+        default: ; 
+    }
 }
 
 BattleMenu.prototype.showMenu = function (flag) {
     if (flag) {
-        this.menu.style.visibility = "visible";
         this.game.context.canvas.tabIndex = 0;
-        this.menu.tabIndex = 1;
-        this.attack.tabIndex = 1;
-        this.use_item.tabIndex = 1;
-        this.flee.tabIndex = 1;
+        this.changeTabIndex("main", true);
         this.attack.focus();
     } else {
-        this.menu.style.visibility = "hidden";
         this.game.context.canvas.tabIndex = 2;
-        this.menu.tabIndex = 0;
-        this.menu.attack.tabIndex = 0;
-        this.menu.use_item.tabIndex = 0;
-        this.menu.flee.tabIndex = 0;
+        this.changeTabIndex("main", false);
         this.game.context.canvas.focus();
     }
 }

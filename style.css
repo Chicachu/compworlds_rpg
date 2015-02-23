@@ -27,7 +27,8 @@
     vertical-align: middle; 
 }
 
-#battle_menu {
+#battle_menu, #attack_sub {
+    display: block; 
     margin: 0 auto;
     width: 608px; 
     height: 417px;
@@ -35,11 +36,20 @@
     position: relative;
     z-index: 2; 
     top: -443px;
-    visibility: hidden;
+    visibility: hidden; 
     pointer-events: none;
 }
 
-#battle_menu ul {
+#attack_sub {
+    display: block; 
+    margin: 0 auto; 
+    position: relative; 
+    visibility: hidden; 
+    top: -581px; 
+    left: 1099px; 
+}
+
+#battle_menu ul, #attack_sub ul {
     list-style-type: none;
     display: inline-block;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
@@ -49,10 +59,9 @@
     height: 280px; 
     width: 100px; 
     padding-top: 138px;
-    pointer-events: none;
 }
 
-#battle_menu li { 
+#battle_menu li, #attack_sub li { 
     position: relative;
     left: -40px;
     width: 120px; 
@@ -63,7 +72,7 @@
     pointer-events: none;
 }
 
-#battle_menu a:focus {
+#battle_menu a:focus, #attack_sub a:focus {
     color: white;
     outline: solid 1px #d8bca1;
     pointer-events: none;
@@ -79,4 +88,16 @@
 
 #esc_menu {
     visibility: hidden; 
+}
+
+#attack_sub {
+    list-style-type: none;
+    display: inline-block;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+    font-size: 25px;
+    text-align: center; 
+    height: 280px; 
+    width: 100px; 
+    padding-top: 138px;
+    pointer-events: none;
 }
