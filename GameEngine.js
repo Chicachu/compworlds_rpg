@@ -61,6 +61,69 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+
+//sound part
+sounds.load([
+  "sounds/AncientForest.wav"
+]);
+
+sounds.whenLoaded = setup;
+
+function setup() {
+    console.log("sounds loaded");
+
+    //Create the sounds
+    var music = sounds["sounds/AncientForest.wav"]
+
+    //Make the music loop
+    music.loop = true;
+
+    //Set the pan to the left
+    music.pan = -0.8;
+
+    //Set the music volume
+    music.volume = 0.7;
+
+    //Set a reverb effect on the bounce sound
+    //arguments: duration, decay, reverse?
+    //music.setReverb(2, 2, false);
+
+    //Set the sound's `reverb` property to `false` to turn it off
+    //music.reverb = false;
+
+    //Optionally set the music playback rate to half speed
+    //music.playbackRate = 0.5;
+
+    // if (game is not battle?)
+    if (true) {
+        music.play();
+    } else {
+        music.pause();
+    }
+
+
+
+    //Capture the keyboard events
+    var k = keyboard(75);
+    l = keyboard(76);
+
+    //Control the sounds based on which keys are pressed
+
+    //Play the loaded music sound
+    k.press = function () {
+        if (!music.isPlaying) music.play();
+        if (music.pause) music.restart();
+        console.log("music playing");
+    };
+
+    //Pause the music 
+    l.press = function () {
+        music.pause();
+        console.log("music paused");
+    };
+}
+//end sound part
+
 GameEngine = function () {
     this.entities = [];
     this.context = null;
@@ -799,7 +862,6 @@ Warrior.prototype.constructor = Warrior;
 
 Warrior.prototype.draw = function (context) {
     Hero.prototype.draw.call(this, context);
-    this.inventory.draw.call(this);
 }
 
 Warrior.prototype.update = function () {
@@ -1017,6 +1079,7 @@ NPC.prototype.startInteraction = function () {
     this.reposition();
     var text_box = document.getElementById("dialogue_box");
     text_box.style.visibility = "visible";
+    text_box.style.display = "block";
     this.game.context.canvas.tabIndex = 0;
     text_box.tabIndex = 1;
     text_box.focus();
@@ -1649,14 +1712,14 @@ Inventory.prototype.showInventory = function (flag) {
 }
 
 Inventory.prototype.draw = function (ctx) {
-    for (var i = 0; i < this.inventory.items.length; i++) {
+    for (var i = 0; i < this.items.length; i++) {
         // get img of each item
-        var img = this.inventory.items[i].img;
-        this.inventory.html_items[i].innerHTML = img.outerHTML;
+        var img = this.items[i].img;
+        this.html_items[i].innerHTML = img.outerHTML;
     }
     // draw coin amount
     var inner_stuff = 
-    this.inventory.html_coin.innerHTML = this.inventory.coin;
+    this.html_coin.innerHTML = this.coin;
 }
 
 Inventory.prototype.update = function () {
@@ -1688,7 +1751,7 @@ Inventory.prototype.addItem = function (item) {
             // wont fit in inventory
         }
     }
-    
+    this.draw.call(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
@@ -1708,6 +1771,7 @@ Inventory.prototype.removeItem = function (item_name, qty) {
             }
         }
     }
+    this.draw.call(this);
     return item;
 }
 
@@ -1724,42 +1788,42 @@ Inventory.prototype.splitStack = function (item_name, qty) {
     return new_stack;
 }
 
-//Inventory.prototype.input = function () {
-//    for (var i = 0; i < this.html_items.length; i++) {
-//        var item = this.html_items[i];
-//        item.addEventListener("keydown", function (e) {
-//            if (e.which === 37) { // left 
-//                // if at the end of a row, send focus to the beginning of row. 
-//                if ((indexOf(this) % 5 - 1) === 0) {
-//                    this.html_items[indexOf(this) - 5].focus();
-//                } else {
-//                    this.html_items[indexOf(this) - 1].focus();
-//                }
-//            } else if (e.which === 38) { // up
-//                // if in top row, send focus to bottom row. 
-//                if (Math.floor((indexOf(this) / 5)) === 0) {
-//                    this.html_items[20 - indexOf(this)].focus();
-//                } else {
-//                    this.html_items[indexOf(this) - 5];
-//                }
-//            } else if (e.which === 39) { // right
-//                // if at the beginning of a row, send focus to the end of row. 
-//                if ((indexOf(this) % 5 - 1) === 0) {
-//                    this.html_items[indexOf(this) + 5].focus();
-//                } else {
-//                    this.html_items[indexOf(this) + 1].focus();
-//                }
-//            } else if (e.which === 40) { // down
-//                // if in bottom row, send focus to top row
-//                if (Math.floor((indexOf(this) / 5)) === 4) {
-//                    this.html_items[indexOf(this) % 5].focus();
-//                } else {
-//                    this.html_items[indexOf(this) + 5];
-//                }
-//            } else if (String.fromCharCode(e.which) === ' ') {
-//                // bring up menu to let user choose what to do with item
-//                // item could be usable or equipable
-//            }
-//        });
-//    }
-//}
+Inventory.prototype.input = function () {
+    for (var i = 0; i < this.html_items.length; i++) {
+        var item = this.html_items[i];
+        item.addEventListener("keydown", function (e) {
+            if (e.which === 37) { // left 
+                // if at the end of a row, send focus to the beginning of row. 
+                if ((indexOf(this) % 5 - 1) === 0) {
+                    this.html_items[indexOf(this) - 5].focus();
+                } else {
+                    this.html_items[indexOf(this) - 1].focus();
+                }
+            } else if (e.which === 38) { // up
+                // if in top row, send focus to bottom row. 
+                if (Math.floor((indexOf(this) / 5)) === 0) {
+                    this.html_items[20 - indexOf(this)].focus();
+                } else {
+                    this.html_items[indexOf(this) - 5];
+                }
+            } else if (e.which === 39) { // right
+                // if at the beginning of a row, send focus to the end of row. 
+                if ((indexOf(this) % 5 - 1) === 0) {
+                    this.html_items[indexOf(this) + 5].focus();
+                } else {
+                    this.html_items[indexOf(this) + 1].focus();
+                }
+            } else if (e.which === 40) { // down
+                // if in bottom row, send focus to top row
+                if (Math.floor((indexOf(this) / 5)) === 4) {
+                    this.html_items[indexOf(this) % 5].focus();
+                } else {
+                    this.html_items[indexOf(this) + 5];
+                }
+            } else if (String.fromCharCode(e.which) === ' ') {
+                // bring up menu to let user choose what to do with item
+                // item could be usable or equipable
+            }
+        });
+    }
+}
