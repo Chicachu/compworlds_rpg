@@ -1591,7 +1591,7 @@ Inventory = function (game, coin, max_items) {
     this.html_items = document.getElementById("items").getElementsByTagName('DIV');
     this.items = [];
     this.stacking_limit = 50;
-    this.input();
+    //this.input();
 }
 
 Inventory.prototype.showInventory = function (flag) {
