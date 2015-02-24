@@ -61,6 +61,69 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+
+//sound part
+sounds.load([
+  "sounds/AncientForest.wav"
+]);
+
+sounds.whenLoaded = setup;
+
+function setup() {
+    console.log("sounds loaded");
+
+    //Create the sounds
+    var music = sounds["sounds/AncientForest.wav"]
+
+    //Make the music loop
+    music.loop = true;
+
+    //Set the pan to the left
+    music.pan = -0.8;
+
+    //Set the music volume
+    music.volume = 0.7;
+
+    //Set a reverb effect on the bounce sound
+    //arguments: duration, decay, reverse?
+    //music.setReverb(2, 2, false);
+
+    //Set the sound's `reverb` property to `false` to turn it off
+    //music.reverb = false;
+
+    //Optionally set the music playback rate to half speed
+    //music.playbackRate = 0.5;
+
+    // if (game is not battle?)
+    if (true) {
+        music.play();
+    } else {
+        music.pause();
+    }
+
+
+
+    //Capture the keyboard events
+    var k = keyboard(75);
+    l = keyboard(76);
+
+    //Control the sounds based on which keys are pressed
+
+    //Play the loaded music sound
+    k.press = function () {
+        if (!music.isPlaying) music.play();
+        if (music.pause) music.restart();
+        console.log("music playing");
+    };
+
+    //Pause the music 
+    l.press = function () {
+        music.pause();
+        console.log("music paused");
+    };
+}
+//end sound part
+
 GameEngine = function () {
     this.entities = [];
     this.context = null;
@@ -332,7 +395,7 @@ GameEngine.prototype.battleOver = function (game) {
     var net_health_1 = 0;
     for (var i = 0 ; i < game.fiends.length; i++) {
         net_health_1 += game.fiends[i].stats.health;
-
+    }
         net_health_1 = game.fiends[0].stats.health;
         if (net_health_1 <= 0) {
             game.canControl = false;
@@ -343,7 +406,6 @@ GameEngine.prototype.battleOver = function (game) {
             }, 2000);
         }
 
-    }
 }
 
 /*
@@ -446,6 +508,26 @@ Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
 
+Entity.prototype.drawHealthBar = function(context)
+{
+    if (this.stats.health < 0)
+    {
+        green = 0;
+    }
+    else {
+        var green = this.stats.health / this.stats.total_health;
+    }
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y - 7, this.curr_anim.frameWidth, 5);
+    context.fillStyle = 'red';
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y - 7, this.curr_anim.frameWidth * green, 5);
+    context.fillStyle = 'green';
+    context.fill();
+    context.closePath();
+}
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
 }
@@ -465,8 +547,11 @@ Entity.prototype.setAnimation = function(anim)
 
 Statistics = function (health, attack, defense) {
     this.health = health;
+    this.total_health = health;
     this.attack = attack;
+    this.total_attack = attack;
     this.defense = defense;
+    this.total_defense = defense;
 }
 
 /* HERO and subclasses */
@@ -554,6 +639,7 @@ Hero.prototype.draw = function (context) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
     else {
+        this.drawHealthBar(context);
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
 }
@@ -844,6 +930,7 @@ Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
      
+    this.drawHealthBar(context);
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
 }
 
@@ -1351,7 +1438,9 @@ BattleMenu.prototype.init = function () {
         } else if (String.fromCharCode(e.which) === ' ') {
             // stuff to make character do a single attack 
             if (that.game.canControl) {
-                that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+                if (that.game.fight_queue[0]) {
+                    that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+                }
             }
             //that.attack_queue.push(that.attack_queue.shift());
             that.changeTabIndex("attack", false);
