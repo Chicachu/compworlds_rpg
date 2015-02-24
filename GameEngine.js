@@ -69,7 +69,8 @@ GameEngine = function () {
     this.timer = null;
     this.key = null; 
     this.space = null;
-    this.esc = null; 
+    this.esc = null;
+    this.key_i = null;
     this.curr_background = null;
     this.is_battle = false;
     this.menu = null;
@@ -112,11 +113,14 @@ GameEngine.prototype.startInput = function () {
                 that.key = e.which;
             } else if (e.which === 27) {
                 that.esc_menu.showMenu(true); 
+            } else if (e.which === 73) {
+                that.key_i = true; 
             }
         } else {
             that.key = 0;
             that.space = 0;
-            that.esc = 0; 
+            that.esc = 0;
+            that.key_i = 0;
         }
         e.preventDefault();
     }, false);
@@ -125,7 +129,7 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
-        that.esc = 0; 
+        that.esc = 0;
     }, false);
 
     var text_box = document.getElementById("dialogue_box");
@@ -762,7 +766,8 @@ Warrior = function (game, stats) {
     };
     this.x = 10;
     this.y = 215;
-    this.inventory = new Inventory(100);
+    
+    this.inventory = new Inventory(this.game, 100, 20);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
 
@@ -771,9 +776,11 @@ Warrior.prototype.constructor = Warrior;
 
 Warrior.prototype.draw = function (context) {
     Hero.prototype.draw.call(this, context);
+    this.inventory.draw.call(this);
 }
 
 Warrior.prototype.update = function () {
+    this.inventory.update.call(this); 
     Hero.prototype.update.call(this);
 }
 
@@ -801,55 +808,6 @@ Warrior.prototype.setAction = function(action, target)
     if (this.game.is_battle) {
         this.game.battleOver(this.game);
     }
-}
-<<<<<<< HEAD
-Warrior.prototype.getActions = function()
-{
-    return ["Spiral Cut", "Divine Sword"];
-}
-
-Inventory = function (coin, max_items) {
-    this.items = [];
-    this.max_items = max_items;
-    this.coin = coin;
-=======
-Warrior.prototype.deductCoin = function (amount) {
-    if (this.coin >= amount) {
-        this.coin -= amount;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-Warrior.prototype.addCoin = function (amount) {
-    this.coint += amount;
-}
-
-Warrior.prototype.recieveItem = function (item) {
-    if (this.items[item.name]) {
-        this.items[item.name].increaseQty(item.qty);
-    } else {
-        this.items[item.name] = item;
-    }
-}
-
-Warrior.prototype.giveItem = function (item_name, qty) {
-    var item = null;
-    if (this.items[item_name] && this.items[item_name].qty >= qty) {
-        if (this.items[item_name].qty === qty) {
-            item = this.items[item_name];
-            this.items.splice(item_name, 1);
-        } else {
-            item = this.items[item_name];
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
-        }
-        _item = item;
-        this.items.splice(item.name, 1);
-    }
->>>>>>> origin/origin
 }
 
 /* ENEMY and subclasses */
@@ -905,26 +863,29 @@ anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
 NPC = function (game, dialogue, anims, path, pause) {
-    this.game = game;
-    this.spriteSheet = anims.right.spriteSheet;
+    if (game && dialogue && anims && path) {
+        this.game = game;
 
-    //next variables for the npc's path
-    this.path = path;
-    this.pause = pause;
-    this.next_point = null;
-    this.pause_timer = null;
-    this.animations = anims;
-    this.x = this.path[0].getX();
-    this.y = this.path[0].getY();
-    this.path.push(this.path.shift());
+        this.animations = anims;
+        this.spriteSheet = this.animations.right.spriteSheet;
 
-    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
-    
-    // next few variables used for NPC interaction and dialogue. 
-    this.interacting = false;
-    this.dialogue = dialogue;
-    this.dialogue_index = 0;
-    this.setNextCoords();
+        //next variables for the npc's path
+        this.path = path;
+        this.pause = pause;
+        this.next_point = null;
+        this.pause_timer = null;
+        this.x = this.path[0].getX();
+        this.y = this.path[0].getY();
+        this.path.push(this.path.shift());
+
+        Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations);
+
+        // next few variables used for NPC interaction and dialogue. 
+        this.interacting = false;
+        this.dialogue = dialogue;
+        this.dialogue_index = 0;
+        this.setNextCoords();
+    }
 }
 
 NPC.prototype = new Entity();
@@ -1014,12 +975,6 @@ NPC.prototype.updateDialogue = function () {
     }
 }
 
-// when setting changes or a quest completes, change what the NPC says with this function
-NPC.prototype.changeDialogue = function () {
-    this.dialogue = ["",
-                     "",
-                     ""];
-}
 
 // loops through dialogue for the given NPC.
 NPC.prototype.startInteraction = function () {
@@ -1045,67 +1000,7 @@ NPC.prototype.reposition = function () {
     }
 }
 
-
-Item = function (name, price, qty) {
-    this.name = name;
-    this.price = price;
-    this.qty = qty;
-}
-
-Item.prototype.increaseQty = function (amount) {
-    this.qty += amount;
-}
-
-Item.prototype.decreaseQty = function (amount) {
-    if (this.qty >= amount) {
-        this.qty -= amount;
-    }
-}
-
-<<<<<<< HEAD
-Warrior.prototype.deductCoin = function (amount) {
-    if (this.coin >= amount) {
-        this.coin -= amount;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-Warrior.prototype.addCoin = function (amount) {
-    this.coint += amount;
-}
-
-Warrior.prototype.recieveItem = function (item) {
-    if (this.items[item.name]) {
-        this.items[item.name].increaseQty(item.qty);
-    } else {
-        this.items[item.name] = item;
-    }
-}
-
-Warrior.prototype.giveItem = function (item_name, qty) {
-    var item = null;
-    if (this.items[item_name] && this.items[item_name].qty >= qty) {
-        if (this.items[item_name].qty === qty) {
-            item = this.items[item_name];
-            this.items.splice(item_name, 1);
-        } else {
-            item = this.items[item_name];
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
-        }
-        _item = item;
-        this.items.splice(item.name, 1);
-    }
-}
-
-Point = function(x, y)
-{
-=======
 Point = function (x, y) {
->>>>>>> origin/origin
     this.x = x;
     this.y = y;
 }
@@ -1383,36 +1278,6 @@ Environment.prototype.setQuadrant = function (number) {
     this.curr_quadrant = number;
 }
 
-Background = function () {
-    // "Map" will be a double array of integer values. 
-    this.map = [[],
-                [],
-                [],
-                []];
-    this.tileSheet = new Tilesheet(/* TODO: fill in parameters here */);
-}
-
-/* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
-Background.prototype.draw = function (context, scaleBy) {
-    var scaleBy = (scaleBy || 1);
-
-    for (var i = 0; i < this.map[0].length; i++) { // length of each row
-        for (var j = 0; j < this.map.length; j++) { // length of each column
-            var tile_index = this.map[i][j];
-
-            context.drawImage(this.tileSheet,
-                                tile_index % this.tileSheet.sheetWidth, tile_index / this.tileSheet.sheetWidth, // where to start clipping
-                                this.tileSheet.tileSize, this.tileSheet.tileSize,  // how much to clip
-                                this.tileSheet.tileSize * i, this.tileSheet.tileSize * j, // coordinates to start drawing to 
-                                this.tileSheet.tileSize * scaleBy, this.tileSheet.tileSize * scaleBy); // how big to draw.                          
-        }
-    }
-}
-
-Background.prototype.update = function () {
-    
-}
-
 
 BattleMenu = function (menu_element, game) {
     this.game = game; 
@@ -1569,6 +1434,7 @@ BattleMenu.prototype.showMenu = function (flag) {
 // menu accessed by pressing "esc" 
 GeneralMenu = function (game) {
     this.game = game;
+    this.hero = null;
     this.menu = document.getElementById("esc_menu");
     this.inventory = document.getElementById("inventory");
     this.save = document.getElementById("save_game");
@@ -1577,13 +1443,17 @@ GeneralMenu = function (game) {
     this.init();
 }
 
+GeneralMenu.prototype.initHero = function (hero) {
+    this.hero = hero; 
+}
+
 GeneralMenu.prototype.init = function () {
     var that = this; 
     this.inventory.addEventListener("keydown", function (e) {
         if (e.which === 40) {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            // opens inventory
+            that.hero.inventory.showInventory(); 
         }
         e.preventDefault();
     });
@@ -1637,6 +1507,7 @@ GeneralMenu.prototype.showMenu = function (flag) {
         this.inventory.tabIndex = 0;
         this.return.tabIndex = 0; 
         this.game.context.canvas.tabIndex = 1;
+        this.game.context.canvas.focus();
     }
 }
 
@@ -1669,5 +1540,188 @@ Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
 Storekeeper.prototype.initializeItems = function (items) {
     for (var i = 0; i < items.length; i++) {
         this.items[items[i].name] = items[i];
+    }
+}
+
+Item = function (name, price, qty, img, stackable) {
+    this.name = name;
+    this.price = price;
+    this.qty = qty;
+    this.img = img;
+    this.isStackable = stackable; 
+}
+
+Item.prototype.increaseQty = function (amount) {
+    this.qty += amount;
+}
+
+Item.prototype.decreaseQty = function (amount) {
+    if (this.qty >= amount) {
+        this.qty -= amount;
+    }
+}
+
+Warrior.prototype.deductCoin = function (amount) {
+    if (this.inventory.coin >= amount) {
+        this.inventory.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Warrior.prototype.addCoin = function (amount) {
+    this.inventory.coin += amount;
+}
+
+Warrior.prototype.recieveItem = function (item) {
+    this.inventory.addItem(item); 
+}
+
+Warrior.prototype.removeItem = function (item_name, qty) {
+    this.inventory.removeItem(item_name, qty);
+}
+
+Inventory = function (game, coin, max_items) {
+    this.game = game; 
+    this.coin = coin;
+    this.html_coin = document.getElementById("coin");
+    this.max_items = max_items;
+    this.interface = document.getElementById("inventory_sack");
+    this.html_items = document.getElementById("items").getElementsByTagName('DIV');
+    this.items = [];
+    this.stacking_limit = 50;
+    this.input();
+}
+
+Inventory.prototype.showInventory = function (flag) {
+    if (flag) {
+        this.game.context.canvas.tabIndex = 0;
+        this.interface.tabIndex = 1;
+        this.interface.style.visibility = "visible";
+        this.interface.style.display = "block";
+        this.html_items[0].focus();
+    } else {
+        this.interface.style.visibility = "hidden";
+        this.interface.style.display = "none";
+        this.interface.tabIndex = 0;
+        this.game.context.canvas.tabIndex = 1;
+        this.game.context.canvas.focus();
+    }
+}
+
+Inventory.prototype.draw = function (ctx) {
+    for (var i = 0; i < this.inventory.items.length; i++) {
+        // get img of each item
+        var img = this.inventory.items[i].img;
+        this.inventory.html_items[i].innerHTML = img.outerHTML;
+    }
+    // draw coin amount
+    var inner_stuff = 
+    this.inventory.html_coin.innerHTML = this.inventory.coin;
+}
+
+Inventory.prototype.update = function () {
+    if (this.game.key_i) {
+        this.inventory.showInventory(true); 
+    } else if (this.inventory.interface.style.visibility === "visible" && this.game.esc) {
+        this.inventory.showInventory(false);
+        this.game.key_i = 0;
+    }
+}
+
+Inventory.prototype.addItem = function (item) {
+    var found = false;
+    if (this.items && item.isStackable) {
+        for (var i = 0; i < this.items.length; i++) {
+            if (this.items[i].name === item.name) {
+                if ((this.items[i].qty += item.qty) <= this.stacking_limit) {
+
+                }
+                this.items[i].qty += item.qty;
+                found = true;
+            }
+        }
+    }
+    if (!found) {
+        if (this.items.length < this.max_items) {
+            this.items.push(item);
+        } else {
+            // wont fit in inventory
+        }
+    }
+    
+}
+
+// will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
+// otherwise it will return the item 
+Inventory.prototype.removeItem = function (item_name, qty) {
+    var item = false;
+    for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].name === item_name) {
+            if (this.items[i].qty > qty) {
+                //split stack
+                item = this.splitStack(item_name, qty)
+            } else if (this.items[i].qty === qty) {
+                item = this.items[i];
+                this.items.splice(item, 1);
+            } else {
+                // can't remove item. 
+            }
+        }
+    }
+    return item;
+}
+
+// returns new item object of the qty requested while keeping the remaining in the inventory
+// use only when the qty of the item in the inventory is greater than the stack being requested. 
+Inventory.prototype.splitStack = function (item_name, qty) {
+    var new_stack = null; 
+    for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].name === item_name) {
+            new_stack = new Item(item_name, items[i].price, items[i].qty, items[i].img, items[i].stackable);
+            items[i].qty -= qty; 
+        }
+    }
+    return new_stack;
+}
+
+Inventory.prototype.input = function () {
+    for (var i = 0; i < this.html_items.length; i++) {
+        var item = this.html_items[i];
+        item.addEventListener("keydown", function (e) {
+            if (e.which === 37) { // left 
+                // if at the end of a row, send focus to the beginning of row. 
+                if ((indexOf(this) % 5 - 1) === 0) {
+                    this.html_items[indexOf(this) - 5].focus();
+                } else {
+                    this.html_items[indexOf(this) - 1].focus();
+                }
+            } else if (e.which === 38) { // up
+                // if in top row, send focus to bottom row. 
+                if (Math.floor((indexOf(this) / 5)) === 0) {
+                    this.html_items[20 - indexOf(this)].focus();
+                } else {
+                    this.html_items[indexOf(this) - 5];
+                }
+            } else if (e.which === 39) { // right
+                // if at the beginning of a row, send focus to the end of row. 
+                if ((indexOf(this) % 5 - 1) === 0) {
+                    this.html_items[indexOf(this) + 5].focus();
+                } else {
+                    this.html_items[indexOf(this) + 1].focus();
+                }
+            } else if (e.which === 40) { // down
+                // if in bottom row, send focus to top row
+                if (Math.floor((indexOf(this) / 5)) === 4) {
+                    this.html_items[indexOf(this) % 5].focus();
+                } else {
+                    this.html_items[indexOf(this) + 5];
+                }
+            } else if (String.fromCharCode(e.which) === ' ') {
+                // bring up menu to let user choose what to do with item
+                // item could be usable or equipable
+            }
+        });
     }
 }

@@ -1,6 +1,9 @@
 ﻿::-webkit-scrollbar { 
     width: 0; 
 }
+body {
+    overflow: hidden; 
+}
 #gameworld {   
     border: 1px solid black; 
     display: block; 
@@ -88,16 +91,17 @@
     display: none;
     margin: 0 auto;
     width: 608px; 
-    height: 417px;
+    height: 467px;
     top: -400px;
     text-align: center; 
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
 
 #esc_menu ul{
     list-style-type: none;
     display: inline-block;
-    height: 180px; 
-    width: 150px;
+    height: auto; 
+    width: 145px;
     background-image: url("./imgs/menu_background.png"); 
     text-align: center; 
     font-size: 25px;
@@ -105,11 +109,87 @@
 
 #esc_menu li {
     position: relative;
-    width: 120px; 
+    width: auto; 
     height: auto;
     color: #d8bca1; 
-    margin: 10px;
+    padding: 5px;
     right: 13px;
+    overflow: visible;
+}
+
+#inventory_sack {
+    height: 194px; 
+    width: 324px; 
+    position: relative; 
+    background-image: url("./imgs/menu_background.png"); 
+    margin: 0 auto; 
+    display: none;
+    top: -380px;  
+    visibility: hidden;
+}
+
+#items {
+    position: relative; 
+    height: 144px; 
+    width: 180px;
+    border:  1px double #d8bca1;
+    padding: 25px;
+    display: inline-block; 
+    left: 1px;
+    top: -10px;
+}
+
+#items p {
+    display: block; 
+    position: relative; 
+    text-align: right; 
+    color: #d8bca1;
+    margin-bottom: 3px;
+    font-weight: 900;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+}
+
+#items img {
+   float: right; 
+   display: block; 
+}
+
+.item, .equip {
+    height: 34px; 
+    width: 34px; 
+    border:  1px solid #d8bca1;
+}
+
+.item:focus {
+    border-color: white; 
+}
+
+.item {
+    float: left; 
+}
+
+#equipment {
+    position: relative; 
+    display: inline-block; 
+    padding: 25px; 
+    border:  1px double #d8bca1;
+    left: -1px; 
+}
+
+#equip_armor {
+    background-image: url("./imgs/equipment/armor.png");
+}
+
+#equip_accessory {
+    background-image: url("./imgs/equipment/accessory.png");
+}
+
+#equip_mainhand {
+    background-image: url("./imgs/equipment/main_hand.png");
+}
+
+#equip_offhand {
+    background-image: url("./imgs/equipment/offhand.png");
 }
 
 
