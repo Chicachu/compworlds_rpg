@@ -61,6 +61,69 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+
+//sound part
+sounds.load([
+  "sounds/AncientForest.wav"
+]);
+
+sounds.whenLoaded = setup;
+
+function setup() {
+    console.log("sounds loaded");
+
+    //Create the sounds
+    var music = sounds["sounds/AncientForest.wav"]
+
+    //Make the music loop
+    music.loop = true;
+
+    //Set the pan to the left
+    music.pan = -0.8;
+
+    //Set the music volume
+    music.volume = 0.7;
+
+    //Set a reverb effect on the bounce sound
+    //arguments: duration, decay, reverse?
+    //music.setReverb(2, 2, false);
+
+    //Set the sound's `reverb` property to `false` to turn it off
+    //music.reverb = false;
+
+    //Optionally set the music playback rate to half speed
+    //music.playbackRate = 0.5;
+
+    // if (game is not battle?)
+    if (true) {
+        music.play();
+    } else {
+        music.pause();
+    }
+
+
+
+    //Capture the keyboard events
+    var k = keyboard(75);
+    l = keyboard(76);
+
+    //Control the sounds based on which keys are pressed
+
+    //Play the loaded music sound
+    k.press = function () {
+        if (!music.isPlaying) music.play();
+        if (music.pause) music.restart();
+        console.log("music playing");
+    };
+
+    //Pause the music 
+    l.press = function () {
+        music.pause();
+        console.log("music paused");
+    };
+}
+//end sound part
+
 GameEngine = function () {
     this.entities = [];
     this.context = null;
