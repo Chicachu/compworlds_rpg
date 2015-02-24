@@ -286,10 +286,25 @@ if(this.is_battle) {
         if (event.entity.curr_anim.looped) {
             if (this.animation_queue.length >= 0) {
                 //if loop has been made, dequeue off the queue and set it to event
-                event = this.animation_queue.shift();
+                var that = this;
+                var that_event = event;
                 //Sets the events entitiy's animation
-                event.entity.setAnimation(event.animation);
-                event.entity.curr_anim.looped = false;
+                if (event.wait && !event.hanging) {
+                    event.hanging = true;
+                    event.hang_timer = setTimeout(function () {
+                        event.hanging = false;
+                        clearInterval(that_event.hang_timer);
+                        that_event = that.animation_queue.shift();
+                        that_event.entity.setAnimation(that_event.animation);
+                        that_event.entity.curr_anim.looped = false;
+                    }, event.wait);
+                }
+                else if(!event.hanging) {
+                    event = this.animation_queue.shift();
+                    event.entity.setAnimation(event.animation);
+                    event.entity.curr_anim.looped = false;
+                }
+            
             }
             else {
                 event.entity.setAnimation(event.entity.stop_move_animation);
@@ -333,7 +348,7 @@ Takes a game as a parameter
 GameEngine.prototype.fadeIn = function (game) {
     var that = game;
 
-    this.timerId = setInterval(function () {
+    that.timerId = setInterval(function () {
         that.context.globalAlpha += .05;
         if (that.context.globalAlpha > .95) {
             that.context.globalAlpha = 1;
@@ -349,7 +364,6 @@ Takes the main player as a parameter. Sets up the battle by setting is_battle to
 setting the battle background, saving coordinates, and also generating a list or random fiends for the hero
 */
 GameEngine.prototype.setBattle = function (game) {
-    game.fight_queue[0] = game.entities[0];
     game.is_battle = true;
     game.setBackground("./imgs/woods.png");
     game.entities[0].save_x = game.entities[0].x;
@@ -367,6 +381,7 @@ GameEngine.prototype.setBattle = function (game) {
         next_y += space_out;
         game.addEntity(game.fiends[i]);
     }
+    game.decideFighters();
     window.setTimeout(game.menu.showMenu(true), 5000);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
 }
@@ -386,6 +401,7 @@ GameEngine.prototype.endBattle = function (game)
     game.clearEntities(false);
     game.reLoadEntities();
     game.fiends = [];
+    game.fight_queue = [];
 }
 /**
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
@@ -408,15 +424,42 @@ GameEngine.prototype.battleOver = function (game) {
 
 }
 
+GameEngine.prototype.decideFighters = function()
+{
+    //var total_weight = 0;
+    //var dice_roll = 0;
+    //for(var i = 0; i < this.entities.length; i++)
+    //{
+    //    total_weight += this.entities[i];
+    //}
+
+    //for(var i = 0; i < this.entities.length; i++)
+    //{
+    //    this.entities[i].turn_chance = this.entities[i].turn_weight / total_weight;
+    //}
+    
+    //dice_roll = Math.random();
+    var fighter = 0;
+    for(var i = 0; i < this.entities.length * 10; i++)
+    {
+        fighter = i % this.entities.length;
+        this.fight_queue.push(this.entities[fighter]);
+    }
+}
+
+GameEngine.prototype.setNextFighter = function()
+{
+    this.fight_queue.shift();
+}
 /*
     Takes in two players as parameters, pushes the players attack animation to the queue and 
     the foes hit animation. also does a damage calculation for the hit target
 */
-GameEngine.prototype.performAction = function (player, foe) {
+GameEngine.prototype.performBattleUpdates = function () {
     player.game.animation_queue.push(new Event(player, player.animations.destroy));
-    player.game.animation_queue.push(new Event(player, player.stop_move_animation));
+    player.game.animation_queue.push(new Event(player, player.stop_move_animation, 1000));
     foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
-    foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation));
+    foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation, 1000));
     foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
@@ -446,10 +489,13 @@ var Direction = {
 /**
     Object that is stored in the queue animation. Takes an entity and one of the entities animations as a parameter
 */
-Event = function(entity, animation)
+Event = function(entity, animation, wait)
 {
     this.entity = entity;
     this.animation = animation;
+    this.wait = wait;
+    this.hang_timer = null;
+    this.hanging = false;
 }
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */
@@ -465,11 +511,11 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.spriteSheet = spriteSheet;
     this.stats = stats;
     this.curr_anim = null;
+    this.id = Math.random() * Math.random();
     if (animations) {
         this.animations = animations;
         this.curr_anim = this.animations.down;
         this.stop_move_animation = this.stopAnimation(this.animations.right);
-
     }
 }
 
@@ -528,6 +574,11 @@ Entity.prototype.drawHealthBar = function(context)
     context.fill();
     context.closePath();
 }
+
+Entity.prototype.updateStats = function(statistic, update)
+{
+    Statistics.statistic = update;
+}
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
 }
@@ -545,17 +596,19 @@ Entity.prototype.setAnimation = function(anim)
     this.curr_anim = anim;
 }
 
-Statistics = function (health, attack, defense) {
+Statistics = function (health, attack, defense, turn_weight) {
     this.health = health;
     this.total_health = health;
     this.attack = attack;
     this.total_attack = attack;
     this.defense = defense;
     this.total_defense = defense;
+    this.turn_weight = turn_weight
+    this.turn_chance = 0;
 }
 
 /* HERO and subclasses */
-Hero = function (game, x, y, spriteSheet, animations, stats) {
+Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
     this.width = 43;
     this.height = 64;
@@ -877,8 +930,8 @@ Warrior.prototype.setAction = function(action, target)
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
             target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit));
-            target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation));
-            target[0].stats.health = target[0].stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.random() * 10));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation, 1000));
+            target[0].stats.health = target[0].stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.floor(Math.random() * (10 - 1)) + 1));
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.special));
@@ -887,9 +940,10 @@ Warrior.prototype.setAction = function(action, target)
             {
                 target[i].game.animation_queue.push(new Event(target[i], target[i].animations.hit));
                 target[i].game.animation_queue.push(new Event(target[i], target[i].stop_move_animation));
-                target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
+                target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.floor(Math.random() * (10 - 1)) + 1));
             }
     }
+
     if (this.game.is_battle) {
         this.game.battleOver(this.game);
     }
@@ -931,10 +985,15 @@ Enemy.prototype.constructor = Enemy;
 Enemy.prototype.draw = function (context) {
      
     this.drawHealthBar(context);
-        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
 }
 
-Enemy.prototype.update = function() {
+Enemy.prototype.update = function () {
+    if(this.game.fight_queue[0].id === this.id)
+    {
+        this.setAction("Single", this.game.entities);
+        this.game.setNextFighter();
+    }
 }
 
 
@@ -942,6 +1001,28 @@ Enemy.prototype.hit = function () {
 
 }
 
+Enemy.prototype.setAction = function (action, target) {
+    switch (action) {
+        case "Single":
+            this.game.animation_queue.push(new Event(this, this.animations.destroy));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation, 1000));
+            target[0].stats.health = target[0].stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.random() * 10));
+            break;
+        case "Sweep":
+            this.game.animation_queue.push(new Event(this, this.animations.special));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            for (var i = 0; i < target.length; i++) {
+                target[i].game.animation_queue.push(new Event(target[i], target[i].animations.hit));
+                target[i].game.animation_queue.push(new Event(target[i], target[i].stop_move_animation));
+                target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
+            }
+    }
+    if (this.game.is_battle) {
+        this.game.battleOver(this.game);
+    }
+}
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
@@ -1314,7 +1395,7 @@ Environment.prototype.generateFiend = function (game)
     for (var i = 0; i < number_of_fiends; i++) {
         var fiend_number = Math.floor(Math.random() * (this.fiends.length - 0) + 0);
         var fiend = this.fiends[fiend_number];
-        fiend_array.push(new Enemy(this.game, new Statistics(100, 15, 5), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
+        fiend_array.push(new Enemy(this.game, new Statistics(100, 15, 5, .2), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
     }
     return fiend_array;
 }
@@ -1440,6 +1521,7 @@ BattleMenu.prototype.init = function () {
             if (that.game.canControl) {
                 if (that.game.fight_queue[0]) {
                     that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+                    that.game.setNextFighter();
                 }
             }
             //that.attack_queue.push(that.attack_queue.shift());

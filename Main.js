@@ -45,7 +45,7 @@ ASSET_MANAGER.downloadAll(function () {
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
     //    );
-    var warrior = new Warrior(gameEngine, new Statistics(50, 20, 10));
+    var warrior = new Warrior(gameEngine, new Statistics(50, 20, 10, .4));
 
     var sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -57,7 +57,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "We must do something! I saw the dragon fly to the southeast *points determindly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
-                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], 1.13, false);
+                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], .3, false);
     //var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
