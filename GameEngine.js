@@ -776,7 +776,6 @@ Warrior.prototype.constructor = Warrior;
 
 Warrior.prototype.draw = function (context) {
     Hero.prototype.draw.call(this, context);
-    this.inventory.draw.call(this);
 }
 
 Warrior.prototype.update = function () {
@@ -1612,14 +1611,14 @@ Inventory.prototype.showInventory = function (flag) {
 }
 
 Inventory.prototype.draw = function (ctx) {
-    for (var i = 0; i < this.inventory.items.length; i++) {
+    for (var i = 0; i < this.items.length; i++) {
         // get img of each item
-        var img = this.inventory.items[i].img;
-        this.inventory.html_items[i].innerHTML = img.outerHTML;
+        var img = this.items[i].img;
+        this.html_items[i].innerHTML = img.outerHTML;
     }
     // draw coin amount
     var inner_stuff = 
-    this.inventory.html_coin.innerHTML = this.inventory.coin;
+    this.html_coin.innerHTML = this.coin;
 }
 
 Inventory.prototype.update = function () {
@@ -1651,7 +1650,7 @@ Inventory.prototype.addItem = function (item) {
             // wont fit in inventory
         }
     }
-    
+    this.draw.call(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
@@ -1671,6 +1670,7 @@ Inventory.prototype.removeItem = function (item_name, qty) {
             }
         }
     }
+    this.draw.call(this);
     return item;
 }
 
