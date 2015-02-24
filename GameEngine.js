@@ -120,7 +120,7 @@ GameEngine.prototype.startInput = function () {
             that.key = 0;
             that.space = 0;
             that.esc = 0;
-            that.key_i = 0;
+            that.key_i = false;
         }
         e.preventDefault();
     }, false);
@@ -1465,7 +1465,8 @@ GeneralMenu.prototype.init = function () {
         if (e.which === 40) {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            that.hero.inventory.showInventory(); 
+            that.showMenu(false);
+            that.hero.inventory.showInventory(true); 
         }
         e.preventDefault();
     });
@@ -1603,22 +1604,25 @@ Inventory = function (game, coin, max_items) {
     this.html_items = document.getElementById("items").getElementsByTagName('DIV');
     this.items = [];
     this.stacking_limit = 50;
-    //this.input();
+    this.input();
+    this.open = false; 
 }
 
 Inventory.prototype.showInventory = function (flag) {
     if (flag) {
         this.game.context.canvas.tabIndex = 0;
-        this.interface.tabIndex = 1;
+        this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
         this.html_items[0].focus();
+        this.open = true; 
     } else {
         this.interface.style.visibility = "hidden";
         this.interface.style.display = "none";
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
+        this.open = false; 
     }
 }
 
@@ -1634,9 +1638,9 @@ Inventory.prototype.draw = function (ctx) {
 }
 
 Inventory.prototype.update = function () {
-    if (this.game.key_i) {
+    if (this.game.key_i && this.inventory.open === false) {
         this.inventory.showInventory(true); 
-    } else if (this.inventory.interface.style.visibility === "visible" && this.game.esc) {
+    } else if (this.inventory.open === true && this.game.esc) {
         this.inventory.showInventory(false);
         this.game.key_i = 0;
     }
@@ -1700,41 +1704,69 @@ Inventory.prototype.splitStack = function (item_name, qty) {
 }
 
 Inventory.prototype.input = function () {
+    var that = this; 
     for (var i = 0; i < this.html_items.length; i++) {
         var item = this.html_items[i];
+        item.index = i;
+        item.pressed = false; 
         item.addEventListener("keydown", function (e) {
-            if (e.which === 37) { // left 
-                // if at the end of a row, send focus to the beginning of row. 
-                if ((indexOf(this) % 5 - 1) === 0) {
-                    this.html_items[indexOf(this) - 5].focus();
-                } else {
-                    this.html_items[indexOf(this) - 1].focus();
+            var new_index = null;
+            var index = this.index;
+            if (!this.pressed) {
+                if (e.which === 37) { // left 
+                    // if at the beginning of a row, send focus to the end of row. 
+                    if ((index % 5) < 1) {
+                        new_index = index + 4;
+                        that.changeFocus(new_index);
+                    } else {
+                        new_index = index - 1;
+                        that.changeFocus(new_index);
+                    }
+                } else if (e.which === 38) { // up
+                    // if in top row, send focus to bottom row. 
+                    if (Math.floor(index / 5) === 0) {
+                        new_index = that.html_items.length - 5 + index;
+                        that.changeFocus(new_index);
+                    } else {
+                        new_index = index - 5;
+                        that.changeFocus(new_index);
+                    }
+                } else if (e.which === 39) { // right
+                    // if at the end of a row, send focus to the beginning of row. 
+                    if (((index + 1) % 5 ) === 0) {
+                        new_index = index - 4;
+                        that.changeFocus(new_index);
+                    } else {
+                        new_index = index + 1;
+                        that.changeFocus(new_index);
+                    }
+                } else if (e.which === 40) { // down
+                    // if in bottom row, send focus to top row
+                    if (Math.floor((index / 5)) === 3) {
+                        new_index = index % 5;
+                        that.changeFocus(new_index);
+                    } else {
+                        new_index = index + 5;
+                        that.changeFocus(new_index);
+                    }
+                } else if (String.fromCharCode(e.which) === ' ') {
+                    // bring up menu to let user choose what to do with item
+                    // item could be usable or equipable
                 }
-            } else if (e.which === 38) { // up
-                // if in top row, send focus to bottom row. 
-                if (Math.floor((indexOf(this) / 5)) === 0) {
-                    this.html_items[20 - indexOf(this)].focus();
-                } else {
-                    this.html_items[indexOf(this) - 5];
-                }
-            } else if (e.which === 39) { // right
-                // if at the beginning of a row, send focus to the end of row. 
-                if ((indexOf(this) % 5 - 1) === 0) {
-                    this.html_items[indexOf(this) + 5].focus();
-                } else {
-                    this.html_items[indexOf(this) + 1].focus();
-                }
-            } else if (e.which === 40) { // down
-                // if in bottom row, send focus to top row
-                if (Math.floor((indexOf(this) / 5)) === 4) {
-                    this.html_items[indexOf(this) % 5].focus();
-                } else {
-                    this.html_items[indexOf(this) + 5];
-                }
-            } else if (String.fromCharCode(e.which) === ' ') {
-                // bring up menu to let user choose what to do with item
-                // item could be usable or equipable
+                this.pressed = true; 
             }
+            e.preventDefault();
+
+        });
+
+        item.addEventListener("keyup", function () {
+            this.pressed = false; 
         });
     }
+}
+
+Inventory.prototype.changeFocus = function (index) {
+    var that = this
+    window.setTimeout(that.html_items[index].focus(), 0);
+    
 }

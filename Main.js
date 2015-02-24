@@ -57,14 +57,16 @@ ASSET_MANAGER.downloadAll(function () {
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "We must do something! I saw the dragon fly to the southeast *points determindly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
-                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], 1.13, false);
+                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], .2, false);
     //var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
         // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
     var item = new Item("Amulet", 130, 1, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), false);
+    var item2 = new Item("Amulet", 130, 1, ASSET_MANAGER.getAsset("./imgs/items/amulet2.png"), false);
     warrior.recieveItem(item);
+    warrior.recieveItem(item2);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);

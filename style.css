@@ -93,7 +93,7 @@ body {
     margin: 0 auto;
     width: 608px; 
     height: 467px;
-    top: -400px;
+    top: -300px;
     text-align: center; 
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
@@ -125,7 +125,7 @@ body {
     background-image: url("./imgs/menu_background.png"); 
     margin: 0 auto; 
     display: none;
-    top: -380px;  
+    top: -280px;  
     visibility: hidden;
 }
 
