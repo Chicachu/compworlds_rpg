@@ -332,7 +332,7 @@ GameEngine.prototype.battleOver = function (game) {
     var net_health_1 = 0;
     for (var i = 0 ; i < game.fiends.length; i++) {
         net_health_1 += game.fiends[i].stats.health;
-
+    }
         net_health_1 = game.fiends[0].stats.health;
         if (net_health_1 <= 0) {
             game.canControl = false;
@@ -343,7 +343,6 @@ GameEngine.prototype.battleOver = function (game) {
             }, 2000);
         }
 
-    }
 }
 
 /*
@@ -446,6 +445,26 @@ Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
 
+Entity.prototype.drawHealthBar = function(context)
+{
+    if (this.stats.health < 0)
+    {
+        green = 0;
+    }
+    else {
+        var green = this.stats.health / this.stats.total_health;
+    }
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y - 7, this.curr_anim.frameWidth, 5);
+    context.fillStyle = 'red';
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y - 7, this.curr_anim.frameWidth * green, 5);
+    context.fillStyle = 'green';
+    context.fill();
+    context.closePath();
+}
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
 }
@@ -465,8 +484,11 @@ Entity.prototype.setAnimation = function(anim)
 
 Statistics = function (health, attack, defense) {
     this.health = health;
+    this.total_health = health;
     this.attack = attack;
+    this.total_attack = attack;
     this.defense = defense;
+    this.total_defense = defense;
 }
 
 /* HERO and subclasses */
@@ -554,6 +576,7 @@ Hero.prototype.draw = function (context) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
     else {
+        this.drawHealthBar(context);
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
 }
@@ -845,6 +868,7 @@ Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
      
+    this.drawHealthBar(context);
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
 }
 
@@ -1351,7 +1375,9 @@ BattleMenu.prototype.init = function () {
         } else if (String.fromCharCode(e.which) === ' ') {
             // stuff to make character do a single attack 
             if (that.game.canControl) {
-                that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+                if (that.game.fight_queue[0]) {
+                    that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+                }
             }
             //that.attack_queue.push(that.attack_queue.shift());
             that.changeTabIndex("attack", false);
