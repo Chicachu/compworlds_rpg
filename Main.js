@@ -57,7 +57,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "We must do something! I saw the dragon fly to the southeast *points determindly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
-                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], false);
+                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], 1.13, false);
     //var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
