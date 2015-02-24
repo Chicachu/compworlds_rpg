@@ -861,7 +861,7 @@ dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, pause) {
+NPC = function (game, dialogue, anims, path, speed, pause) {
     if (game && dialogue && anims && path) {
         this.game = game;
 
@@ -870,6 +870,7 @@ NPC = function (game, dialogue, anims, path, pause) {
 
         //next variables for the npc's path
         this.path = path;
+        this.speed = speed;
         this.pause = pause;
         this.next_point = null;
         this.pause_timer = null;
@@ -902,31 +903,43 @@ NPC.prototype.draw = function (context) {
 }
 
 NPC.prototype.update = function () {
-    if (!this.interacting)
-    {
-        if (this.next_point.getX() > this.x)
-        {
+    if (!this.interacting) {
+        if (this.next_point.getX() > this.x) {
             this.curr_anim = this.animations.right;
             this.direction = Direction.RIGHT;
-            this.changeCoordinates(0, 0, 0, 0.5);
+            if (this.next_point.getX() - this.x < this.speed) {
+                this.x = this.next_point.getX();
+            }
+            else {
+                this.changeCoordinates(0, 0, 0, this.speed);
+            }
         }
-        else if (this.next_point.getX() < this.x)
-        {
+        else if (this.next_point.getX() < this.x) {
             this.curr_anim = this.animations.left;
             this.direction = Direction.LEFT;
-            this.changeCoordinates(0, 0, 0.5, 0);
+            if (this.x - this.next_point.getX() < this.speed) {
+                this.x = this.next_point.getX();
+            }
+            else {
+                this.changeCoordinates(0, 0, this.speed, 0);
+            }
         }
-        else if (this.next_point.getY() > this.y)
-        {
+        else if (this.next_point.getY() > this.y) {
             this.curr_anim = this.animations.down;
             this.direction = Direction.DOWN;
-            this.changeCoordinates(0.5, 0, 0, 0);
+            if (this.next_point.getY() - this.y < this.speed) {
+                this.y = this.next_point.getY();
+            }
+            else {
+                this.changeCoordinates(this.speed, 0, 0, 0);
+            }
         }
-        else if (this.next_point.getY() < this.y)
-        {
+        else if (this.next_point.getY() < this.y) {
             this.curr_anim = this.animations.up;
             this.direction = Direction.UP;
-            this.changeCoordinates(0, 0.5, 0, 0);
+            if (this.y - this.next_point.getY() < this.speed) {
+                this.changeCoordinates(0, this.speed, 0, 0);
+            }
         }
         else {
             if (!this.pause_timer && this.pause) {
@@ -939,12 +952,11 @@ NPC.prototype.update = function () {
                     that.pause_timer = null;
                 }, 1000);
             }
-            else if(!this.pause)
-            {
+            else {
                 this.setNextCoords();
             }
+
         }
-            
     }
     else {
         this.curr_anim = this.stopAnimation(this.curr_anim);
@@ -1513,7 +1525,7 @@ GeneralMenu.prototype.showMenu = function (flag) {
 
 Storekeeper = function (game, dialogue, anims, path, pause, name) {
     this.name = name;
-    NPC.call(this, game, dialogue, anims, path, pause);
+    NPC.call(this, game, dialogue, anims, path, 0, pause);
 }
 
 Storekeeper.prototype = new NPC();
