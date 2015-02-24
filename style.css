@@ -19,11 +19,12 @@ body {
     text-align: center; 
     position: relative;
     z-index: 2; 
-    top: -525px;
+    top: -130px;
     pointer-events: none;
     background-image: url("./imgs/menu_background.png"); 
     border-radius: 25px;
     visibility: hidden;
+    display: none; 
 }
 
 #dialogue_box p {
