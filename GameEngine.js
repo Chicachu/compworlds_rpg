@@ -1686,42 +1686,42 @@ Inventory.prototype.splitStack = function (item_name, qty) {
     return new_stack;
 }
 
-Inventory.prototype.input = function () {
-    for (var i = 0; i < this.html_items.length; i++) {
-        var item = this.html_items[i];
-        item.addEventListener("keydown", function (e) {
-            if (e.which === 37) { // left 
-                // if at the end of a row, send focus to the beginning of row. 
-                if ((indexOf(this) % 5 - 1) === 0) {
-                    this.html_items[indexOf(this) - 5].focus();
-                } else {
-                    this.html_items[indexOf(this) - 1].focus();
-                }
-            } else if (e.which === 38) { // up
-                // if in top row, send focus to bottom row. 
-                if (Math.floor((indexOf(this) / 5)) === 0) {
-                    this.html_items[20 - indexOf(this)].focus();
-                } else {
-                    this.html_items[indexOf(this) - 5];
-                }
-            } else if (e.which === 39) { // right
-                // if at the beginning of a row, send focus to the end of row. 
-                if ((indexOf(this) % 5 - 1) === 0) {
-                    this.html_items[indexOf(this) + 5].focus();
-                } else {
-                    this.html_items[indexOf(this) + 1].focus();
-                }
-            } else if (e.which === 40) { // down
-                // if in bottom row, send focus to top row
-                if (Math.floor((indexOf(this) / 5)) === 4) {
-                    this.html_items[indexOf(this) % 5].focus();
-                } else {
-                    this.html_items[indexOf(this) + 5];
-                }
-            } else if (String.fromCharCode(e.which) === ' ') {
-                // bring up menu to let user choose what to do with item
-                // item could be usable or equipable
-            }
-        });
-    }
-}
+//Inventory.prototype.input = function () {
+//    for (var i = 0; i < this.html_items.length; i++) {
+//        var item = this.html_items[i];
+//        item.addEventListener("keydown", function (e) {
+//            if (e.which === 37) { // left 
+//                // if at the end of a row, send focus to the beginning of row. 
+//                if ((indexOf(this) % 5 - 1) === 0) {
+//                    this.html_items[indexOf(this) - 5].focus();
+//                } else {
+//                    this.html_items[indexOf(this) - 1].focus();
+//                }
+//            } else if (e.which === 38) { // up
+//                // if in top row, send focus to bottom row. 
+//                if (Math.floor((indexOf(this) / 5)) === 0) {
+//                    this.html_items[20 - indexOf(this)].focus();
+//                } else {
+//                    this.html_items[indexOf(this) - 5];
+//                }
+//            } else if (e.which === 39) { // right
+//                // if at the beginning of a row, send focus to the end of row. 
+//                if ((indexOf(this) % 5 - 1) === 0) {
+//                    this.html_items[indexOf(this) + 5].focus();
+//                } else {
+//                    this.html_items[indexOf(this) + 1].focus();
+//                }
+//            } else if (e.which === 40) { // down
+//                // if in bottom row, send focus to top row
+//                if (Math.floor((indexOf(this) / 5)) === 4) {
+//                    this.html_items[indexOf(this) % 5].focus();
+//                } else {
+//                    this.html_items[indexOf(this) + 5];
+//                }
+//            } else if (String.fromCharCode(e.which) === ' ') {
+//                // bring up menu to let user choose what to do with item
+//                // item could be usable or equipable
+//            }
+//        });
+//    }
+//}
