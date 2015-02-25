@@ -271,50 +271,49 @@ GameEngine.prototype.draw = function (drawCallBack) {
     this.context.restore();
 }
 
-GameEngine.prototype.queueActions = function()
-{
-if(this.is_battle) {
-    //Logic to calculate when to time the next animation event
+GameEngine.prototype.queueActions = function () {
+    if (this.is_battle) {
+        //Logic to calculate when to time the next animation event
         var event = this.event;
-    //if event is null and there is an animation in the queue, set animation to the first item in the queue
-    if (!event && this.animation_queue.length > 0) {
-        event = this.animation_queue[0];
-        event.entity.setAnimation(event.animation);
-    }
-    //If event is not null, check if the current event has gone through a full loop
-    if(event){
-        if (event.entity.curr_anim.looped) {
-            if (this.animation_queue.length >= 0) {
-                //if loop has been made, dequeue off the queue and set it to event
-                
-                //Sets the events entitiy's animation
-                if (event.wait && !event.hanging) {
-                    var that = this;
-                    var that_event = event;
-                    event.hanging = true;
-                    event.hang_timer = setTimeout(function () {
-                        that_event.hanging = false;
-                        that_event.executeCallback();
-                        clearInterval(that_event.hang_timer);
-                        that_event = that.animation_queue.shift();
-                        that_event.entity.setAnimation(that_event.animation);
-                        that_event.entity.curr_anim.looped = false;
-                    }, event.wait);
+        //if event is null and there is an animation in the queue, set animation to the first item in the queue
+        if (!event && this.animation_queue.length > 0) {
+            event = this.animation_queue[0];
+            event.entity.setAnimation(event.animation);
+        }
+        //If event is not null, check if the current event has gone through a full loop
+        if (event) {
+            if (event.entity.curr_anim.looped) {
+                if (this.animation_queue.length >= 0) {
+                    //if loop has been made, dequeue off the queue and set it to event
+
+                    //Sets the events entitiy's animation
+                    if (event.wait && !event.hanging) {
+                        var that = this;
+                        var that_event = event;
+                        event.hanging = true;
+                        event.hang_timer = setTimeout(function () {
+                            that_event.hanging = false;
+                            that_event.executeCallback();
+                            clearInterval(that_event.hang_timer);
+                            that_event = that.animation_queue.shift();
+                            that_event.entity.setAnimation(that_event.animation);
+                            that_event.entity.curr_anim.looped = false;
+                        }, event.wait);
+                    }
+                    else if (!event.hanging) {
+                        event.executeCallback();
+                        event = this.animation_queue.shift();
+                        event.entity.setAnimation(event.animation);
+                        event.entity.curr_anim.looped = false;
+                    }
+
                 }
-                else if (!event.hanging) {
-                    event.executeCallback();
-                    event = this.animation_queue.shift();
-                    event.entity.setAnimation(event.animation);
-                    event.entity.curr_anim.looped = false;
+                else {
+                    event.entity.setAnimation(event.entity.stop_move_animation);
                 }
-            
-            }
-            else {
-                event.entity.setAnimation(event.entity.stop_move_animation);
             }
         }
     }
-}
 }
 GameEngine.prototype.update = function () {
     for (var i = 0; i < this.entities.length; i++) {
@@ -385,8 +384,9 @@ GameEngine.prototype.setBattle = function (game) {
         game.addEntity(game.fiends[i]);
     }
     game.decideFighters();
-    window.setTimeout(game.menu.showMenu(true), 5000);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
+    window.setTimeout(game.menu.showMenu(true), 5000);
+    
 }
     
 /*
@@ -397,6 +397,7 @@ GameEngine.prototype.setBattle = function (game) {
 GameEngine.prototype.endBattle = function (game)
 {
     game.is_battle = false;
+    window.setTimeout(game.menu.showMenu(false), 5000);
     window.setTimeout(game.menu.showMenu(false), 5000);
     game.entities[0].x = game.entities[0].save_x;
     game.entities[0].y = game.entities[0].save_y;
@@ -449,6 +450,7 @@ GameEngine.prototype.decideFighters = function()
         fighter = i % this.entities.length;
         this.fight_queue.push(this.entities[fighter]);
     }
+    this.fight_queue[0].is_turn = true;
 }
 
 GameEngine.prototype.removeFighters = function(player)
@@ -460,27 +462,11 @@ GameEngine.prototype.removeFighters = function(player)
             this.fight_queue.splice(i, 1);
         }
     }
-    //for (var i = 0; i < this.animation_queue.length; i++) {
-    //    if (this.animation_queue[i].entity.id === player.id) {
-    //      //  this.animation_queue.splice(i, 1);
-    //    }
-    //}
 }
 
 GameEngine.prototype.setNextFighter = function()
 {
     this.fight_queue.shift();
-}
-/*
-    Takes in two players as parameters, pushes the players attack animation to the queue and 
-    the foes hit animation. also does a damage calculation for the hit target
-*/
-GameEngine.prototype.performBattleUpdates = function () {
-    player.game.animation_queue.push(new Event(player, player.animations.destroy));
-    player.game.animation_queue.push(new Event(player, player.stop_move_animation, true, 1000));
-    foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
-    foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation, 1000));
-    foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
 }
 
 Timer = function () {
@@ -514,7 +500,6 @@ Event = function(entity, animation, wait, callback, args)
     this.entity = entity;
     this.animation = animation;
     this.wait = wait;
-    this.turn_over = false;
     this.hang_timer = null;
     this.hanging = false;
     this.callback = callback;
@@ -606,24 +591,68 @@ Entity.prototype.drawHealthBar = function(context)
     context.closePath();
 }
 
-Entity.prototype.doDamage = function(players)
+Entity.prototype.doDamage = function(args)
 {
-    players[1].stats.health = players[1].stats.health - ((players[0].stats.attack / players[1].stats.defense) * (Math.random() * 10));
-    if(players[1].stats.health <= 0)
+    args[1].stats.health = args[1].stats.health - ((args[0].stats.attack / args[1].stats.defense) * (Math.random() * 10));
+    if (args[1].stats.health <= 0)
     {
-        players[1].stats.health = 0;
-        players[1].game.removeFighters(players[1]);
-        players[1].game.animation_queue.push(new Event(players[1], players[1].animations.death, 1000));
-        players[1].game.battleOver(players[1].game);
-
+        args[1].stats.health = 0;
+        args[1].game.removeFighters(args[1]);
+        args[1].game.animation_queue.push(new Event(args[1], args[1].animations.death, 1000));
+        args[1].game.battleOver(args[1].game);
     }
     else {
-        players[1].game.animation_queue.push(new Event(players[1], players[1].stop_move_animation, 1000));
+            args[1].game.animation_queue.push(new Event(args[1], args[1].stop_move_animation, 1000));
+        
     }
+        args[0].game.setNextFighter();
+        args[0].game.fight_queue[0].is_turn = true;
     
-    players[0].game.setNextFighter();
-    players[0].game.fight_queue[0].is_turn = true;
 
+}
+
+Entity.prototype.doMultiDamage = function(player, foes)
+{
+    var player = player;
+    var args = foes;
+    for(var i = 0; i < args.length; i++)
+    {
+        args[i].stats.health = args[i].stats.health - ((player.stats.attack / args[i].stats.defense) * (Math.random() * 10));
+        if(i === args.length - 1)
+        {
+            if (args[i].stats.health <= 0)
+            {
+                args[i].stats.health = 0;
+                args[i].game.removeFighters(args[i]);
+                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
+                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.death, 1000));
+                args[i].game.battleOver(args[i].game);
+            }
+            else
+            {
+                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
+                args[i].game.animation_queue.push(new Event(args[i], args[i].stop_move_animation, 1000));
+            }
+        }
+        else
+        {
+            if (args[i].stats.health <= 0)
+            {
+                args[i].stats.health = 0;
+                args[i].game.removeFighters(args[i]);
+                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
+                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.death));
+                args[i].game.battleOver(args[i].game);
+            }
+            else
+            {
+                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
+                args[i].game.animation_queue.push(new Event(args[i], args[i].stop_move_animation));
+            }
+        }
+    }
+    args[0].game.setNextFighter();
+    args[0].game.fight_queue[0].is_turn = true;
 }
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
@@ -976,17 +1005,11 @@ Warrior.prototype.setAction = function(action, target)
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
             target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
-            
             break;
         case "Sweep":
-            this.game.animation_queue.push(new Event(this, this.animations.special));
+            this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            for(var i = 0; i < target.length; i++)
-            {
-                target[i].game.animation_queue.push(new Event(target[i], target[i].animations.hit));
-                target[i].game.animation_queue.push(new Event(target[i], target[i].stop_move_animation));
-                target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.floor(Math.random() * (10 - 1)) + 1));
-            }
+            this.doMultiDamage(this, target);
     }
 
 }
@@ -1035,7 +1058,6 @@ Enemy.prototype.update = function () {
     {
         this.setAction("Single", this.game.entities);
         this.is_turn = false;
-        //this.game.setNextFighter();
     }
 }
 
@@ -1559,11 +1581,10 @@ BattleMenu.prototype.init = function () {
             window.setTimeout(that.aoe_attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             // stuff to make character do a single attack 
-            if (that.game.canControl) {
+            if (that.game.entities[0].is_turn) {
                 if (that.game.fight_queue[0]) {
                     that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
-                    //that.game.setNextFighter();
-                    
+                    that.game.entities[0].is_turn = false;
                 }
             }
             that.target_queue.push(that.target_queue.shift());
@@ -1580,7 +1601,10 @@ BattleMenu.prototype.init = function () {
         } else if (e.which === 38) {
             window.setTimeout(that.single_attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            // stuff to make character do an aoe attack
+            if (that.game.fight_queue[0] && that.game.entities[0].is_turn) {
+                that.game.fight_queue[0].setAction("Sweep", that.target_queue);
+                that.game.entities[0].is_turn = false;
+            }
         }
         e.preventDefault();
     });
