@@ -298,8 +298,10 @@ GameEngine.prototype.queueActions = function () {
                             that_event.executeCallback();
                             clearInterval(that_event.hang_timer);
                             that_event = that.animation_queue.shift();
-                            that_event.entity.setAnimation(that_event.animation);
-                            that_event.entity.curr_anim.looped = false;
+                            if (that_event) {
+                                that_event.entity.setAnimation(that_event.animation);
+                                that_event.entity.curr_anim.looped = false;
+                            }
                         }, event.wait);
                     }
                     else if (!event.hanging) {
@@ -475,6 +477,11 @@ GameEngine.prototype.setNextFighter = function()
     this.fight_queue.shift();
 }
 
+GameEngine.prototype.selectTarget = function()
+{
+
+}
+
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
@@ -533,6 +540,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.stats = stats;
     this.curr_anim = null;
     this.is_turn = false;
+    this.is_targeted = false;
     this.id = Math.random() * Math.random();
     if (animations) {
         this.animations = animations;
@@ -576,6 +584,18 @@ Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
 
+Entity.prototype.drawSelector = function(context, color)
+{
+    context.beginPath();
+    context.moveTo(this.x + this.curr_anim.frameWidth, this.y - 8);
+    context.lineTo(this.x + this.curr_anim.frameWidth - 10, this.y - 18);
+    context.lineTo(this.x + this.curr_anim.frameWidth + 10, this.y - 18);
+    context.lineTo(this.x + this.curr_anim.frameWidth, this.y - 8);
+    context.fillStyle = color;
+    context.fill();
+    context.closePath();
+
+}
 Entity.prototype.drawHealthBar = function(context)
 {
     if (this.stats.health < 0)
@@ -597,10 +617,6 @@ Entity.prototype.drawHealthBar = function(context)
     context.closePath();
 }
 
-Entity.prototype.flee = function()
-{
-    this
-}
 Entity.prototype.doDamage = function(player, foes, game, is_multi_attack)
 {
     foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
@@ -721,7 +737,8 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     this.width = 43;
     this.height = 64;
     this.sight = 20; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
-                        // pick up on any interaction. 
+    // pick up on any interaction. 
+    this.fleeing = false;
 }
 
 Hero.prototype = new Entity();
@@ -801,10 +818,36 @@ Hero.prototype.draw = function (context) {
     }
     else {
         this.drawHealthBar(context);
+        if (this.is_turn)
+        {
+            this.drawSelector(context, 'green');
+        }
+        else if (this.is_targeted)
+        {
+            this.drawSelector(context, 'yellow');
+        }
+        if (this.fleeing)
+        {
+            this.direction = Direction.RIGHT;
+            this.curr_anim = this.animations.right;
+            if(context.canvas.width - this.curr_anim.frameWidth >= this.x)
+            {
+                this.changeCoordinates(0, 0, 0, .3);
+            }
+            else {
+                this.fleeing = false;
+                var that = this;
+                this.game.fadeOut(this.game, this.game, this.game.endBattle);
+            }
+        }
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
 }
 
+Hero.prototype.flee = function(flee)
+{
+    this.fleeing = flee;
+}
 Hero.prototype.checkSurroundings = function () {
     // return true or false
     return Math.round(Math.random() * 1000) >= 999;
@@ -1065,6 +1108,7 @@ Warrior.prototype.setAction = function(action, target)
         default:
             break;
     }
+    this.is_turn = false;
 
 }
 
@@ -1104,6 +1148,10 @@ Enemy.prototype.constructor = Enemy;
 Enemy.prototype.draw = function (context) {
      
     this.drawHealthBar(context);
+    if (this.is_targeted)
+    {
+        this.drawSelector(context, 'yellow');
+    }
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
 }
 
@@ -1679,6 +1727,7 @@ BattleMenu.prototype.init = function () {
         if (e.which === 38) {
             window.setTimeout(that.use_item.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
+            that.game.entities[0].flee(true);
             // characters flee
         }
         e.preventDefault();
