@@ -399,8 +399,9 @@ GameEngine.prototype.setBattle = function (game) {
 GameEngine.prototype.endBattle = function (game)
 {
     game.is_battle = false;
-    window.setTimeout(game.menu.showMenu(false), 5000);
-    window.setTimeout(game.menu.showMenu(false), 5000);
+    game.menu.showMenu(false);
+    window.setTimeout(game.esc_menu.showMenu(false), 5000);
+    game.context.canvas.focus();
     game.entities[0].x = game.entities[0].save_x;
     game.entities[0].y = game.entities[0].save_y;
     game.entities[0].direction = game.entities[0].save_direction;
@@ -420,14 +421,17 @@ GameEngine.prototype.battleOver = function (game) {
         net_health_1 += game.fiends[i].stats.health;
     }
         //net_health_1 = game.fiends[0].stats.health;
-        if (net_health_1 <= 0) {
-            game.canControl = false;
-            //players[1].game.animation_queue.push(new Event(players[1], players[1].animations.death));
-            game.timerId2 = setTimeout(function () {
-                game.fadeOut(game, game, game.endBattle);
-                clearInterval(game.timerId2);
-            }, 2000);
-        }
+    if (net_health_1 <= 0) {
+        return true;
+            //game.canControl = false;
+            //game.timerId2 = setTimeout(function () {
+            //    game.fadeOut(game, game, game.endBattle);
+            //    clearInterval(game.timerId2);
+            //}, 2000);
+    }
+    else {
+        return false;
+    }
 
 }
 
@@ -593,27 +597,54 @@ Entity.prototype.drawHealthBar = function(context)
     context.closePath();
 }
 
-Entity.prototype.doDamage = function(args)
+Entity.prototype.flee = function()
 {
-    args[1].stats.health = args[1].stats.health - ((args[0].stats.attack / args[1].stats.defense) * (Math.random() * 10));
-    if (args[1].stats.health <= 0)
+    this
+}
+Entity.prototype.doDamage = function(player, foes, game, is_multi_attack)
+{
+    foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
+    if (foes.stats.health <= 0)
     {
-        args[1].stats.health = 0;
-        args[1].game.removeFighters(args[1]);
-        args[1].game.animation_queue.push(new Event(args[1], args[1].animations.death, 1000));
-        args[1].game.battleOver(args[1].game);
-    }
-    else {
-            args[1].game.animation_queue.push(new Event(args[1], args[1].stop_move_animation, 1000));
+        foes.stats.health = 0;
+        game.removeFighters(foes);
+        game.animation_queue.push(new Event(foes, foes.animations.hit));
+        if (is_multi_attack) {
+            game.animation_queue.push(new Event(foes, foes.animations.death));
+        }
+        else
+        {
+            game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
+            if(game.battleOver(game))
+            {
+                game.canControl = false;
+                setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+            }
+
+        }
         
     }
-        args[0].game.setNextFighter();
-        args[0].game.fight_queue[0].is_turn = true;
+    else {
+        if (is_multi_attack) {
+            game.animation_queue.push(new Event(foes, foes.animations.hit));
+            game.animation_queue.push(new Event(foes, foes.stop_move_animation, 200));
+        }
+        else
+        {
+            game.animation_queue.push(new Event(foes, foes.animations.hit));
+            game.animation_queue.push(new Event(foes, foes.stop_move_animation, 1000));
+        }
+        
+    }
+    if (!is_multi_attack && !game.battleOver(game)) {
+        game.setNextFighter();
+        game.fight_queue[0].is_turn = true;
+    }
     
 
 }
 
-Entity.prototype.doMultiDamage = function(player, foes)
+Entity.prototype.doMultiDamage = function(player, foes, game)
 {
     var player = player;
     var args = foes;
@@ -625,10 +656,10 @@ Entity.prototype.doMultiDamage = function(player, foes)
             if (args[i].stats.health <= 0)
             {
                 args[i].stats.health = 0;
-                args[i].game.removeFighters(args[i]);
-                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
-                args[i].game.animation_queue.push(new Event(args[i], args[i].animations.death, 1000));
-                args[i].game.battleOver(args[i].game);
+                game.removeFighters(args[i]);
+                game.animation_queue.push(new Event(args[i], args[i].animations.hit));
+                game.animation_queue.push(new Event(args[i], args[i].animations.death, 1000));
+                game.battleOver(game);
             }
             else
             {
@@ -653,8 +684,8 @@ Entity.prototype.doMultiDamage = function(player, foes)
             }
         }
     }
-    args[0].game.setNextFighter();
-    args[0].game.fight_queue[0].is_turn = true;
+    game.setNextFighter();
+    game.fight_queue[0].is_turn = true;
 }
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
@@ -1007,17 +1038,32 @@ Warrior.prototype.update = function () {
 
 Warrior.prototype.setAction = function(action, target)
 {
+    var that = this;
     switch(action)
     {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
-            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));    
+            //target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
+            //setTimeout(function () { that.doDamage(that, target[0], that.game, false); }, 1000);
+            that.doDamage(that, target[0], that.game, false);
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            this.doMultiDamage(this, target);
+            for (var i = 0; i < target.length; i++)
+            {
+                if (i === target.length - 1) {
+                    that.doDamage(that, target[i], that.game, false);
+                }
+                else {
+                    that.doDamage(that, target[i], that.game, true);
+                }
+            }
+            //setTimeout(function () { that.doMultiDamage(that, target, that.game); }, 1000);
+            break;
+        default:
+            break;
     }
 
 }
@@ -1078,8 +1124,8 @@ Enemy.prototype.setAction = function (action, target) {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
-            //target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation, 1000));
+            //target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
+            this.doDamage(this, target[0], this.game, false);
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.special));
@@ -1090,9 +1136,9 @@ Enemy.prototype.setAction = function (action, target) {
                 target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
             }
     }
-    if (this.game.is_battle) {
-        this.game.battleOver(this.game);
-    }
+    //if (this.game.is_battle) {
+    //    this.game.battleOver(this.game);
+    //}
 }
 /* NPC 
 game : the game engine
@@ -1662,10 +1708,16 @@ BattleMenu.prototype.init = function () {
         } else if (e.which === 38) {
             window.setTimeout(that.single_attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            if (that.game.fight_queue[0] && that.game.entities[0].is_turn) {
-                that.game.fight_queue[0].setAction("Sweep", that.target_queue);
-                that.game.entities[0].is_turn = false;
+            if (that.game.entities[0].is_turn) {
+                if (that.game.fight_queue[0]) {
+                    that.game.fight_queue[0].setAction("Sweep", that.target_queue);
+                    that.game.entities[0].is_turn = false;
+                }
             }
+            that.target_queue.push(that.target_queue.shift());
+            that.changeTabIndex("attack", false);
+            that.changeTabIndex("main", true);
+            window.setTimeout(that.attack.focus(), 0);
         }
         e.preventDefault();
     });
