@@ -976,7 +976,8 @@ Warrior = function (game, stats) {
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
         destroy : new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false),
-        special : new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false)
+        special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
+        death: new Animation(this.spriteSheet, 21, 64, 64, 0.5, 1, true, false)
     };
     this.x = 10;
     this.y = 215;
