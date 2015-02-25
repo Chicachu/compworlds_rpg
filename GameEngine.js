@@ -193,6 +193,8 @@ GameEngine.prototype.startInput = function () {
         that.key = 0;
         that.space = 0;
         that.esc = 0;
+        that.key_i = false;
+        e.preventDefault();
     }, false);
 
     var text_box = document.getElementById("dialogue_box");
@@ -994,7 +996,7 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    this.inventory.update.call(this); 
+    this.inventory.update(); 
     Hero.prototype.update.call(this);
 }
 
@@ -1969,7 +1971,7 @@ Inventory.prototype.initHtmlItems = function () {
 }
 
 Inventory.prototype.showInventory = function (flag) {
-    if (flag) {
+    if (flag && this.open === false) {
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
@@ -1977,12 +1979,12 @@ Inventory.prototype.showInventory = function (flag) {
         this.html_items[0].element.focus();
         this.open = true;
     } else {
+        this.open = false;
         this.interface.style.visibility = "hidden";
         this.interface.style.display = "none";
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
-        this.open = false; 
     }
 }
 
@@ -2006,10 +2008,10 @@ Inventory.prototype.draw = function (ctx) {
 }
 
 Inventory.prototype.update = function () {
-    if (this.game.key_i && this.inventory.open === false) {
-        this.inventory.showInventory(true); 
-    } else if (this.inventory.open === true && this.game.esc) {
-        this.inventory.showInventory(false);
+    if (this.game.key_i) {
+        
+    } else if (this.open === true && this.game.esc) {
+        this.showInventory(false);
         this.game.key_i = 0;
     }
 }
@@ -2126,6 +2128,7 @@ Inventory.prototype.selectInput = function () {
                     }
                 } else if (e.which === 27 || e.which === 73) {
                     that.showInventory(false);
+                    that.open = false; 
                 }
                 this.pressed = true; 
             }
@@ -2150,7 +2153,7 @@ HTML_Item.prototype.actionInput = function () {
                 that.item.doAction.call(that.item);
                 that.showItemMenu(false);
                 window.setTimeout(that.element.focus(), 0);
-            }
+            } 
         }
         this.pressed = true;
         e.preventDefault();
