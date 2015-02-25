@@ -1262,6 +1262,7 @@ GameEngine.prototype.alertHero = function (dialogue) {
     text_box.addEventListener("keydown", function _func (e) {
         if (String.fromCharCode(e.which) === ' ') {
             this.style.visibility = "hidden";
+            this.style.display = "none";
             this.tabIndex = 0;
             that.context.canvas.tabIndex = 1;
             that.context.canvas.focus();
@@ -1287,6 +1288,7 @@ NPC.prototype.updateDialogue = function () {
             } else {
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
                 text_box.tabIndex = 2;
                 this.game.context.canvas.tabIndex = 1;
                 this.game.context.canvas.focus();
@@ -1950,7 +1952,7 @@ HTML_Item = function (element) {
 }
 
 HTML_Item.prototype.showItemMenu = function (flag, inventory) {
-    if (flag) {
+    if (flag && this.item) {
         inventory.interface.tabIndex = 0; 
         this.menu.style.visibility = "visible";
         this.menu.style.display = "block";
@@ -2003,12 +2005,7 @@ Armor.prototype = new Item();
 Armor.prototype.constructor = Armor;
 
 Armor.prototype.doAction = function () {
-    // check if item is already equipped
-    if (this.game.entities[0].inventory.equipped[this.type] && 
-        this.game.entities[0].inventory.equipped[this.type] !== this) {
-        var old_item = this.game.entities[0].inventory.equipped[this.type];
-        old_item.isEquipped = false; 
-    }
+    this.unequipOldArmor();
     // equip new item
     if (this.isEquipped) {
         this.slot.style.backgroundImage = this.background_img;
@@ -2020,6 +2017,22 @@ Armor.prototype.doAction = function () {
         this.slot.innerHTML = this.img.outerHTML;
         this.game.entities[0].inventory.equipped[this.type] = this;
         this.isEquipped = true;
+    }
+}
+
+Armor.prototype.unequipOldArmor = function (bool) {
+    if (bool) {
+        this.isEquipped = false;
+        this.slot.style.backgroundImage = this.background_img;
+        this.slot.innerHTML = "";
+        this.game.entities[0].inventory.equipped[this.type] = false;
+    } else {
+        // check if item is already equipped
+        if (this.game.entities[0].inventory.equipped[this.type] &&
+            this.game.entities[0].inventory.equipped[this.type] !== this) {
+            var old_item = this.game.entities[0].inventory.equipped[this.type];
+            old_item.isEquipped = false;
+        }
     }
 }
 
@@ -2109,11 +2122,13 @@ Inventory.prototype.draw = function (ctx) {
             this.html_items[i].item = this.items[i];
             this.html_items[i].actionInput();
         } else {
+            this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
         }
     }
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
+    this.selectInput();
     
 }
 
@@ -2160,6 +2175,7 @@ Inventory.prototype.removeItem = function (item_name, qty) {
                 item = this.splitStack(item_name, qty)
             } else if (this.items[i].qty === qty) {
                 item = this.items[i];
+                item.unequipOldArmor(true); 
                 this.items.splice(i, 1);
             } else {
                 // can't remove item. 
@@ -2190,10 +2206,11 @@ Inventory.prototype.selectInput = function () {
         var html = that.html_items[i];
         item.index = i;
         item.pressed = false; 
-        item.addEventListener("keydown", function (e) {
+        item.addEventListener("keydown", function ItemMenu (e) {
             var new_index = null;
             var index = this.index;
             if (!this.pressed) {
+                this.actionListener = ItemMenu; 
                 if (e.which === 37) { // left 
                     // if at the beginning of a row, send focus to the end of row. 
                     if ((index % 5) < 1) {
@@ -2243,7 +2260,6 @@ Inventory.prototype.selectInput = function () {
                 this.pressed = true; 
             }
             e.preventDefault();
-
         });
 
         item.addEventListener("keyup", function () {
