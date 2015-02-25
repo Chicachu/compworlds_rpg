@@ -1204,7 +1204,27 @@ NPC.prototype.update = function () {
 }
 
 GameEngine.prototype.alertHero = function (dialogue) {
-
+    var text_box = document.getElementById("dialogue_box");
+    var text = text_box.childNodes[1];
+    text.innerHTML = dialogue;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    var that = this; 
+    text_box.addEventListener("keydown", function (e) {
+        if (String.fromCharCode(e.which) === ' ') {
+            this.style.visibility = "hidden";
+            this.tabIndex = 0;
+            that.context.canvas.tabIndex = 1;
+            that.context.canvas.focus();
+            that.canControl = true;
+        }
+        e.preventDefault();
+    }, false);
+    text_box.focus();
+    this.interacting = true;
+    this.canControl = false;
 }
 
 NPC.prototype.updateDialogue = function () {
@@ -1460,7 +1480,7 @@ Door.prototype.startInteraction = function () {
         y += 11; 
     }
     if (this.locked) {
-
+        this.game.alertHero("This door is locked. Try coming back after the village isn't burning down."); 
     } else {
         if (this.is_closed) {
             // close door
