@@ -64,7 +64,7 @@ Animation.prototype.isDone = function () {
 
 //sound part
 sounds.load([
-  "sounds/AncientForest.wav"
+//  "sounds/AncientForest.wav"
 ]);
 
 sounds.whenLoaded = setup;
@@ -82,7 +82,7 @@ function setup() {
     music.pan = -0.8;
 
     //Set the music volume
-    music.volume = 0.7;
+    music.volume = 0.5;
 
     //Set a reverb effect on the bounce sound
     //arguments: duration, decay, reverse?
@@ -104,23 +104,23 @@ function setup() {
 
 
     //Capture the keyboard events
-    var k = keyboard(75);
-    l = keyboard(76);
+    //var k = keyboard(75);
+    //l = keyboard(76);
 
-    //Control the sounds based on which keys are pressed
+    ////Control the sounds based on which keys are pressed
 
-    //Play the loaded music sound
-    k.press = function () {
-        if (!music.isPlaying) music.play();
-        if (music.pause) music.restart();
-        console.log("music playing");
-    };
+    ////Play the loaded music sound
+    //k.press = function () {
+    //    if (!music.isPlaying) music.play();
+    //    if (music.pause) music.restart();
+    //    console.log("music playing");
+    //};
 
-    //Pause the music 
-    l.press = function () {
-        music.pause();
-        console.log("music paused");
-    };
+    ////Pause the music 
+    //l.press = function () {
+    //    music.pause();
+    //    console.log("music paused");
+    //};
 }
 //end sound part
 
@@ -286,20 +286,23 @@ if(this.is_battle) {
         if (event.entity.curr_anim.looped) {
             if (this.animation_queue.length >= 0) {
                 //if loop has been made, dequeue off the queue and set it to event
-                var that = this;
-                var that_event = event;
+                
                 //Sets the events entitiy's animation
                 if (event.wait && !event.hanging) {
+                    var that = this;
+                    var that_event = event;
                     event.hanging = true;
                     event.hang_timer = setTimeout(function () {
-                        event.hanging = false;
+                        that_event.hanging = false;
+                        that_event.executeCallback();
                         clearInterval(that_event.hang_timer);
                         that_event = that.animation_queue.shift();
                         that_event.entity.setAnimation(that_event.animation);
                         that_event.entity.curr_anim.looped = false;
                     }, event.wait);
                 }
-                else if(!event.hanging) {
+                else if (!event.hanging) {
+                    event.executeCallback();
                     event = this.animation_queue.shift();
                     event.entity.setAnimation(event.animation);
                     event.entity.curr_anim.looped = false;
@@ -402,6 +405,7 @@ GameEngine.prototype.endBattle = function (game)
     game.reLoadEntities();
     game.fiends = [];
     game.fight_queue = [];
+    game.animation_queue = [];
 }
 /**
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
@@ -447,6 +451,22 @@ GameEngine.prototype.decideFighters = function()
     }
 }
 
+GameEngine.prototype.removeFighters = function(player)
+{
+    for(var i = 0; i < this.fight_queue.length; i++)
+    {
+        if(this.fight_queue[i].id === player.id)
+        {
+            this.fight_queue.splice(1, i);
+        }
+    }
+    for (var i = 0; i < this.animation_queue.length; i++) {
+        if (this.animation_queue[i].entity.id === player.id) {
+            this.animation_queue.splice(1, i);
+        }
+    }
+}
+
 GameEngine.prototype.setNextFighter = function()
 {
     this.fight_queue.shift();
@@ -457,7 +477,7 @@ GameEngine.prototype.setNextFighter = function()
 */
 GameEngine.prototype.performBattleUpdates = function () {
     player.game.animation_queue.push(new Event(player, player.animations.destroy));
-    player.game.animation_queue.push(new Event(player, player.stop_move_animation, 1000));
+    player.game.animation_queue.push(new Event(player, player.stop_move_animation, true, 1000));
     foe.game.animation_queue.push(new Event(foe, foe.animations.hit));
     foe.game.animation_queue.push(new Event(foe, foe.stop_move_animation, 1000));
     foe.stats.health = foe.stats.health - ((player.stats.attack / foe.stats.defense) * (Math.random() * 10));
@@ -489,13 +509,23 @@ var Direction = {
 /**
     Object that is stored in the queue animation. Takes an entity and one of the entities animations as a parameter
 */
-Event = function(entity, animation, wait)
+Event = function(entity, animation, wait, callback, args)
 {
     this.entity = entity;
     this.animation = animation;
     this.wait = wait;
+    this.turn_over = false;
     this.hang_timer = null;
     this.hanging = false;
+    this.callback = callback;
+    this.args = args;
+}
+
+Event.prototype.executeCallback = function()
+{
+    if (this.callback) {
+        this.callback(this.args);
+    }
 }
 
 /* ENTITY - Super class to the heroes, npcs, and enemies. */
@@ -575,9 +605,15 @@ Entity.prototype.drawHealthBar = function(context)
     context.closePath();
 }
 
-Entity.prototype.updateStats = function(statistic, update)
+Entity.prototype.doDamage = function(players)
 {
-    Statistics.statistic = update;
+    players[1].stats.health = players[1].stats.health - ((players[0].stats.attack / players[1].stats.defense) * (Math.random() * 10));
+    if(players[1].stats.health <= 0)
+    {
+        players[1].game.animation_queue.push(new Event(players[1], players[1].animations.death));
+        players[1].game.removeFighters(players[1]);
+        players[1].game.battleOver(players[1].game);
+    }
 }
 Entity.prototype.draw = function (context) {
     // code for NPCs and Enemies. 
@@ -929,9 +965,8 @@ Warrior.prototype.setAction = function(action, target)
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
             target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation, 1000));
-            target[0].stats.health = target[0].stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.floor(Math.random() * (10 - 1)) + 1));
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.special));
@@ -944,9 +979,6 @@ Warrior.prototype.setAction = function(action, target)
             }
     }
 
-    if (this.game.is_battle) {
-        this.game.battleOver(this.game);
-    }
 }
 
 /* ENEMY and subclasses */
@@ -996,7 +1028,6 @@ Enemy.prototype.update = function () {
     }
 }
 
-
 Enemy.prototype.hit = function () {
 
 }
@@ -1006,9 +1037,8 @@ Enemy.prototype.setAction = function (action, target) {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit));
+            target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
             target[0].game.animation_queue.push(new Event(target[0], target[0].stop_move_animation, 1000));
-            target[0].stats.health = target[0].stats.health - ((this.stats.attack / target[0].stats.defense) * (Math.random() * 10));
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.special));
@@ -1522,6 +1552,7 @@ BattleMenu.prototype.init = function () {
                 if (that.game.fight_queue[0]) {
                     that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
                     that.game.setNextFighter();
+                    
                 }
             }
             //that.attack_queue.push(that.attack_queue.shift());
@@ -1600,6 +1631,7 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
 }
 
 BattleMenu.prototype.showMenu = function (flag) {
+    this.target_queue = [];
     for (var i = 0; i < this.game.fiends.length; i++) {
         this.target_queue.push(this.game.fiends[i])
     }
