@@ -1205,20 +1205,22 @@ NPC.prototype.update = function () {
 
 GameEngine.prototype.alertHero = function (dialogue) {
     var text_box = document.getElementById("dialogue_box");
-    var text = text_box.childNodes[1];
+    var text = document.createElement('p');
     text.innerHTML = dialogue;
+    text_box.innerHTML = text.outerHTML; 
     text_box.style.visibility = "visible";
     text_box.style.display = "block";
     this.context.canvas.tabIndex = 0;
     text_box.tabIndex = 1;
     var that = this; 
-    text_box.addEventListener("keydown", function (e) {
+    text_box.addEventListener("keydown", function _func (e) {
         if (String.fromCharCode(e.which) === ' ') {
             this.style.visibility = "hidden";
             this.tabIndex = 0;
             that.context.canvas.tabIndex = 1;
             that.context.canvas.focus();
             that.canControl = true;
+            text_box.removeEventListener("keydown", _func);
         }
         e.preventDefault();
     }, false);
@@ -1231,10 +1233,11 @@ NPC.prototype.updateDialogue = function () {
     if (this.game) {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
-            var text = text_box.childNodes[1];
+            var text = document.createElement('p');
             if (this.dialogue_index < this.dialogue.length - 1) {
                 this.dialogue_index++;
                 text.innerHTML = this.dialogue[this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
             } else {
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
@@ -1254,15 +1257,17 @@ NPC.prototype.updateDialogue = function () {
 NPC.prototype.startInteraction = function () {
     this.reposition();
     var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
     text_box.style.visibility = "visible";
     text_box.style.display = "block";
     this.game.context.canvas.tabIndex = 0;
     text_box.tabIndex = 1;
     text_box.focus();
     this.interacting = true;
-    var text = text_box.childNodes[1];
     this.game.canControl = false;
-    text.innerHTML = this.dialogue[this.dialogue_index];
 }
 
 NPC.prototype.reposition = function () {
