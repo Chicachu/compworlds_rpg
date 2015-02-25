@@ -1519,7 +1519,7 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
 
 BattleMenu.prototype.showMenu = function (flag) {
     for (var i = 0; i < this.game.fiends.length; i++) {
-        this.target_queue.push(this.game.fiends[i])
+        this.target_queue.push(this.game.fiends[i]);
     }
     if (flag) {
         this.game.context.canvas.tabIndex = 0;
@@ -1613,44 +1613,46 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
-Storekeeper = function (game, dialogue, anims, path, pause, name) {
-    this.name = name;
-    NPC.call(this, game, dialogue, anims, path, 0, pause);
-}
+//Storekeeper = function (game, dialogue, anims, path, pause, name) {
+//    this.name = name;
+//    NPC.call(this, game, dialogue, anims, path, 0, pause);
+//}
 
-Storekeeper.prototype = new NPC();
-Storekeeper.prototype.constructor = Storekeeper;
+//Storekeeper.prototype = new NPC();
+//Storekeeper.prototype.constructor = Storekeeper;
 
-Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
-    var item = null;
-    if (buyer.deductCoin()) {
-        this.items.splice(item.name, 1);
-        item = this.items[item_name];
-        if (this.items[item_name].qty === qty) {
-            this.items.splice(item_name, 1);
-        } else {
-            item.decreaseQty(item.qty);
-            item.increaseQty(qty);
-            this.items[item_name].decreaseQty(qty);
-        }
-        buyer.recieveItem(item);
-    } else {
-        // TODO make shopkeeper say something about not having enough money to buy the item. 
-    }
-}
+//Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
+//    var item = null;
+//    if (buyer.deductCoin()) {
+//        this.items.splice(item.name, 1);
+//        item = this.items[item_name];
+//        if (this.items[item_name].qty === qty) {
+//            this.items.splice(item_name, 1);
+//        } else {
+//            item.decreaseQty(item.qty);
+//            item.increaseQty(qty);
+//            this.items[item_name].decreaseQty(qty);
+//        }
+//        buyer.recieveItem(item);
+//    } else {
+//        // TODO make shopkeeper say something about not having enough money to buy the item. 
+//    }
+//}
 
-Storekeeper.prototype.initializeItems = function (items) {
-    for (var i = 0; i < items.length; i++) {
-        this.items[items[i].name] = items[i];
-    }
-}
+//Storekeeper.prototype.initializeItems = function (items) {
+//    for (var i = 0; i < items.length; i++) {
+//        this.items[items[i].name] = items[i];
+//    }
+//}
 
-Item = function (name, price, qty, img, stackable) {
+Item = function (game, name, price, qty, img) {
+    this.game = game; 
     this.name = name;
     this.price = price;
     this.qty = qty;
     this.img = img;
-    this.isStackable = stackable; 
+    this.isStackable = true;
+    this.html = null;
 }
 
 Item.prototype.increaseQty = function (amount) {
@@ -1660,6 +1662,110 @@ Item.prototype.increaseQty = function (amount) {
 Item.prototype.decreaseQty = function (amount) {
     if (this.qty >= amount) {
         this.qty -= amount;
+    }
+}
+
+Item.prototype.setActionText = function () {
+
+}
+
+Item.prototype.doAction = function () {
+
+}
+
+HTML_Item = function (element) {
+    this.element = element;
+    this.item = null;
+    this.menu = document.getElementById("item_menu");
+    this.action = document.createElement("a");
+    this.action.setAttribute("id", "action");
+    this.destroy = document.createElement("a");
+    this.destroy.setAttribute("id", "destroy");
+    this.destroy.innerHTML = "Destroy";
+    this.return = document.createElement("a");
+    this.return.setAttribute("id", "return");
+    this.return.innerHTML = "Return";
+}
+
+HTML_Item.prototype.showItemMenu = function (flag, inventory) {
+    if (flag) {
+        inventory.interface.tabIndex = 0; 
+        this.menu.style.visibility = "visible";
+        this.menu.style.display = "block";
+        this.menu.tabIndex = 1;
+        this.setActionText();
+        this.insertATags();
+        this.action = document.getElementById("action");
+        this.destroy = document.getElementById("destroy");
+        this.return = document.getElementById("return");
+        this.destroy.tabIndex = 1;
+        this.return.tabIndex = 1;
+        this.action.tabIndex = 1;
+        this.actionInput();
+        this.action.focus();
+    } else {
+        this.menu.style.visibility = "hidden";
+        this.menu.style.display = "none";
+        this.menu.tabIndex = 0;
+        this.action.tabIndex = 0;
+        this.destroy.tabIndex = 0;
+        this.return.tabIndex = 0;
+    }
+}
+
+HTML_Item.prototype.insertATags = function () {
+    var li_nodes = this.menu.children[0].children;
+    li_nodes[0].innerHTML = this.action.outerHTML;
+    li_nodes[1].innerHTML = this.destroy.outerHTML;
+    li_nodes[2].innerHTML = this.return.outerHTML;
+}
+
+HTML_Item.prototype.setActionText = function () {
+    if (this.item.isEquipped) {
+        this.action.innerHTML = "Unequip";
+    } else {
+        this.action.innerHTML = "Equip";
+    }
+}
+
+Armor = function (game, name, price, img, type) {
+    this.isEquipped = false; 
+    this.type = type;
+    this.slot = document.getElementById("equip_" + type);
+    this.background_img = this.slot.style.backgroundImage;
+    Item.call(this, game, name, price, 1, img);
+    this.isStackable = false; 
+}
+
+Armor.prototype = new Item();
+Armor.prototype.constructor = Armor;
+
+Armor.prototype.doAction = function () {
+    // check if item is already equipped
+    if (this.game.entities[0].inventory.equipped[this.type] && 
+        this.game.entities[0].inventory.equipped[this.type] !== this) {
+        var old_item = this.game.entities[0].inventory.equipped[this.type];
+        old_item.isEquipped = false; 
+    }
+    // equip new item
+    if (this.isEquipped) {
+        this.slot.style.backgroundImage = this.background_img;
+        this.slot.innerHTML = "";
+        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.isEquipped = false; 
+    } else {
+        this.slot.style.backgroundImage = "none";
+        this.slot.innerHTML = this.img.outerHTML;
+        this.game.entities[0].inventory.equipped[this.type] = this;
+        this.isEquipped = true;
+    }
+}
+
+Armor.prototype.setActionText = function () {
+    if (this.item.isEquipped) {
+        this.action.innerHTML = "Unequip"; 
+    } else {
+        this.action.innerHTML = "Equip"; 
     }
 }
 
@@ -1690,11 +1796,26 @@ Inventory = function (game, coin, max_items) {
     this.html_coin = document.getElementById("coin");
     this.max_items = max_items;
     this.interface = document.getElementById("inventory_sack");
-    this.html_items = document.getElementById("items").getElementsByTagName('DIV');
+    this.html_items = [];
     this.items = [];
     this.stacking_limit = 50;
-    this.input();
-    this.open = false; 
+    this.initHtmlItems();
+    this.selectInput();
+    this.open = false;
+    this.equipped = {
+        armor: false,
+        accessory: false,
+        offhand: false,
+        mainhand: false
+    }
+}
+
+Inventory.prototype.initHtmlItems = function () {
+    var html_elements = document.getElementById("items").getElementsByTagName('DIV');
+    for (var i = 0; i < html_elements.length; i++) {
+        var new_object = new HTML_Item(html_elements[i]); 
+        this.html_items.push(new_object);
+    }
 }
 
 Inventory.prototype.showInventory = function (flag) {
@@ -1703,8 +1824,8 @@ Inventory.prototype.showInventory = function (flag) {
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
-        this.html_items[0].focus();
-        this.open = true; 
+        this.html_items[0].element.focus();
+        this.open = true;
     } else {
         this.interface.style.visibility = "hidden";
         this.interface.style.display = "none";
@@ -1716,14 +1837,22 @@ Inventory.prototype.showInventory = function (flag) {
 }
 
 Inventory.prototype.draw = function (ctx) {
-    for (var i = 0; i < this.items.length; i++) {
+    for (var i = 0; i < this.html_items.length; i++) {
         // get img of each item
-        var img = this.items[i].img;
-        this.html_items[i].innerHTML = img.outerHTML;
+        if (this.items[i]) {
+            var img = this.items[i].img;
+            this.html_items[i].element.innerHTML = img.outerHTML;
+            // set items html spot
+            this.items[i].html = this.html_items[i];
+            this.html_items[i].item = this.items[i];
+            this.html_items[i].actionInput();
+        } else {
+            this.html_items[i].element.innerHTML = "";
+        }
     }
     // draw coin amount
-    var inner_stuff = 
     this.html_coin.innerHTML = this.coin;
+    
 }
 
 Inventory.prototype.update = function () {
@@ -1769,7 +1898,7 @@ Inventory.prototype.removeItem = function (item_name, qty) {
                 item = this.splitStack(item_name, qty)
             } else if (this.items[i].qty === qty) {
                 item = this.items[i];
-                this.items.splice(item, 1);
+                this.items.splice(i, 1);
             } else {
                 // can't remove item. 
             }
@@ -1792,10 +1921,11 @@ Inventory.prototype.splitStack = function (item_name, qty) {
     return new_stack;
 }
 
-Inventory.prototype.input = function () {
+Inventory.prototype.selectInput = function () {
     var that = this; 
     for (var i = 0; i < this.html_items.length; i++) {
-        var item = this.html_items[i];
+        var item = that.html_items[i].element;
+        var html = that.html_items[i];
         item.index = i;
         item.pressed = false; 
         item.addEventListener("keydown", function (e) {
@@ -1841,6 +1971,11 @@ Inventory.prototype.input = function () {
                 } else if (String.fromCharCode(e.which) === ' ') {
                     // bring up menu to let user choose what to do with item
                     // item could be usable or equipable
+                    if (that.html_items[index]) {
+                        that.html_items[index].showItemMenu(true, that);
+                    }
+                } else if (e.which === 27 || e.which === 73) {
+                    that.showInventory(false);
                 }
                 this.pressed = true; 
             }
@@ -1854,8 +1989,62 @@ Inventory.prototype.input = function () {
     }
 }
 
-Inventory.prototype.changeFocus = function (index) {
-    var that = this
-    window.setTimeout(that.html_items[index].focus(), 0);
+HTML_Item.prototype.actionInput = function () {
+    var that = this;
+    var pressed = false;
+    this.action.addEventListener("keydown", function (e) {
+        if (!this.pressed) {
+            if (e.which === 40) {
+                window.setTimeout(that.destroy.focus(), 0);
+            } else if (e.which === 32) {
+                that.item.doAction.call(that.item);
+                that.showItemMenu(false);
+                window.setTimeout(that.element.focus(), 0);
+            }
+        }
+        this.pressed = true;
+        e.preventDefault();
+    }, false);
+    this.destroy.addEventListener("keydown", function (e) {
+        if (!this.pressed) {
+            if (e.which === 40) {
+                window.setTimeout(that.return.focus(), 0);
+            } else if (e.which === 38) {
+                window.setTimeout(that.action.focus(), 0);
+            } else if (e.which === 32) {
+                that.showItemMenu(false);
+                window.setTimeout(that.element.focus(), 0);
+                that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+            }
+        }
+        this.pressed = true;
+        e.preventDefault();
+    }, false);
+    this.return.addEventListener("keydown", function (e) {
+        if (!this.pressed) {
+            if (e.which === 38) {
+                window.setTimeout(that.destroy.focus(), 0);
+            } else if (e.which === 32) {
+                that.showItemMenu(false);
+                window.setTimeout(that.element.focus(), 0);
+            }
+        }
+        this.pressed = true;
+        e.preventDefault();
+    }, false);
+    this.action.addEventListener("keyup", function (e) {
+        this.pressed = false;
+    }, false);
+    this.destroy.addEventListener("keyup", function (e) {
+        this.pressed = false;
+    }, false);
+    this.return.addEventListener("keyup", function (e) {
+        this.pressed = false;
+    }, false);
     
+}
+
+Inventory.prototype.changeFocus = function (index) {
+    var element = this.html_items[index].element; 
+    window.setTimeout(element.focus(), 0);
 }

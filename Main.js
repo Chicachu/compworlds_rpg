@@ -63,8 +63,8 @@ ASSET_MANAGER.downloadAll(function () {
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
         // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
-    var item = new Item("Amulet", 130, 1, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), false);
-    var item2 = new Item("Amulet", 130, 1, ASSET_MANAGER.getAsset("./imgs/items/amulet2.png"), false);
+    var item = new Armor(gameEngine, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory");
+    var item2 = new Armor(gameEngine, "Amulet2", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet2.png"), "accessory");
     warrior.recieveItem(item);
     warrior.recieveItem(item2);
     //gameEngine.addAuxillaryEntity(mal);
@@ -74,6 +74,4 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
     gameEngine.start();
-    
-    
 });

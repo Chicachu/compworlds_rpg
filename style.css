@@ -22,7 +22,7 @@ body {
     top: -130px;
     pointer-events: none;
     background-image: url("./imgs/menu_background.png"); 
-    border-radius: 25px;
+    border-radius: 15px;
     visibility: hidden;
     display: none; 
 }
@@ -70,7 +70,7 @@ body {
     pointer-events: none;
 }
 
-#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus {
+#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus, #item_menu a:focus {
     color: white;
     outline: solid 1px #d8bca1;
     pointer-events: none;
@@ -85,7 +85,7 @@ body {
     margin-left: -150px;
 }
 
-#esc_menu {
+#esc_menu, #item_menu {
     position: relative;
     z-index: 2; 
     visibility: hidden; 
@@ -98,7 +98,7 @@ body {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
 
-#esc_menu ul{
+#esc_menu ul, #item_menu ul {
     list-style-type: none;
     display: inline-block;
     height: auto; 
@@ -106,9 +106,10 @@ body {
     background-image: url("./imgs/menu_background.png"); 
     text-align: center; 
     font-size: 25px;
+    border-radius: 15px;
 }
 
-#esc_menu li {
+#esc_menu li, #item_menu li {
     position: relative;
     width: auto; 
     height: auto;
@@ -116,7 +117,21 @@ body {
     padding: 5px;
     right: 13px;
     overflow: visible;
+    margin-left: -10px;
 }
+
+#item_menu {
+    top: -450px;
+    width: 75px; 
+    height: auto; 
+}
+
+#item_menu ul {
+    width: auto;
+    font-size: 15px;
+    border:  1px double #d8bca1;
+}
+
 
 #inventory_sack {
     height: 194px; 
@@ -150,7 +165,7 @@ body {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
 
-#items img {
+#items img, #equipment img {
    float: right; 
    display: block; 
 }
