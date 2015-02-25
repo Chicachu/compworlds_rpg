@@ -1947,7 +1947,7 @@ HTML_Item = function (element) {
     this.destroy.setAttribute("id", "destroy");
     this.destroy.innerHTML = "Destroy";
     this.return = document.createElement("a");
-    this.return.setAttribute("id", "return");
+    this.return.setAttribute("id", "return2");
     this.return.innerHTML = "Return";
 }
 
@@ -1961,7 +1961,7 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory) {
         this.insertATags();
         this.action = document.getElementById("action");
         this.destroy = document.getElementById("destroy");
-        this.return = document.getElementById("return");
+        this.return = document.getElementById("return2");
         this.destroy.tabIndex = 1;
         this.return.tabIndex = 1;
         this.action.tabIndex = 1;
