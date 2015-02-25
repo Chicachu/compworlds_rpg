@@ -776,7 +776,7 @@ Hero.prototype.draw = function (context) {
 
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 1000) >= 999;
+    return Math.round(Math.random() * 1000) >= 10000;
 }
 
 Hero.prototype.update = function () {
@@ -953,7 +953,12 @@ Hero.prototype.checkBoundaries = function () {
 
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
 Hero.prototype.getTile = function (x, y) {
-    return this.game.environment.map[y][x];
+    if (y < 24) {
+        return this.game.environment.map[y][x];
+    } else {
+        console.log(y);
+        return this.game.environment.map[y - 1][x];
+    }
 }
 
 Hero.prototype.isPassable = function (tile, index) {
@@ -1198,6 +1203,10 @@ NPC.prototype.update = function () {
     }
 }
 
+GameEngine.prototype.alertHero = function (dialogue) {
+
+}
+
 NPC.prototype.updateDialogue = function () {
     if (this.game) {
         if (this.game.next === true) {
@@ -1297,13 +1306,13 @@ Environment = function (game) {
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 65, 29, 20, 5, 6],
                 [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 19, 0, 28],
                 [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 0, 0, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
-                [70, 71, 72, 95, 90, 0, 0, 91, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 8, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 65],
-                [73, 74, 75, 94, 92, 0, 0, 93, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
+                [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 8, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 65],
+                [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
                 [76, 78, 76, 95, 94, 0, 0, 0, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 0, 0, 3, 4, 65, 32, 63, 32, 31, 31],
                 [77, 79, 77, 0, 95, 0, 0, 0, 0, 77, 79, 77, 0, 95, 95, 92, 93, 95, 9, 10, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 81, 82, 0, 0, 5, 6, 63, 33, 30, 33, 65, 65],
                 [0, 80, 0, 25, 26, 27, 0, 0, 0, 0, 80, 0, 90, 91, 133, 106, 107, 108, 104, 104, 0, 0, 3, 4, 103, 21, 22, 20, 11, 12, 83, 84, 0, 0, 81, 82, 81, 82, 31, 96, 97, 32],
                 [0, 0, 0, 0, 0, 25, 26, 27, 0, 0, 0, 0, 92, 93, 109, 110, 111, 112, 0, 0, 0, 0, 5, 6, 0, 23, 24, 19, 13, 14, 104, 104, 0, 0, 83, 84, 83, 84, 65, 98, 99, 33],
-                [39, 39, 40, 41, 0, 25, 26, 27, 36, 34, 36, 0, 0, 0, 113, 114, 115, 95, 0, 3, 4, 28, 20, 28, 3, 4, 0, 28, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 96, 97],
+                [39, 39, 40, 41, 0, 25, 26, 27, 36, 34, 36, 0, 0, 0, 113, 114, 115, 116, 0, 3, 4, 28, 20, 28, 3, 4, 0, 28, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 96, 97],
                 [46, 46, 47, 48, 0, 0, 42, 43, 44, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 29, 19, 29, 5, 6, 64, 29, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 98, 99],
                 [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 28, 64, 62, 3, 4, 62, 64, 62, 65, 103, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
                 [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 29, 3, 4, 5, 6, 37, 38, 0, 62, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
@@ -1383,7 +1392,9 @@ Environment = function (game) {
     this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.5, 9, true, false);
     this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.5, 4, true, false);
     this.flame1_locations = [[0, 4], [1, 4], [7, 4], [14, 4], [16, 4]];
-    this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2]];
+    this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2], [0, 11], [10, 12]];
+    this.flame3_locations = [[2,2], [9, 2], [11, 2]];
+    this.flame4_locations = [[0,0], [10, 1]];
     this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
     this.curr_quadrant = 0;
     
@@ -1413,10 +1424,13 @@ Environment.prototype.initSpriteSets = function()
 }
 
 Environment.prototype.initInteractables = function () {
-    this.interactables.push(new Door(2 * 32, 6 * 32, 0, this.game)); // door 1
-    this.interactables.push(new Door(8 * 32, 6 * 32, 0, this.game)); // door 2 
-    this.interactables.push(new Interactable(7 * 32, 6 * 32, 0, this.game)); // sign in front of store
-    this.interactables.push(new Door(15 * 32, 6 * 32, 0, this.game)); // door 3
+    this.interactables.push(new Door(2 , 6 , 0, this.game)); // door 1
+    this.interactables.push(new Door(8, 6, 0, this.game)); // door 2 
+    this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
+    this.interactables.push(new Door(15, 6, 0, this.game)); // door 3
+
+    this.interactables.push(new Door(1, 4, 3, this.game));
+    this.interactables.push(new Door(10, 4, 3, this.game));
 }
 
 Interactable = function (x, y, quad, game) {
@@ -1429,8 +1443,11 @@ Interactable = function (x, y, quad, game) {
 Interactable.prototype.startInteraction = function () { }
 
 Door = function (x, y, quad, game) {
+    var new_x = x * 32;
+    var new_y = y * 32; 
     this.is_closed = true;
-    Interactable.call(this, x, y, quad, game);
+    this.locked = true; 
+    Interactable.call(this, new_x, new_y, quad, game);
 }
 
 Door.prototype = new Interactable();
@@ -1439,18 +1456,25 @@ Door.prototype.constructor = Door;
 Door.prototype.startInteraction = function () {
     var y = this.y / 32;
     var x = this.x / 32;
-    if (this.is_closed) {
-        // close door
-        this.game.environment.map[y][x] = 105;
-        this.game.environment.map[y - 1][x] = 102;
-        this.game.environment.map[y - 2][x] = 101;
-    } else {
-        // open door
-        this.game.environment.map[y][x] = 80;
-        this.game.environment.map[y - 1][x] = 79;
-        this.game.environment.map[y - 2][x] = 78;
+    if (this.quad === 3) {
+        y += 11; 
     }
-    this.is_closed = !this.is_closed;
+    if (this.locked) {
+
+    } else {
+        if (this.is_closed) {
+            // close door
+            this.game.environment.map[y][x] = 105;
+            this.game.environment.map[y - 1][x] = 102;
+            this.game.environment.map[y - 2][x] = 101;
+        } else {
+            // open door
+            this.game.environment.map[y][x] = 80;
+            this.game.environment.map[y - 1][x] = 79;
+            this.game.environment.map[y - 2][x] = 78;
+        }
+        this.is_closed = !this.is_closed;
+    }
 }
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
@@ -1505,13 +1529,22 @@ Environment.prototype.drawFlames = function () {
             var x = this.flame1_locations[i][0];
             var y = this.flame1_locations[i][1];
             this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
-
         }
         for (var i = 0; i < this.flame2_locations.length; i++) {
             var x = this.flame2_locations[i][0];
             var y = this.flame2_locations[i][1];
             this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-
+        }
+    } else if (this.curr_quadrant === 3) {
+        for (var i = 0; i < this.flame3_locations.length; i++) {
+            var x = this.flame3_locations[i][0];
+            var y = this.flame3_locations[i][1];
+            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
+        }
+        for (var i = 0; i < this.flame4_locations.length; i++) {
+            var x = this.flame4_locations[i][0];
+            var y = this.flame4_locations[i][1];
+            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
         }
     }
 }
