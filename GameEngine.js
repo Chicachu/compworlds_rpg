@@ -764,7 +764,7 @@ Hero.prototype.checkForUserInteraction = function () {
     }
     for (var i = 0; i < this.game.environment.interactables.length; i++) {
         var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 5));
-        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 40));
+        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 45));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
         if (ent_distance < min_distance) {
             min_distance = ent_distance;
@@ -1585,7 +1585,7 @@ Environment.prototype.initInteractables = function () {
     var loot1 = [new Armor(this.game, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
     var loot2 = [new Potion(this.game, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55];
     this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
-    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, true));
+    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, false));
 
     // healing berry bushes
 }
@@ -2358,7 +2358,7 @@ Inventory.prototype.addItem = function (item) {
     if (this.items && item.isStackable) {
         for (var i = 0; i < this.items.length; i++) {
             if (this.items[i].name === item.name) {
-                if ((this.items[i].qty += item.qty) <= this.stacking_limit) {
+                if ((this.items[i].qty + item.qty) <= this.stacking_limit) {
                     this.items[i].qty += item.qty;
                     found = true;
                 }
