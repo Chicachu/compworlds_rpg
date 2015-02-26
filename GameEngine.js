@@ -2323,7 +2323,7 @@ Inventory.prototype.draw = function (ctx) {
         if (this.items[i]) {
             var img = this.items[i].img;
             this.html_items[i].element.innerHTML = img.outerHTML;
-            if (this.items[i].qty > 1) {
+            if (this.items[i].qty && this.items[i].qty > 1) {
                 var qty = document.createElement('p');
                 qty.innerHTML = this.items[i].qty
                 this.html_items[i].element.innerHTML += qty.outerHTML;

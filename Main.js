@@ -66,8 +66,9 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(warrior);
     //test items
     var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
-
+    var amulet = new Armor(gameEngine, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0));
     warrior.recieveItem(heal_berry);
+    warrior.recieveItem(amulet); 
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
