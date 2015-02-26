@@ -850,7 +850,7 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 1000) >= 999;
+    return Math.round(Math.random() * 1000) >= 1001;
 }
 
 Hero.prototype.update = function () {
@@ -1598,6 +1598,53 @@ Door.prototype.startInteraction = function () {
     }
 }
 
+Chest = function (x, y, quad, game, loot, locked) {
+    this.game = game;
+    this.closed = true;
+    this.loot = loot;
+    this.locked = locked;
+    Interactable.call(this, x, y, quad, game); 
+}
+
+Chest.prototype = new Interactable();
+Chest.prototype.constructor = Chest; 
+
+Chest.prototype.startInteraction = function () {
+    var y = this.y / 32;
+    var x = this.x / 32;
+
+    if (this.closed) {
+        if (!this.locked) {
+            for (var i = 0; i < this.loot.length; i++) {
+                this.game.entities[0].addItem(this.loot[i]);
+                this.game.alertHero("You recieved " + this.loot[i].name);
+            }
+            this.closed = false; 
+        } else if (this.locked && this.game.entities[0].removeItem("chest_key", 1)) {
+            var key = this.game.entities[0].removeItem("chest_key", 1);
+            // open chest
+            // give loot
+            this.game.alertHero("You had a key and it unlocked the chest!");
+            for (var i = 0; i < this.loot.length; i++) {
+                this.game.entities[0].addItem(this.loot[i]);
+                this.game.alertHero("You recieved " + this.loot[i].name);
+            }
+            this.closed = false; 
+        } else {
+            this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
+        }
+    } else {
+        this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
+    }
+    if (!this.closed) {
+        this.game.environment.map[x][y] = 100;
+    }
+}
+
+HealBerry = function (game) {
+
+}
+
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
 Environment.prototype.generateFiend = function (game)
 {
@@ -2111,7 +2158,7 @@ Warrior.prototype.recieveItem = function (item) {
 }
 
 Warrior.prototype.removeItem = function (item_name, qty) {
-    this.inventory.removeItem(item_name, qty);
+    return this.inventory.removeItem(item_name, qty);
 }
 
 Inventory = function (game, coin, max_items) {
