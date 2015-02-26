@@ -192,6 +192,12 @@ body {
     float: left; 
 }
 
+.item p {
+    font-size: 28px; 
+    color: #d8bca1;
+    position: absolute; 
+}
+
 #equipment {
     position: relative; 
     display: inline-block; 

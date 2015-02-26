@@ -188,7 +188,6 @@ GameEngine.prototype.startInput = function () {
         e.preventDefault();
     }, false);
 
-
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
@@ -764,7 +763,7 @@ Hero.prototype.checkForUserInteraction = function () {
         }
     }
     for (var i = 0; i < this.game.environment.interactables.length; i++) {
-        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 15));
+        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 5));
         var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 40));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
         if (ent_distance < min_distance) {
@@ -1584,9 +1583,9 @@ Environment.prototype.initInteractables = function () {
 
     // chests
     var loot1 = [new Armor(this.game, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
-    var loot2 = [55];
+    var loot2 = [new Potion(this.game, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55];
     this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
-    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, false));
+    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, true));
 
     // healing berry bushes
 }
@@ -1650,23 +1649,12 @@ Chest.prototype.startInteraction = function () {
 
     if (this.closed) {
         if (!this.locked) {
-            for (var i = 0; i < this.loot.length; i++) {
-                this.game.entities[0].inventory.addItem(this.loot[i]);
-                var loot = (this.loot[i].name || this.loot[i] + " gold");
-                this.game.alertHero("You recieved " + loot + ".");
-            }
-            this.closed = false; 
+            this.lootChest(); 
         } else if (this.locked && this.game.entities[0].removeItem("chest_key", 1)) {
             var key = this.game.entities[0].removeItem("chest_key", 1);
             // open chest
             // give loot
-            this.game.alertHero("You had a key and it unlocked the chest!");
-            for (var i = 0; i < this.loot.length; i++) {
-                this.game.entities[0].inventory.addItem(this.loot[i]);
-                var loot = (this.loot[i].name || this.loot[i] + " gold");
-                this.game.alertHero("You recieved " + loot + ".");
-            }
-            this.closed = false; 
+            this.lootChest()
         } else {
             this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
         }
@@ -1674,15 +1662,39 @@ Chest.prototype.startInteraction = function () {
         this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
     }
     if (!this.closed) {
-        console.log(loc_point.x + " " + loc_point.y);
         this.game.environment.map[loc_point.y][loc_point.x] = 100;
     }
 }
 
-HealBerry = function (game, berry) {
+Chest.prototype.lootChest = function () {
+    var loot_items = "";
+    for (var i = 0; i < this.loot.length; i++) {
+        this.game.entities[0].inventory.addItem(this.loot[i]);
+        var loot = (this.loot[i].name || this.loot[i] + " gold");
+        if (this.loot[i].qty > 1) {
+            loot += " x2";
+        }
+        if (i === this.loot.length - 1) {
+            loot_items += "and " + loot; 
+        } else {
+            loot_items += loot + ", ";
+        }
+    }
+    this.game.alertHero("You recieved " + loot_items + ".");
+    this.closed = false;
+}
+
+HealBerry = function (x, y, quad, game, berry) {
     this.picked = false;
     this.berry = berry; 
 
+    Interactable.call(this, x, y, quad, game);
+}
+
+HealBerry.prototype = new Interactable();
+HealBerry.prototype.constructor = HealBerry;
+
+HealBerry.prototype.startInteraction = function () {
     if (!this.picked) {
         this.game.entities[0].addItem(this.berry);
         this.picked = true;
@@ -1690,9 +1702,6 @@ HealBerry = function (game, berry) {
         this.game.alertHero("You've already picked the berries off of this plant.");
     }
 }
-
-HealBerry.prototype = new Interactable();
-HealBerry.prototype.constructor = HealBerry; 
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
 Environment.prototype.generateFiend = function (game)
