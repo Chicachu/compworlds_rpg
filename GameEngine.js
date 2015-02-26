@@ -720,15 +720,20 @@ Entity.prototype.setAnimation = function(anim)
     this.curr_anim = anim;
 }
 
-Statistics = function (health, attack, defense, turn_weight) {
+// attack and defense used to determine if hero hits or gets hit
+// strength is used for warrior attacks
+// dexterity for rogue attacks
+// intelligence for mage attacks
+Statistics = function (health, attack, defense, strength, dex, intel) {
     this.health = health;
     this.total_health = health;
     this.attack = attack;
     this.total_attack = attack;
     this.defense = defense;
     this.total_defense = defense;
-    this.turn_weight = turn_weight
-    this.turn_chance = 0;
+    this.strength = strength; 
+    this.dexterity = dex; 
+    this.intelligence = intel; 
 }
 
 /* HERO and subclasses */
@@ -850,7 +855,7 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 1000) >= 1001;
+    return Math.round(Math.random() * 10000) >= 9999;
 }
 
 Hero.prototype.update = function () {
@@ -923,8 +928,8 @@ Hero.prototype.changeCoordinates = function (down, up, left, right) {
 // used for map collision detection
 Hero.prototype.canMove = function (direction) {
     // default is for Direction.DOWN.
-    var index_low = { x: this.x + 20, y: this.y + 62 };
-    var index_high = { x: this.x + 44, y: this.y + 62 };
+    var index_low = { x: this.x + 18, y: this.y + 62 };
+    var index_high = { x: this.x + 40, y: this.y + 62 };
 
     // change if not default.
     switch (direction) {
@@ -972,6 +977,29 @@ Hero.prototype.changeBound = function (index_object) {
             index_object.x += 23 * 32;
         }
     }
+}
+
+GameEngine.prototype.changeXYForQuad = function (point, quad) {
+    switch (quad) {
+        case 1:
+            point.x += 11;
+            break;
+        case 2:
+            point.x += 23;
+            break;
+        case 3:
+            point.y += 11;
+            break;
+        case 4:
+            point.x += 11;
+            point.y += 11; 
+            break;
+        case 5:
+            point.x += 23;
+            point.y += 11; 
+            break;
+    }
+    return point; 
 }
 
 
@@ -1426,20 +1454,20 @@ Environment = function (game) {
                 [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 28, 0, 3, 4],
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 65, 29, 20, 5, 6],
                 [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 19, 0, 28],
-                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 0, 0, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
+                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
                 [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 65],
                 [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
                 [76, 78, 76, 95, 94, 0, 0, 0, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 0, 0, 3, 4, 65, 32, 63, 32, 31, 31],
                 [77, 79, 77, 0, 95, 0, 0, 0, 0, 77, 79, 77, 0, 95, 95, 92, 93, 95, 9, 10, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 81, 82, 0, 0, 5, 6, 63, 33, 30, 33, 65, 65],
-                [0, 80, 0, 25, 26, 27, 0, 0, 0, 0, 80, 0, 90, 91, 133, 106, 107, 108, 104, 104, 0, 0, 3, 4, 103, 21, 22, 20, 11, 12, 83, 84, 0, 0, 81, 82, 81, 82, 31, 96, 97, 32],
+                [0, 80, 0, 25, 26, 27, 0, 0, 0, 0, 80, 0, 90, 91, 133, 106, 107, 108, 104, 104, 0, 0, 3, 4, 0, 21, 22, 20, 11, 12, 83, 84, 0, 0, 81, 82, 81, 82, 31, 96, 97, 32],
                 [0, 0, 0, 0, 0, 25, 26, 27, 0, 0, 0, 0, 92, 93, 109, 110, 111, 112, 0, 0, 0, 0, 5, 6, 0, 23, 24, 19, 13, 14, 104, 104, 0, 0, 83, 84, 83, 84, 65, 98, 99, 33],
                 [39, 39, 40, 41, 0, 25, 26, 27, 36, 34, 36, 0, 0, 0, 113, 114, 115, 116, 0, 3, 4, 28, 20, 28, 3, 4, 0, 28, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 96, 97],
                 [46, 46, 47, 48, 0, 0, 42, 43, 44, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 29, 19, 29, 5, 6, 64, 29, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 98, 99],
-                [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 28, 64, 62, 3, 4, 62, 64, 62, 65, 103, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
-                [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 29, 3, 4, 5, 6, 37, 38, 0, 62, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
-                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 64, 5, 6, 28, 0, 20, 3, 4, 62, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
-                [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 3, 4, 28, 28, 29, 28, 19, 5, 6, 3, 4, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
-                [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 65, 5, 6, 29, 29, 0, 29, 62, 37, 38, 5, 6, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
+                [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 65, 64, 62, 3, 4, 62, 64, 0, 0, 65, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
+                [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 0, 0, 0, 5, 6, 37, 38, 0, 0, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
+                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 0, 0, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
+                [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
+                [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
     ];
 
     this.house_floor = [[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
@@ -1545,18 +1573,27 @@ Environment.prototype.initSpriteSets = function()
 }
 
 Environment.prototype.initInteractables = function () {
+    // doors and sign
     this.interactables.push(new Door(2 , 6 , 0, this.game)); // door 1
     this.interactables.push(new Door(8, 6, 0, this.game)); // door 2 
-    this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
+    //this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
     this.interactables.push(new Door(15, 6, 0, this.game)); // door 3
 
     this.interactables.push(new Door(1, 4, 3, this.game));
     this.interactables.push(new Door(10, 4, 3, this.game));
+
+    // chests
+    var loot1 = [new Armor(this.game, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
+    var loot2 = [55];
+    this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
+    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, false));
+
+    // healing berry bushes
 }
 
 Interactable = function (x, y, quad, game) {
-    this.x = x;
-    this.y = y;
+    this.x = x * 32;
+    this.y = y * 32;
     this.quad = quad;
     this.game = game;
 }
@@ -1564,11 +1601,9 @@ Interactable = function (x, y, quad, game) {
 Interactable.prototype.startInteraction = function () { }
 
 Door = function (x, y, quad, game) {
-    var new_x = x * 32;
-    var new_y = y * 32; 
     this.is_closed = true;
     this.locked = true; 
-    Interactable.call(this, new_x, new_y, quad, game);
+    Interactable.call(this, x, y, quad, game);
 }
 
 Door.prototype = new Interactable();
@@ -1577,29 +1612,27 @@ Door.prototype.constructor = Door;
 Door.prototype.startInteraction = function () {
     var y = this.y / 32;
     var x = this.x / 32;
-    if (this.quad === 3) {
-        y += 11; 
-    }
+    var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad); 
+
     if (this.locked) {
         this.game.alertHero("This door is locked. Try coming back after the village isn't burning down."); 
     } else {
         if (this.is_closed) {
             // close door
-            this.game.environment.map[y][x] = 105;
-            this.game.environment.map[y - 1][x] = 102;
-            this.game.environment.map[y - 2][x] = 101;
+            this.game.environment.map[loc_point.y][loc_point.x] = 105;
+            this.game.environment.map[loc_point.y - 1][loc_point.x] = 102;
+            this.game.environment.map[loc_point.y - 2][loc_point.x] = 101;
         } else {
             // open door
-            this.game.environment.map[y][x] = 80;
-            this.game.environment.map[y - 1][x] = 79;
-            this.game.environment.map[y - 2][x] = 78;
+            this.game.environment.map[loc_point.y][loc_point.x] = 80;
+            this.game.environment.map[loc_point.y - 1][loc_point.x] = 79;
+            this.game.environment.map[loc_point.y - 2][loc_point.x] = 78;
         }
         this.is_closed = !this.is_closed;
     }
 }
 
 Chest = function (x, y, quad, game, loot, locked) {
-    this.game = game;
     this.closed = true;
     this.loot = loot;
     this.locked = locked;
@@ -1613,11 +1646,14 @@ Chest.prototype.startInteraction = function () {
     var y = this.y / 32;
     var x = this.x / 32;
 
+    var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad); 
+
     if (this.closed) {
         if (!this.locked) {
             for (var i = 0; i < this.loot.length; i++) {
-                this.game.entities[0].addItem(this.loot[i]);
-                this.game.alertHero("You recieved " + this.loot[i].name);
+                this.game.entities[0].inventory.addItem(this.loot[i]);
+                var loot = (this.loot[i].name || this.loot[i] + " gold");
+                this.game.alertHero("You recieved " + loot + ".");
             }
             this.closed = false; 
         } else if (this.locked && this.game.entities[0].removeItem("chest_key", 1)) {
@@ -1626,8 +1662,9 @@ Chest.prototype.startInteraction = function () {
             // give loot
             this.game.alertHero("You had a key and it unlocked the chest!");
             for (var i = 0; i < this.loot.length; i++) {
-                this.game.entities[0].addItem(this.loot[i]);
-                this.game.alertHero("You recieved " + this.loot[i].name);
+                this.game.entities[0].inventory.addItem(this.loot[i]);
+                var loot = (this.loot[i].name || this.loot[i] + " gold");
+                this.game.alertHero("You recieved " + loot + ".");
             }
             this.closed = false; 
         } else {
@@ -1637,13 +1674,25 @@ Chest.prototype.startInteraction = function () {
         this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
     }
     if (!this.closed) {
-        this.game.environment.map[x][y] = 100;
+        console.log(loc_point.x + " " + loc_point.y);
+        this.game.environment.map[loc_point.y][loc_point.x] = 100;
     }
 }
 
-HealBerry = function (game) {
+HealBerry = function (game, berry) {
+    this.picked = false;
+    this.berry = berry; 
 
+    if (!this.picked) {
+        this.game.entities[0].addItem(this.berry);
+        this.picked = true;
+    } else {
+        this.game.alertHero("You've already picked the berries off of this plant.");
+    }
 }
+
+HealBerry.prototype = new Interactable();
+HealBerry.prototype.constructor = HealBerry; 
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
 Environment.prototype.generateFiend = function (game)
@@ -2013,6 +2062,7 @@ Item = function (game, name, price, qty, img) {
     this.img = img;
     this.isStackable = true;
     this.html = null;
+    this.usable = false; 
 }
 
 Item.prototype.increaseQty = function (amount) {
@@ -2031,6 +2081,52 @@ Item.prototype.setActionText = function () {
 
 Item.prototype.doAction = function () {
 
+}
+
+UsableItem = function (game, name, price, qty, img) {
+    Item.call(this, game, name, price, qty, img);
+    this.usable = true;
+    this.isEquipped = false; 
+}
+
+UsableItem.prototype = new Item();
+UsableItem.prototype.constructor = UsableItem;
+
+// potion will be mostly potions but a heal berry does the same thing so it's also a Potion. 
+// types are: mana, health, str, dex, int, stam - exactly as typed here so other code works. 
+
+// level is 1, 2, or 3
+Potion = function (game, name, price, qty, img, type, level) {
+    this.potion_type = type;
+    this.level = level; 
+    UsableItem.call(this, game, name, price, qty, img);
+}
+
+Potion.prototype = new UsableItem();
+Potion.prototype.constructor = Potion;
+
+Potion.prototype.doAction = function () {
+    switch (this.potion_type) {
+        case "health":
+            this.game.entities[0].health += this.level * 25;
+            break;
+        case "stam":
+            
+            break;
+        case "mana":
+
+            break;
+        case "str":
+            this.game.entities[0].strength += this.level * 1;
+            break;
+        case "dex":
+            this.game.entities[0].dexterity += this.level * 1;
+            break;
+        case "int":
+            this.game.entities[0].intelligence += this.level * 1;
+            break;
+    }
+    this.game.entities[0].inventory.removeItem(this.name, 1);
 }
 
 HTML_Item = function (element) {
@@ -2081,20 +2177,25 @@ HTML_Item.prototype.insertATags = function () {
 }
 
 HTML_Item.prototype.setActionText = function () {
-    if (this.item.isEquipped) {
-        this.action.innerHTML = "Unequip";
-    } else {
-        this.action.innerHTML = "Equip";
+    if (this.item.type) {
+        if (this.item.isEquipped) {
+            this.action.innerHTML = "Unequip";
+        } else {
+            this.action.innerHTML = "Equip";
+        }
+    } else if (this.item.usable) {
+        this.action.innerHTML = "Use Item";
     }
 }
 
-Armor = function (game, name, price, img, type) {
+Armor = function (game, name, price, img, type, stats) {
     this.isEquipped = false; 
     this.type = type;
     this.slot = document.getElementById("equip_" + type);
     this.background_img = this.slot.style.backgroundImage;
     Item.call(this, game, name, price, 1, img);
     this.isStackable = false; 
+    this.stats = stats; 
 }
 
 Armor.prototype = new Item();
@@ -2140,19 +2241,6 @@ Armor.prototype.setActionText = function () {
     }
 }
 
-Warrior.prototype.deductCoin = function (amount) {
-    if (this.inventory.coin >= amount) {
-        this.inventory.coin -= amount;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-Warrior.prototype.addCoin = function (amount) {
-    this.inventory.coin += amount;
-}
-
 Warrior.prototype.recieveItem = function (item) {
     this.inventory.addItem(item); 
 }
@@ -2189,6 +2277,19 @@ Inventory.prototype.initHtmlItems = function () {
     }
 }
 
+Inventory.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Inventory.prototype.addCoin = function (amount) {
+    this.coin += amount;
+}
+
 Inventory.prototype.showInventory = function (flag) {
     if (flag && this.open === false) {
         this.game.context.canvas.tabIndex = 0;
@@ -2217,6 +2318,7 @@ Inventory.prototype.draw = function (ctx) {
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
             this.html_items[i].actionInput();
+            
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
@@ -2243,16 +2345,18 @@ Inventory.prototype.addItem = function (item) {
         for (var i = 0; i < this.items.length; i++) {
             if (this.items[i].name === item.name) {
                 if ((this.items[i].qty += item.qty) <= this.stacking_limit) {
-
+                    this.items[i].qty += item.qty;
+                    found = true;
                 }
-                this.items[i].qty += item.qty;
-                found = true;
             }
         }
     }
     if (!found) {
-        if (this.items.length < this.max_items) {
+        if (this.items.length < this.max_items && typeof (item) == "object") {
             this.items.push(item);
+        } else if (typeof(item) == "number") {
+            // add coin
+            this.addCoin(item);
         } else {
             // wont fit in inventory
         }
@@ -2271,7 +2375,9 @@ Inventory.prototype.removeItem = function (item_name, qty) {
                 item = this.splitStack(item_name, qty)
             } else if (this.items[i].qty === qty) {
                 item = this.items[i];
-                item.unequipOldArmor(true); 
+                if (item.type) {
+                    item.unequipOldArmor(true);
+                }
                 this.items.splice(i, 1);
             } else {
                 // can't remove item. 
@@ -2288,8 +2394,8 @@ Inventory.prototype.splitStack = function (item_name, qty) {
     var new_stack = null; 
     for (var i = 0; i < this.items.length; i++) {
         if (this.items[i].name === item_name) {
-            new_stack = new Item(item_name, items[i].price, items[i].qty, items[i].img, items[i].stackable);
-            items[i].qty -= qty; 
+            new_stack = new Item(item_name, this.items[i].price, qty, this.items[i].img, this.items[i].stackable);
+            this.items[i].qty -= qty; 
         }
     }
     return new_stack;

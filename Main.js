@@ -45,7 +45,7 @@ ASSET_MANAGER.downloadAll(function () {
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
     //    );
-    var warrior = new Warrior(gameEngine, new Statistics(50, 200, 100, .4));
+    var warrior = new Warrior(gameEngine, new Statistics(50, 200, 100, 4, 3, 1));
 
     var sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -64,10 +64,10 @@ ASSET_MANAGER.downloadAll(function () {
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
         // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
-    var item = new Armor(gameEngine, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory");
-    var item2 = new Armor(gameEngine, "Amulet2", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet2.png"), "accessory");
-    warrior.recieveItem(item);
-    warrior.recieveItem(item2);
+    //test items
+    var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
+
+    warrior.recieveItem(heal_berry);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
