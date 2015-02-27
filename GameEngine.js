@@ -1400,13 +1400,18 @@ This is an NPC with a quest object
 game: game engine
 name: name of the NPC_QUEST
 dialog: message or task foor hero
-anims: animations
-path: path of the object
+anims: a SpriteSet object with the characters full set of animations
+path: an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 speed: speed of the movement
 quest: what kind of quest it has
+pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quest){
-
+	if(game && dialog && anims && path){
+	this.game = game;
+	this.animations = anims;
+	this.spriteSheet = this,animations.right.spriteSheet;
+	
 }
 
 
