@@ -26,30 +26,30 @@ Animation = function (spriteSheet, startX, startY, frameWidth, frameHeight, fram
 
 Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
     this.elapsedTime += tick;
-    var scaleBy = scaleBy || 1;
+    var scaleBy = scaleBy || 1; 
     if (this.loop) {
         if (this.isDone()) {
             this.elapsedTime = 0;
             this.looped = true;
         }
     } else if (this.isDone()) {
-        return;
+        return; 
     }
     var index = 5;
     var that = this;
     if (this.reverse) {
-        index = that.frames - that.currentFrame() - 1;
+        index = that.frames - that.currentFrame() - 1; 
     } else {
         index = that.currentFrame();
     }
-
+    
 
     var locX = x;
     var locY = y;
-    context.drawImage(this.spriteSheet,
-                      index * this.frameWidth, this.startY * this.frameHeight,
-                      this.frameWidth, this.frameHeight,
-                      locX, locY,
+    context.drawImage(this.spriteSheet, 
+                      index * this.frameWidth, this.startY * this.frameHeight, 
+                      this.frameWidth, this.frameHeight, 
+                      locX, locY, 
                       this.frameWidth * scaleBy, this.frameHeight * scaleBy);
 }
 
@@ -130,7 +130,7 @@ GameEngine = function () {
     this.width = null;
     this.height = null;
     this.timer = null;
-    this.key = null;
+    this.key = null; 
     this.space = null;
     this.esc = null;
     this.key_i = null;
@@ -175,9 +175,9 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 40) {
                 that.key = e.which;
             } else if (e.which === 27) {
-                that.esc_menu.showMenu(true);
+                that.esc_menu.showMenu(true); 
             } else if (e.which === 73) {
-                that.key_i = true;
+                that.key_i = true; 
             }
         } else {
             that.key = 0;
@@ -187,7 +187,6 @@ GameEngine.prototype.startInput = function () {
         }
         e.preventDefault();
     }, false);
-
 
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
@@ -201,7 +200,7 @@ GameEngine.prototype.startInput = function () {
 
     text_box.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ' && text_box.style.visibility === "visible") {
-            that.next = true;
+            that.next = true; 
         }
         if (e.which == 9) {
             e.preventDefault();
@@ -231,24 +230,28 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-GameEngine.prototype.clearEntities = function (save_entities) {
+GameEngine.prototype.clearEntities = function(save_entities)
+{
     //for(var i = 1; i < this.entities.length; i++)
     //{
-    if (save_entities) {
-        this.auxillary_sprites = this.entities.splice(1, this.entities.length - 1);
-    }
-    else {
-        this.entities = [this.entities[0]];
-    }
+        if (save_entities) {
+            this.auxillary_sprites = this.entities.splice(1, this.entities.length - 1);
+        }
+        else {
+            this.entities = [this.entities[0]];
+        }
     //}
 }
 
-GameEngine.prototype.reLoadEntities = function () {
-    for (var i = 0; i < this.auxillary_sprites.length; i++) {
+GameEngine.prototype.reLoadEntities = function()
+{
+    for(var i = 0; i < this.auxillary_sprites.length; i++)
+    {
         this.entities.push(this.auxillary_sprites.pop());
     }
 }
-GameEngine.prototype.addAuxillaryEntity = function (entity) {
+GameEngine.prototype.addAuxillaryEntity = function(entity)
+{
     this.auxillary_sprites.push(entity);
 }
 GameEngine.prototype.draw = function (drawCallBack) {
@@ -276,63 +279,40 @@ GameEngine.prototype.queueActions = function () {
         //if event is null and there is an animation in the queue, set animation to the first item in the queue
         if (!event && this.animation_queue.length > 0) {
             event = this.animation_queue[0];
-            if (event.entity) {
-                event.entity.setAnimation(event.animation);
-            }
+            event.entity.setAnimation(event.animation);
         }
-        if (event && event.entity === null) {
-            if (event.wait && !event.hanging) {
-                var that = this;
-                var that_event = event;
-                event.hanging = true;
-                event.hang_timer = setTimeout(function () {
-                    that_event.executeCallback();
-                    if (that.animation_queue.length >= 0) {
-                        that_event = that.animation_queue.shift();
-                    }
-                    clearInterval(that_event.hang_timer);
-                }, that_event.wait);
-            }
-            else if (!event.hanging) {
-                event.executeCallback();
+        //If event is not null, check if the current event has gone through a full loop
+        if (event) {
+            if (event.entity.curr_anim.looped) {
                 if (this.animation_queue.length >= 0) {
-                    event = this.animation_queue.shift();
-                }
-            }
-        }
-        else if (event) {
-            //if (event.entity.curr_anim.looped) {
-            //if (this.animation_queue.length >= 0) {
-            //if loop has been made, dequeue off the queue and set it to event
+                    //if loop has been made, dequeue off the queue and set it to event
 
-            //Sets the events entitiy's animation
-            if (!event.hanging && event.wait) {
-                var that = this;
-                var that_event = event;
-                event.hanging = true;
-                event.hang_timer = setTimeout(function () {
-                    that_event.hanging = false;
-                    that_event.executeCallback();
-                    clearInterval(that_event.hang_timer);
-                    if (that.animation_queue.length >= 0) {
-                        that_event = that.animation_queue.shift();
-                        if (that_event.entity) {
-                            that_event.entity.setAnimation(that_event.animation);
-                            that_event.entity.curr_anim.looped = false;
-                        }
+                    //Sets the events entitiy's animation
+                    if (event.wait && !event.hanging) {
+                        var that = this;
+                        var that_event = event;
+                        event.hanging = true;
+                        event.hang_timer = setTimeout(function () {
+                            that_event.hanging = false;
+                            that_event.executeCallback();
+                            clearInterval(that_event.hang_timer);
+                            that_event = that.animation_queue.shift();
+                            if (that_event) {
+                                that_event.entity.setAnimation(that_event.animation);
+                                that_event.entity.curr_anim.looped = false;
+                            }
+                        }, event.wait);
                     }
-                }, event.wait);
-            }
-            else if (!event.wait) {
-                if (event.entity.curr_anim.looped) {
-                    event.executeCallback();
-                    if (this.animation_queue.length >= 0) {
+                    else if (!event.hanging) {
+                        event.executeCallback();
                         event = this.animation_queue.shift();
-                        if (event.entity) {
-                            event.entity.setAnimation(event.animation);
-                        }
+                        event.entity.setAnimation(event.animation);
+                        event.entity.curr_anim.looped = false;
                     }
-                    event.entity.curr_anim.looped = false;
+
+                }
+                else {
+                    event.entity.setAnimation(event.entity.stop_move_animation);
                 }
             }
         }
@@ -356,7 +336,6 @@ Fades out the screen and then invokes the callback function and fadeIn
 */
 GameEngine.prototype.fadeOut = function (game, args, callback) {
     var that = game;
-    game.canControl = false;
     that.timerId = setInterval(function () {
         that.context.globalAlpha -= .05;
         if (that.context.globalAlpha < .05) {
@@ -379,7 +358,7 @@ GameEngine.prototype.fadeIn = function (game) {
         if (that.context.globalAlpha > .95) {
             that.context.globalAlpha = 1;
             clearInterval(that.timerId);
-            that.canControl = true;
+            that.canControl = true; 
         }
     }, 50);
 
@@ -410,20 +389,20 @@ GameEngine.prototype.setBattle = function (game) {
     game.decideFighters();
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     window.setTimeout(game.menu.showMenu(true), 5000);
-
+    
 }
-
+    
 /*
     Puts ending conditions for a battle including resetting is_battle to false,
     putting the player back to original position, 
     and for now resets the players health.
 */
-GameEngine.prototype.endBattle = function (game) {
+GameEngine.prototype.endBattle = function (game)
+{
     game.is_battle = false;
     game.menu.showMenu(false);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     game.context.canvas.focus();
-    game.animation_queue = [];
     game.entities[0].x = game.entities[0].save_x;
     game.entities[0].y = game.entities[0].save_y;
     game.entities[0].direction = game.entities[0].save_direction;
@@ -440,12 +419,16 @@ GameEngine.prototype.endBattle = function (game) {
 GameEngine.prototype.battleOver = function (game) {
     var net_health_1 = 0;
     for (var i = 0 ; i < game.fiends.length; i++) {
-        if (game.fiends[i]) {
-            net_health_1 += game.fiends[i].stats.health;
-        }
+        net_health_1 += game.fiends[i].stats.health;
     }
+        //net_health_1 = game.fiends[0].stats.health;
     if (net_health_1 <= 0) {
         return true;
+            //game.canControl = false;
+            //game.timerId2 = setTimeout(function () {
+            //    game.fadeOut(game, game, game.endBattle);
+            //    clearInterval(game.timerId2);
+            //}, 2000);
     }
     else {
         return false;
@@ -453,7 +436,8 @@ GameEngine.prototype.battleOver = function (game) {
 
 }
 
-GameEngine.prototype.decideFighters = function () {
+GameEngine.prototype.decideFighters = function()
+{
     //var total_weight = 0;
     //var dice_roll = 0;
     //for(var i = 0; i < this.entities.length; i++)
@@ -465,37 +449,35 @@ GameEngine.prototype.decideFighters = function () {
     //{
     //    this.entities[i].turn_chance = this.entities[i].turn_weight / total_weight;
     //}
-
+    
     //dice_roll = Math.random();
     var fighter = 0;
-    for (var i = 0; i < this.entities.length * 10; i++) {
+    for(var i = 0; i < this.entities.length * 10; i++)
+    {
         fighter = i % this.entities.length;
         this.fight_queue.push(this.entities[fighter]);
     }
     this.fight_queue[0].is_turn = true;
 }
 
-GameEngine.prototype.removeFighters = function (player) {
-    for (var i = 0; i < this.fight_queue.length; i++) {
-        if (this.fight_queue[i].id === player.id) {
+GameEngine.prototype.removeFighters = function(player)
+{
+    for(var i = 0; i < this.fight_queue.length; i++)
+    {
+        if(this.fight_queue[i].id === player.id)
+        {
             this.fight_queue.splice(i, 1);
         }
     }
-    for (var i = 0; i < this.fiends.length; i++) {
-        if (this.fiends[i] && this.fiends[i].id === player.id) {
-            this.fiends[i].is_targeted = false;
-            //this.fiends[i] = null;
-            this.fiends.splice(i, 1);
-        }
-    }
 }
 
-GameEngine.prototype.setNextFighter = function (game) {
-    game.fight_queue.shift();
-    game.fight_queue[0].is_turn = true;
+GameEngine.prototype.setNextFighter = function()
+{
+    this.fight_queue.shift();
 }
 
-GameEngine.prototype.selectTarget = function () {
+GameEngine.prototype.selectTarget = function()
+{
 
 }
 
@@ -525,7 +507,8 @@ var Direction = {
 /**
     Object that is stored in the queue animation. Takes an entity and one of the entities animations as a parameter
 */
-Event = function (entity, animation, wait, callback, args) {
+Event = function(entity, animation, wait, callback, args)
+{
     this.entity = entity;
     this.animation = animation;
     this.wait = wait;
@@ -535,7 +518,8 @@ Event = function (entity, animation, wait, callback, args) {
     this.args = args;
 }
 
-Event.prototype.executeCallback = function () {
+Event.prototype.executeCallback = function()
+{
     if (this.callback) {
         this.callback(this.args);
     }
@@ -555,7 +539,6 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.stats = stats;
     this.curr_anim = null;
     this.is_turn = false;
-    this.is_dead = false;
     this.is_targeted = false;
     this.id = Math.random() * Math.random();
     if (animations) {
@@ -600,7 +583,8 @@ Entity.prototype.stopAnimation = function (animation) {
     return new Animation(this.spriteSheet, animation.currentFrame(), animation.startY, animation.frameWidth, animation.frameHeight, animation.frameDuration, 1, true, false);
 }
 
-Entity.prototype.drawSelector = function (context, color) {
+Entity.prototype.drawSelector = function(context, color)
+{
     context.beginPath();
     context.moveTo(this.x + this.curr_anim.frameWidth, this.y - 8);
     context.lineTo(this.x + this.curr_anim.frameWidth - 10, this.y - 18);
@@ -611,8 +595,10 @@ Entity.prototype.drawSelector = function (context, color) {
     context.closePath();
 
 }
-Entity.prototype.drawHealthBar = function (context) {
-    if (this.stats.health < 0) {
+Entity.prototype.drawHealthBar = function(context)
+{
+    if (this.stats.health < 0)
+    {
         green = 0;
     }
     else {
@@ -630,69 +616,84 @@ Entity.prototype.drawHealthBar = function (context) {
     context.closePath();
 }
 
-Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
+Entity.prototype.doDamage = function(player, foes, game, is_multi_attack)
+{
     foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
-    game.animation_queue.push(new Event(foes, foes.animations.hit));
-    if (foes.stats.health <= 0) {
+    if (foes.stats.health <= 0)
+    {
         foes.stats.health = 0;
-        foes.is_dead = true;
         game.removeFighters(foes);
+        game.animation_queue.push(new Event(foes, foes.animations.hit));
         if (is_multi_attack) {
-            game.animation_queue.push(new Event(foes, foes.animations.death, 0));
+            game.animation_queue.push(new Event(foes, foes.animations.death));
         }
-        else {
+        else
+        {
             game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
-            if (game.battleOver(game)) {
+            if(game.battleOver(game))
+            {
                 game.canControl = false;
-                if (game.is_battle) {
-                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                }
+                setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
             }
+
         }
+        
     }
     else {
         if (is_multi_attack) {
+            game.animation_queue.push(new Event(foes, foes.animations.hit));
             game.animation_queue.push(new Event(foes, foes.stop_move_animation, 200));
         }
-        else {
+        else
+        {
+            game.animation_queue.push(new Event(foes, foes.animations.hit));
             game.animation_queue.push(new Event(foes, foes.stop_move_animation, 1000));
         }
-
+        
     }
     if (!is_multi_attack && !game.battleOver(game)) {
-        game.animation_queue.push(new Event(null, null, 500, game.setNextFighter, game));
+        game.setNextFighter();
+        game.fight_queue[0].is_turn = true;
     }
-
+    
 
 }
 
-Entity.prototype.doMultiDamage = function (player, foes, game) {
+Entity.prototype.doMultiDamage = function(player, foes, game)
+{
     var player = player;
     var args = foes;
-    for (var i = 0; i < args.length; i++) {
+    for(var i = 0; i < args.length; i++)
+    {
         args[i].stats.health = args[i].stats.health - ((player.stats.attack / args[i].stats.defense) * (Math.random() * 10));
-        if (i === args.length - 1) {
-            if (args[i].stats.health <= 0) {
+        if(i === args.length - 1)
+        {
+            if (args[i].stats.health <= 0)
+            {
                 args[i].stats.health = 0;
                 game.removeFighters(args[i]);
                 game.animation_queue.push(new Event(args[i], args[i].animations.hit));
                 game.animation_queue.push(new Event(args[i], args[i].animations.death, 1000));
                 game.battleOver(game);
             }
-            else {
+            else
+            {
                 args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
                 args[i].game.animation_queue.push(new Event(args[i], args[i].stop_move_animation, 1000));
             }
         }
-        else {
-            if (args[i].stats.health <= 0) {
+        else
+        {
+            if (args[i].stats.health <= 0)
+            {
                 args[i].stats.health = 0;
                 args[i].game.removeFighters(args[i]);
                 args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
                 args[i].game.animation_queue.push(new Event(args[i], args[i].animations.death));
                 args[i].game.battleOver(args[i].game);
             }
-            else {
+            else
+            {
                 args[i].game.animation_queue.push(new Event(args[i], args[i].animations.hit));
                 args[i].game.animation_queue.push(new Event(args[i], args[i].stop_move_animation));
             }
@@ -713,19 +714,25 @@ Entity.prototype.reset = function () {
 
 }
 //Sets the current animation
-Entity.prototype.setAnimation = function (anim) {
+Entity.prototype.setAnimation = function(anim)
+{
     this.curr_anim = anim;
 }
 
-Statistics = function (health, attack, defense, turn_weight) {
+// attack and defense used to determine if hero hits or gets hit
+// strength is used for warrior attacks
+// dexterity for rogue attacks
+// intelligence for mage attacks
+Statistics = function (health, attack, defense, strength, dex, intel) {
     this.health = health;
     this.total_health = health;
     this.attack = attack;
     this.total_attack = attack;
     this.defense = defense;
     this.total_defense = defense;
-    this.turn_weight = turn_weight
-    this.turn_chance = 0;
+    this.strength = strength; 
+    this.dexterity = dex; 
+    this.intelligence = intel; 
 }
 
 /* HERO and subclasses */
@@ -747,8 +754,8 @@ Hero.prototype.checkForUserInteraction = function () {
     var min_index = null;
     var array = 0;
     for (var i = 1; i < this.game.entities.length; i++) {
-        var ent_x_difference = Math.abs(this.game.entities[i].x - this.x);
-        var ent_y_difference = Math.abs(this.game.entities[i].y - this.y);
+        var ent_x_difference = Math.abs(this.game.entities[i].x - this.x); 
+        var ent_y_difference = Math.abs(this.game.entities[i].y - this.y); 
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
         if (ent_distance < min_distance) {
             min_distance = ent_distance;
@@ -756,8 +763,8 @@ Hero.prototype.checkForUserInteraction = function () {
         }
     }
     for (var i = 0; i < this.game.environment.interactables.length; i++) {
-        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 15));
-        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 40));
+        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 5));
+        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 45));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
         if (ent_distance < min_distance) {
             min_distance = ent_distance;
@@ -815,47 +822,46 @@ Hero.prototype.draw = function (context) {
     }
     else {
         this.drawHealthBar(context);
-        if (this.is_turn) {
+        if (this.is_turn)
+        {
             this.drawSelector(context, 'green');
         }
-        else if (this.is_targeted) {
+        else if (this.is_targeted)
+        {
             this.drawSelector(context, 'yellow');
         }
-        if (this.fleeing) {
+        if (this.fleeing)
+        {
             this.direction = Direction.RIGHT;
             this.curr_anim = this.animations.right;
-            if (context.canvas.width - this.curr_anim.frameWidth >= this.x) {
+            if(context.canvas.width - this.curr_anim.frameWidth >= this.x)
+            {
                 this.changeCoordinates(0, 0, 0, .3);
             }
             else {
                 this.fleeing = false;
                 var that = this;
-                if (this.game.is_battle) {
-                    this.game.fadeOut(this.game, this.game, this.game.endBattle);
-                }
+                this.game.fadeOut(this.game, this.game, this.game.endBattle);
             }
         }
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
     }
 }
 
-Hero.prototype.flee = function (flee) {
+Hero.prototype.flee = function(flee)
+{
     this.fleeing = flee;
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
-    if (Math.abs(distance_traveled) > 100) {
-        var x = 8;
-        return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1995;
-    }
+    return Math.round(Math.random() * 10000) >= 9999;
 }
 
 Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-
+    
     this.preBattle();
     this.checkBoundaries();
     if (!this.game.is_battle) {
@@ -875,7 +881,7 @@ Hero.prototype.update = function () {
 
 Hero.prototype.reposition = function (other) {
     if (this.x < other.x && this.direction !== Direction.RIGHT) {
-        this.direction = Direction.RIGHT;
+        this.direction = Direction.RIGHT; 
     } else if (this.x > other.x && this.direction !== Direction.LEFT) {
         this.direction = Direction.LEFT;
     }
@@ -885,7 +891,7 @@ Hero.prototype.preBattle = function () {
     if (this.moving && this.checkSurroundings()) {
         this.game.canControl = false;
         this.game.key = 0;
-        this.game.space = 0;
+        this.game.space = 0; 
         // lock user input controls here.
         this.game.fadeOut(this.game, this.game, this.game.setBattle);
     }
@@ -921,8 +927,8 @@ Hero.prototype.changeCoordinates = function (down, up, left, right) {
 // used for map collision detection
 Hero.prototype.canMove = function (direction) {
     // default is for Direction.DOWN.
-    var index_low = { x: this.x + 20, y: this.y + 62 };
-    var index_high = { x: this.x + 44, y: this.y + 62 };
+    var index_low = { x: this.x + 18, y: this.y + 62 };
+    var index_high = { x: this.x + 40, y: this.y + 62 };
 
     // change if not default.
     switch (direction) {
@@ -955,12 +961,7 @@ Hero.prototype.canMove = function (direction) {
     var x2 = Math.floor(index_high.x / 32);
     var y1 = Math.floor(index_low.y / 32);
     var y2 = Math.floor(index_high.y / 32);
-    if (this.game.is_battle) {
-        return true;
-    }
-    else {
-        return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
-    }
+    return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
 }
 
 // changes x and/or y coordinates based on which quadrant of the map the character is in. Used for map collision detection
@@ -975,6 +976,29 @@ Hero.prototype.changeBound = function (index_object) {
             index_object.x += 23 * 32;
         }
     }
+}
+
+GameEngine.prototype.changeXYForQuad = function (point, quad) {
+    switch (quad) {
+        case 1:
+            point.x += 11;
+            break;
+        case 2:
+            point.x += 23;
+            break;
+        case 3:
+            point.y += 11;
+            break;
+        case 4:
+            point.x += 11;
+            point.y += 11; 
+            break;
+        case 5:
+            point.x += 23;
+            point.y += 11; 
+            break;
+    }
+    return point; 
 }
 
 
@@ -1006,7 +1030,7 @@ Hero.prototype.checkBoundaries = function () {
                 this.x -= 11 * 32;
             }
         }
-    } else if (this.boundaryLeft()) {
+    }  else if (this.boundaryLeft()) {
         if (quadrant !== 0 && quadrant !== 3) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
             if (quadrant === 2 || quadrant === 5) {
@@ -1018,12 +1042,12 @@ Hero.prototype.checkBoundaries = function () {
     } else if (this.boundaryUp()) {
         if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
-            this.y += 11 * 32;
+            this.y += 11 * 32; 
         }
     } else if (this.boundaryDown()) {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
-            this.y -= 11 * 32;
+            this.y -= 11 * 32; 
         }
     }
 }
@@ -1058,14 +1082,14 @@ Warrior = function (game, stats) {
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
         left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
         right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
+        destroy : new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.05, 7, true, false),
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 21, 64, 64, 0.5, 1, true, false)
     };
     this.x = 10;
     this.y = 215;
-
+    
     this.inventory = new Inventory(this.game, 100, 20);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
 }
@@ -1078,40 +1102,35 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    this.inventory.update();
+    this.inventory.update(); 
     Hero.prototype.update.call(this);
 }
 
-Warrior.prototype.setAction = function (action, target) {
+Warrior.prototype.setAction = function(action, target)
+{
     var that = this;
-    switch (action) {
+    switch(action)
+    {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
-            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));    
+            //target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
+            //setTimeout(function () { that.doDamage(that, target[0], that.game, false); }, 1000);
             that.doDamage(that, target[0], that.game, false);
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            var last_index = 0;
-            var len = target.length;
-            for (var i = 0; i < len; i++) {
-                if (target.length < len) {
-                    len = target.length;
-                    i--;
-                }
-                if (target[i]) {
-                    if (i === target.length - 1 || !target[target.length - 1]) {
-                        that.doDamage(that, target[i], that.game, false);
-                    }
-                    else {
-                        that.doDamage(that, target[i], that.game, true);
-                    }
+            for (var i = 0; i < target.length; i++)
+            {
+                if (i === target.length - 1) {
+                    that.doDamage(that, target[i], that.game, false);
                 }
                 else {
-                    //this.game.setNextFighter(this.game);
+                    that.doDamage(that, target[i], that.game, true);
                 }
             }
+            //setTimeout(function () { that.doMultiDamage(that, target, that.game); }, 1000);
             break;
         default:
             break;
@@ -1140,10 +1159,10 @@ Enemy = function (game, stats, anims, loop_while_standing) {
     //this.animations.death.elapsedTime = .25;
     //this.animations.death.totalTime = .5;
     Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
-    if (!loop_while_standing) {
+    if (!loop_while_standing){
         this.stop_move_animation = this.stopAnimation(this.animations.right);
     }
-    else {
+    else{
         this.stop_move_animation = this.animations.right;
     }
     this.direction = Direction.RIGHT;
@@ -1154,25 +1173,23 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-
+     
     this.drawHealthBar(context);
-    if (this.is_targeted) {
+    if (this.is_targeted)
+    {
         this.drawSelector(context, 'yellow');
     }
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
 }
 
 Enemy.prototype.update = function () {
-    if (this.game.fight_queue[0].id === this.id && this.is_turn) {
+    if(this.game.fight_queue[0].id === this.id && this.is_turn)
+    {
         this.setAction("Single", this.game.entities);
         this.is_turn = false;
     }
 }
 
-Enemy.prototype.determineAction = function () {
-    this.setAction("Single", this.game.entities);
-    this.is_turn = false;
-}
 Enemy.prototype.hit = function () {
 
 }
@@ -1182,6 +1199,7 @@ Enemy.prototype.setAction = function (action, target) {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            //target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
             this.doDamage(this, target[0], this.game, false);
             break;
         case "Sweep":
@@ -1193,6 +1211,9 @@ Enemy.prototype.setAction = function (action, target) {
                 target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
             }
     }
+    //if (this.game.is_battle) {
+    //    this.game.battleOver(this.game);
+    //}
 }
 /* NPC 
 game : the game engine
@@ -1230,9 +1251,10 @@ NPC = function (game, dialogue, anims, path, speed, pause) {
 NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
-NPC.prototype.setNextCoords = function () {
-    this.next_point = this.path.shift();
-    this.path.push(this.next_point);
+NPC.prototype.setNextCoords = function()
+{
+        this.next_point = this.path.shift();
+        this.path.push(this.next_point);
 }
 NPC.prototype.draw = function (context) {
     if (this.game.environment.curr_quadrant === 0) {
@@ -1280,12 +1302,14 @@ NPC.prototype.update = function () {
             }
         }
         else {
-            if (this.pause) {
+            if (!this.pause_timer && this.pause) {
                 var that = this;
                 this.curr_anim = this.stopAnimation(this.curr_anim);
-                setTimeout(function () {
+                this.pause_timer = setTimeout(function () {
                     that.setNextCoords();
                     that.hanging = false;
+                    clearInterval(that.pause_timer);
+                    that.pause_timer = null;
                 }, 1000);
             }
             else {
@@ -1304,13 +1328,13 @@ GameEngine.prototype.alertHero = function (dialogue) {
     var text_box = document.getElementById("dialogue_box");
     var text = document.createElement('p');
     text.innerHTML = dialogue;
-    text_box.innerHTML = text.outerHTML;
+    text_box.innerHTML = text.outerHTML; 
     text_box.style.visibility = "visible";
     text_box.style.display = "block";
     this.context.canvas.tabIndex = 0;
     text_box.tabIndex = 1;
-    var that = this;
-    text_box.addEventListener("keydown", function _func(e) {
+    var that = this; 
+    text_box.addEventListener("keydown", function _func (e) {
         if (String.fromCharCode(e.which) === ' ') {
             this.style.visibility = "hidden";
             this.style.display = "none";
@@ -1379,6 +1403,58 @@ NPC.prototype.reposition = function () {
     }
 }
 
+/*NPC_QUEST object
+This is an NPC with a quest object
+game: game engine
+name: name of the NPC_QUEST
+dialog: message or task foor hero
+anims: animations
+path: path of the object
+speed: speed of the movement
+quest: what kind of quest it has
+*/
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quest){
+
+}
+
+
+/* QUEST OBJECT abstract class
+ Parameters: giverName (who gave the quest), 
+             reward (what the reward is for finishing that quest)
+			 game (the game engine)
+			 
+*/
+QUEST = function(game, giverName, reward, complete){
+	this.game = game;
+	this.giverName = giverName;
+	this.reward = reward;
+	this.complete = complete;
+	if(this.complete){ // if the quest has been complete
+		this.game.alertHero("Your mission is complete, Dear Young Hero! ");
+	}
+}
+
+
+/*RETRIEVE_ITEM_QUEST
+game: game engine
+giverName: name of 
+reward: what is the reward for finishing this quest 
+item: the item to retrieve or find
+item_found: if the item has been retrieved
+ */
+ RETRIEVE_ITEM_QUEST = function(game, giverName, reward, item, item_found){
+	this.item = item;
+	this.item_found = item_found;
+	QUEST.call(this, giverName, reward);
+ }
+
+ /*KILL_QUEST 
+enemy_to_kill : whom our hero has to kill
+enemies_killed[number_enemies]: array of already killed enemies
+number_enemies: how many enemies our hero should kill
+ */
+
+ 
 Point = function (x, y) {
     this.x = x;
     this.y = y;
@@ -1429,20 +1505,20 @@ Environment = function (game) {
                 [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 28, 0, 3, 4],
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 65, 29, 20, 5, 6],
                 [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 19, 0, 28],
-                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 0, 0, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
+                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
                 [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 65],
                 [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
                 [76, 78, 76, 95, 94, 0, 0, 0, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 0, 0, 3, 4, 65, 32, 63, 32, 31, 31],
                 [77, 79, 77, 0, 95, 0, 0, 0, 0, 77, 79, 77, 0, 95, 95, 92, 93, 95, 9, 10, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 81, 82, 0, 0, 5, 6, 63, 33, 30, 33, 65, 65],
-                [0, 80, 0, 25, 26, 27, 0, 0, 0, 0, 80, 0, 90, 91, 133, 106, 107, 108, 104, 104, 0, 0, 3, 4, 103, 21, 22, 20, 11, 12, 83, 84, 0, 0, 81, 82, 81, 82, 31, 96, 97, 32],
+                [0, 80, 0, 25, 26, 27, 0, 0, 0, 0, 80, 0, 90, 91, 133, 106, 107, 108, 104, 104, 0, 0, 3, 4, 0, 21, 22, 20, 11, 12, 83, 84, 0, 0, 81, 82, 81, 82, 31, 96, 97, 32],
                 [0, 0, 0, 0, 0, 25, 26, 27, 0, 0, 0, 0, 92, 93, 109, 110, 111, 112, 0, 0, 0, 0, 5, 6, 0, 23, 24, 19, 13, 14, 104, 104, 0, 0, 83, 84, 83, 84, 65, 98, 99, 33],
                 [39, 39, 40, 41, 0, 25, 26, 27, 36, 34, 36, 0, 0, 0, 113, 114, 115, 116, 0, 3, 4, 28, 20, 28, 3, 4, 0, 28, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 96, 97],
                 [46, 46, 47, 48, 0, 0, 42, 43, 44, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 29, 19, 29, 5, 6, 64, 29, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 98, 99],
-                [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 28, 64, 62, 3, 4, 62, 64, 62, 65, 103, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
-                [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 29, 3, 4, 5, 6, 37, 38, 0, 62, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
-                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 64, 5, 6, 28, 0, 20, 3, 4, 62, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
-                [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 3, 4, 28, 28, 29, 28, 19, 5, 6, 3, 4, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
-                [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 65, 5, 6, 29, 29, 0, 29, 62, 37, 38, 5, 6, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
+                [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 65, 64, 62, 3, 4, 62, 64, 0, 0, 65, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
+                [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 0, 0, 0, 5, 6, 37, 38, 0, 0, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
+                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 0, 0, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
+                [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
+                [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
     ];
 
     this.house_floor = [[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
@@ -1517,11 +1593,11 @@ Environment = function (game) {
     this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.5, 4, true, false);
     this.flame1_locations = [[0, 4], [1, 4], [7, 4], [14, 4], [16, 4]];
     this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2], [0, 11], [10, 12]];
-    this.flame3_locations = [[2, 2], [9, 2], [11, 2]];
-    this.flame4_locations = [[0, 0], [10, 1]];
+    this.flame3_locations = [[2,2], [9, 2], [11, 2]];
+    this.flame4_locations = [[0,0], [10, 1]];
     this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
     this.curr_quadrant = 0;
-
+    
     this.interactables = [];
     this.initInteractables();
 
@@ -1529,7 +1605,8 @@ Environment = function (game) {
     this.initSpriteSets();
 }
 
-Environment.prototype.initSpriteSets = function () {
+Environment.prototype.initSpriteSets = function()
+{
     var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
     this.fiends.push(new SpriteSet(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
@@ -1547,18 +1624,27 @@ Environment.prototype.initSpriteSets = function () {
 }
 
 Environment.prototype.initInteractables = function () {
-    this.interactables.push(new Door(2, 6, 0, this.game)); // door 1
+    // doors and sign
+    this.interactables.push(new Door(2 , 6 , 0, this.game)); // door 1
     this.interactables.push(new Door(8, 6, 0, this.game)); // door 2 
-    this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
+    //this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
     this.interactables.push(new Door(15, 6, 0, this.game)); // door 3
 
     this.interactables.push(new Door(1, 4, 3, this.game));
     this.interactables.push(new Door(10, 4, 3, this.game));
+
+    // chests
+    var loot1 = [new Armor(this.game, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
+    var loot2 = [new Potion(this.game, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55];
+    this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
+    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, false));
+
+    // healing berry bushes
 }
 
 Interactable = function (x, y, quad, game) {
-    this.x = x;
-    this.y = y;
+    this.x = x * 32;
+    this.y = y * 32;
     this.quad = quad;
     this.game = game;
 }
@@ -1566,11 +1652,9 @@ Interactable = function (x, y, quad, game) {
 Interactable.prototype.startInteraction = function () { }
 
 Door = function (x, y, quad, game) {
-    var new_x = x * 32;
-    var new_y = y * 32;
     this.is_closed = true;
-    this.locked = true;
-    Interactable.call(this, new_x, new_y, quad, game);
+    this.locked = true; 
+    Interactable.call(this, x, y, quad, game);
 }
 
 Door.prototype = new Interactable();
@@ -1579,59 +1663,50 @@ Door.prototype.constructor = Door;
 Door.prototype.startInteraction = function () {
     var y = this.y / 32;
     var x = this.x / 32;
-    if (this.quad === 3) {
-        y += 11;
-    }
+    var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad); 
+
     if (this.locked) {
-        this.game.alertHero("This door is locked. Try coming back after the village isn't burning down.");
+        this.game.alertHero("This door is locked. Try coming back after the village isn't burning down."); 
     } else {
         if (this.is_closed) {
             // close door
-            this.game.environment.map[y][x] = 105;
-            this.game.environment.map[y - 1][x] = 102;
-            this.game.environment.map[y - 2][x] = 101;
+            this.game.environment.map[loc_point.y][loc_point.x] = 105;
+            this.game.environment.map[loc_point.y - 1][loc_point.x] = 102;
+            this.game.environment.map[loc_point.y - 2][loc_point.x] = 101;
         } else {
             // open door
-            this.game.environment.map[y][x] = 80;
-            this.game.environment.map[y - 1][x] = 79;
-            this.game.environment.map[y - 2][x] = 78;
+            this.game.environment.map[loc_point.y][loc_point.x] = 80;
+            this.game.environment.map[loc_point.y - 1][loc_point.x] = 79;
+            this.game.environment.map[loc_point.y - 2][loc_point.x] = 78;
         }
         this.is_closed = !this.is_closed;
     }
 }
 
 Chest = function (x, y, quad, game, loot, locked) {
-    this.game = game;
     this.closed = true;
     this.loot = loot;
     this.locked = locked;
-    Interactable.call(this, x, y, quad, game);
+    Interactable.call(this, x, y, quad, game); 
 }
 
 Chest.prototype = new Interactable();
-Chest.prototype.constructor = Chest;
+Chest.prototype.constructor = Chest; 
 
 Chest.prototype.startInteraction = function () {
     var y = this.y / 32;
     var x = this.x / 32;
 
+    var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad); 
+
     if (this.closed) {
         if (!this.locked) {
-            for (var i = 0; i < this.loot.length; i++) {
-                this.game.entities[0].addItem(this.loot[i]);
-                this.game.alertHero("You recieved " + this.loot[i].name);
-            }
-            this.closed = false;
+            this.lootChest(); 
         } else if (this.locked && this.game.entities[0].removeItem("chest_key", 1)) {
             var key = this.game.entities[0].removeItem("chest_key", 1);
             // open chest
             // give loot
-            this.game.alertHero("You had a key and it unlocked the chest!");
-            for (var i = 0; i < this.loot.length; i++) {
-                this.game.entities[0].addItem(this.loot[i]);
-                this.game.alertHero("You recieved " + this.loot[i].name);
-            }
-            this.closed = false;
+            this.lootChest()
         } else {
             this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
         }
@@ -1639,16 +1714,50 @@ Chest.prototype.startInteraction = function () {
         this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
     }
     if (!this.closed) {
-        this.game.environment.map[x][y] = 100;
+        this.game.environment.map[loc_point.y][loc_point.x] = 100;
     }
 }
 
-HealBerry = function (game) {
-
+Chest.prototype.lootChest = function () {
+    var loot_items = "";
+    for (var i = 0; i < this.loot.length; i++) {
+        this.game.entities[0].inventory.addItem(this.loot[i]);
+        var loot = (this.loot[i].name || this.loot[i] + " gold");
+        if (this.loot[i].qty > 1) {
+            loot += " x2";
+        }
+        if (i === this.loot.length - 1) {
+            loot_items += "and " + loot; 
+        } else {
+            loot_items += loot + ", ";
+        }
+    }
+    this.game.alertHero("You recieved " + loot_items + ".");
+    this.closed = false;
 }
 
-/*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
-Environment.prototype.generateFiend = function (game) {
+HealBerry = function (x, y, quad, game, berry) {
+    this.picked = false;
+    this.berry = berry; 
+
+    Interactable.call(this, x, y, quad, game);
+}
+
+HealBerry.prototype = new Interactable();
+HealBerry.prototype.constructor = HealBerry;
+
+HealBerry.prototype.startInteraction = function () {
+    if (!this.picked) {
+        this.game.entities[0].addItem(this.berry);
+        this.picked = true;
+    } else {
+        this.game.alertHero("You've already picked the berries off of this plant.");
+    }
+}
+
+ /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
+Environment.prototype.generateFiend = function (game)
+{
     var number_of_fiends = Math.floor(Math.random() * (4 - 1)) + 1;
     var fiend_array = [];
     for (var i = 0; i < number_of_fiends; i++) {
@@ -1666,7 +1775,7 @@ Environment.prototype.draw = function (scaleBy) {
 
     this.drawTiles(scaleBy);
     this.drawFlames();
-
+    
 }
 
 Environment.prototype.drawTiles = function (scaleBy) {
@@ -1728,7 +1837,7 @@ Environment.prototype.setQuadrant = function (number) {
 
 
 BattleMenu = function (menu_element, game) {
-    this.game = game;
+    this.game = game; 
     this.menu = menu_element;
     this.attack_menu = document.getElementById("attack_sub");
 
@@ -1741,28 +1850,23 @@ BattleMenu = function (menu_element, game) {
     this.single_attack = document.getElementById("single_attack");
     this.aoe_attack = document.getElementById("aoe_attack");
     this.back = document.getElementById("back");
-
+    
     this.target_queue = [];
-    this.is_selecting = false;
-    this.next_target = 0;
 }
 
 BattleMenu.prototype.init = function () {
     var that = this;
 
-
     this.attack.addEventListener("keydown", function (e) {
-        if (that.game.entities[0].is_turn && that.game.canControl) {
-            if (e.which === 40) {
-                window.setTimeout(that.use_item.focus(), 0);
-            } else if (String.fromCharCode(e.which) === ' ') {
-                // opens attack sub_menu
-                that.changeTabIndex("main", false);
+        if (e.which === 40) {
+            window.setTimeout(that.use_item.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // opens attack sub_menu
+            that.changeTabIndex("main", false);
 
-                that.changeTabIndex("attack", true);
+            that.changeTabIndex("attack", true); 
 
-                window.setTimeout(that.single_attack.focus(), 0);
-            }
+            window.setTimeout(that.single_attack.focus(), 0);
         }
         e.preventDefault();
     });
@@ -1777,16 +1881,11 @@ BattleMenu.prototype.init = function () {
         e.preventDefault();
     });
     this.flee.addEventListener("keydown", function (e) {
-        if (that.game.entities[0].is_turn) {
-            if (e.which === 38) {
-                window.setTimeout(that.use_item.focus(), 0);
-            } else if (String.fromCharCode(e.which) === ' ') {
-                if (that.game.entities[0].is_turn) {
-                    that.game.entities[0].is_turn = false;
-                    that.game.entities[0].flee(true);
-                }
-                // characters flee
-            }
+        if (e.which === 38) {
+            window.setTimeout(that.use_item.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            that.game.entities[0].flee(true);
+            // characters flee
         }
         e.preventDefault();
     });
@@ -1794,122 +1893,39 @@ BattleMenu.prototype.init = function () {
     // ATTACK MENU CONTROLS 
     this.single_attack.addEventListener("keydown", function (e) {
         if (e.which === 40) {
-            if (that.is_selecting) {
-                if (that.game.fiends[that.next_target]) {
-                    that.game.fiends[that.next_target].is_targeted = false;
-                    that.next_target += 1;
-                    if (that.next_target > that.game.fiends.length - 1) {
-                        that.next_target = that.game.fiends.length - 1;
-                    }
-                    that.game.fiends[that.next_target].is_targeted = true;
-                }
-            }
-            else {
-                window.setTimeout(that.aoe_attack.focus(), 0);
-            }
-        }
-        else if (e.which === 38) {
-            if (that.is_selecting) {
-                if (that.game.fiends[that.next_target]) {
-                    that.game.fiends[that.next_target].is_targeted = false;
-                    that.next_target -= 1;
-                    if (that.next_target < 0) {
-                        that.next_target = 0;
-                    }
-                    that.game.fiends[that.next_target].is_targeted = true;
-                }
-            }
-        } else if (e.which === 27) {
-            if (that.is_selecting) {
-                that.is_selecting = false;
-                for (var i = 0; i < that.game.fiends.length; i++) {
-                    if (that.game.fiends[i]) {
-                        that.game.fiends[i].is_targeted = false;
-                    }
-                }
-                window.setTimeout(that.single_attack.focus(), 0);
-            }
-        }
-        else if (String.fromCharCode(e.which) === ' ') {
+            window.setTimeout(that.aoe_attack.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
             // stuff to make character do a single attack 
-
-            if (that.is_selecting) {
-                if (that.game.entities[0].is_turn) {
-                    if (that.game.fight_queue[0]) {
-                        that.game.fight_queue[0].setAction("Single", [that.game.fiends[that.next_target]]);
-                        if (that.game.fiends[that.next_target]) {
-                            that.game.fiends[that.next_target].is_targeted = false;
-                        }
-                        that.is_selecting = false;
-                        that.game.entities[0].is_turn = false;
-                        that.changeTabIndex("attack", false);
-                        that.changeTabIndex("main", true);
-                        window.setTimeout(that.attack.focus(), 0);
-                    }
+            if (that.game.entities[0].is_turn) {
+                if (that.game.fight_queue[0]) {
+                    that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
+                    that.game.entities[0].is_turn = false;
                 }
             }
-            else {
-                that.next_target = 0;
-                for (var i = 0; i < that.game.fiends.length; i++) {
-                    if (that.game.fiends[i] && !that.game.fiends[i].is_dead) {
-                        that.game.fiends[i].is_targeted = true;
-                        that.next_target = i;
-                        break;
-                    }
-                }
-                that.is_selecting = true;
-            }
-
+            that.target_queue.push(that.target_queue.shift());
+            that.changeTabIndex("attack", false);
+            that.changeTabIndex("main", true);
+            window.setTimeout(that.attack.focus(), 0);
         }
         e.preventDefault();
     });
 
     this.aoe_attack.addEventListener("keydown", function (e) {
         if (e.which === 40) {
-            if (!that.is_selecting) {
-                window.setTimeout(that.back.focus(), 0);
-            }
+            window.setTimeout(that.back.focus(), 0);
         } else if (e.which === 38) {
-            if (!that.is_selecting) {
-                window.setTimeout(that.single_attack.focus(), 0);
-            }
-        } else if (e.which === 27) {
-            if (that.is_selecting) {
-                that.is_selecting = false;
-                for (var i = 0; i < that.game.fiends.length; i++) {
-                    if (that.game.fiends[i]) {
-                        that.game.fiends[i].is_targeted = false;
-                    }
-                }
-                window.setTimeout(that.aoe_attack.focus(), 0);
-            }
-        }
-        else if (String.fromCharCode(e.which) === ' ') {
-            if (that.is_selecting) {
-                if (that.game.entities[0].is_turn) {
-                    if (that.game.fight_queue[0]) {
-                        that.game.fight_queue[0].setAction("Sweep", that.game.fiends);
-                        for (var i = 0; i < that.game.fiends.length; i++) {
-                            if (that.game.fiends[i]) {
-                                that.game.fiends[i].is_targeted = false;
-                            }
-                        }
-                        that.is_selecting = false;
-                        that.game.entities[0].is_turn = false;
-                        that.changeTabIndex("attack", false);
-                        that.changeTabIndex("main", true);
-                        window.setTimeout(that.attack.focus(), 0);
-                    }
+            window.setTimeout(that.single_attack.focus(), 0);
+        } else if (String.fromCharCode(e.which) === ' ') {
+            if (that.game.entities[0].is_turn) {
+                if (that.game.fight_queue[0]) {
+                    that.game.fight_queue[0].setAction("Sweep", that.target_queue);
+                    that.game.entities[0].is_turn = false;
                 }
             }
-            else {
-                for (var i = 0; i < that.game.fiends.length; i++) {
-                    if (that.game.fiends[i] && !that.game.fiends[i].is_dead) {
-                        that.game.fiends[i].is_targeted = true;
-                    }
-                }
-                that.is_selecting = true;
-            }
+            that.target_queue.push(that.target_queue.shift());
+            that.changeTabIndex("attack", false);
+            that.changeTabIndex("main", true);
+            window.setTimeout(that.attack.focus(), 0);
         }
         e.preventDefault();
     });
@@ -1928,12 +1944,12 @@ BattleMenu.prototype.init = function () {
 
 
 BattleMenu.prototype.changeTabIndex = function (option, bool) {
-    var that = this;
+    var that = this; 
     switch (option) {
         case "main":
             if (bool) {
                 that.menu.style.visibility = "visible";
-                that.menu.style.display = "block";
+                that.menu.style.display = "block"; 
                 that.menu.tabIndex = 1;
                 that.attack.tabIndex = 1;
                 that.use_item.tabIndex = 1;
@@ -1966,7 +1982,7 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
             break;
         case "item":
             break;
-        default:;
+        default: ; 
     }
 }
 
@@ -1999,17 +2015,17 @@ GeneralMenu = function (game) {
 }
 
 GeneralMenu.prototype.initHero = function (hero) {
-    this.hero = hero;
+    this.hero = hero; 
 }
 
 GeneralMenu.prototype.init = function () {
-    var that = this;
+    var that = this; 
     this.inventory.addEventListener("keydown", function (e) {
         if (e.which === 40) {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.showMenu(false);
-            that.hero.inventory.showInventory(true);
+            that.hero.inventory.showInventory(true); 
         }
         e.preventDefault();
     });
@@ -2037,7 +2053,7 @@ GeneralMenu.prototype.init = function () {
         if (e.which === 38) {
             window.setTimeout(that.load.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            that.showMenu(false);
+            that.showMenu(false); 
         }
         e.preventDefault();
     });
@@ -2052,8 +2068,8 @@ GeneralMenu.prototype.showMenu = function (flag) {
         this.save.tabIndex = 1;
         this.load.tabIndex = 1;
         this.inventory.tabIndex = 1;
-        this.return.tabIndex = 1;
-        this.inventory.focus();
+        this.return.tabIndex = 1; 
+        this.inventory.focus(); 
     } else {
         this.menu.style.visibility = "hidden";
         this.menu.style.display = "none";
@@ -2061,19 +2077,19 @@ GeneralMenu.prototype.showMenu = function (flag) {
         this.save.tabIndex = 0;
         this.load.tabIndex = 0;
         this.inventory.tabIndex = 0;
-        this.return.tabIndex = 0;
+        this.return.tabIndex = 0; 
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
     }
 }
 
-//Storekeeper = function (game, dialogue, anims, path, pause, name) {
-//    this.name = name;
-//    NPC.call(this, game, dialogue, anims, path, 0, pause);
-//}
+Storekeeper = function (game, dialogue, anims, path, pause, name) {
+    this.name = name;
+    NPC.call(this, game, dialogue, anims, path, 0, pause);
+}
 
-//Storekeeper.prototype = new NPC();
-//Storekeeper.prototype.constructor = Storekeeper;
+Storekeeper.prototype = new NPC();
+Storekeeper.prototype.constructor = Storekeeper;
 
 //Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
 //    var item = null;
@@ -2100,13 +2116,14 @@ GeneralMenu.prototype.showMenu = function (flag) {
 //}
 
 Item = function (game, name, price, qty, img) {
-    this.game = game;
+    this.game = game; 
     this.name = name;
     this.price = price;
     this.qty = qty;
     this.img = img;
     this.isStackable = true;
     this.html = null;
+    this.usable = false; 
 }
 
 Item.prototype.increaseQty = function (amount) {
@@ -2127,6 +2144,52 @@ Item.prototype.doAction = function () {
 
 }
 
+UsableItem = function (game, name, price, qty, img) {
+    Item.call(this, game, name, price, qty, img);
+    this.usable = true;
+    this.isEquipped = false; 
+}
+
+UsableItem.prototype = new Item();
+UsableItem.prototype.constructor = UsableItem;
+
+// potion will be mostly potions but a heal berry does the same thing so it's also a Potion. 
+// types are: mana, health, str, dex, int, stam - exactly as typed here so other code works. 
+
+// level is 1, 2, or 3
+Potion = function (game, name, price, qty, img, type, level) {
+    this.potion_type = type;
+    this.level = level; 
+    UsableItem.call(this, game, name, price, qty, img);
+}
+
+Potion.prototype = new UsableItem();
+Potion.prototype.constructor = Potion;
+
+Potion.prototype.doAction = function () {
+    switch (this.potion_type) {
+        case "health":
+            this.game.entities[0].health += this.level * 25;
+            break;
+        case "stam":
+            
+            break;
+        case "mana":
+
+            break;
+        case "str":
+            this.game.entities[0].strength += this.level * 1;
+            break;
+        case "dex":
+            this.game.entities[0].dexterity += this.level * 1;
+            break;
+        case "int":
+            this.game.entities[0].intelligence += this.level * 1;
+            break;
+    }
+    this.game.entities[0].inventory.removeItem(this.name, 1);
+}
+
 HTML_Item = function (element) {
     this.element = element;
     this.item = null;
@@ -2143,7 +2206,7 @@ HTML_Item = function (element) {
 
 HTML_Item.prototype.showItemMenu = function (flag, inventory) {
     if (flag && this.item) {
-        inventory.interface.tabIndex = 0;
+        inventory.interface.tabIndex = 0; 
         this.menu.style.visibility = "visible";
         this.menu.style.display = "block";
         this.menu.tabIndex = 1;
@@ -2175,20 +2238,25 @@ HTML_Item.prototype.insertATags = function () {
 }
 
 HTML_Item.prototype.setActionText = function () {
-    if (this.item.isEquipped) {
-        this.action.innerHTML = "Unequip";
-    } else {
-        this.action.innerHTML = "Equip";
+    if (this.item.type) {
+        if (this.item.isEquipped) {
+            this.action.innerHTML = "Unequip";
+        } else {
+            this.action.innerHTML = "Equip";
+        }
+    } else if (this.item.usable) {
+        this.action.innerHTML = "Use Item";
     }
 }
 
-Armor = function (game, name, price, img, type) {
-    this.isEquipped = false;
+Armor = function (game, name, price, img, type, stats) {
+    this.isEquipped = false; 
     this.type = type;
     this.slot = document.getElementById("equip_" + type);
     this.background_img = this.slot.style.backgroundImage;
     Item.call(this, game, name, price, 1, img);
-    this.isStackable = false;
+    this.isStackable = false; 
+    this.stats = stats; 
 }
 
 Armor.prototype = new Item();
@@ -2201,7 +2269,7 @@ Armor.prototype.doAction = function () {
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
         this.game.entities[0].inventory.equipped[this.type] = false;
-        this.isEquipped = false;
+        this.isEquipped = false; 
     } else {
         this.slot.style.backgroundImage = "none";
         this.slot.innerHTML = this.img.outerHTML;
@@ -2228,27 +2296,14 @@ Armor.prototype.unequipOldArmor = function (bool) {
 
 Armor.prototype.setActionText = function () {
     if (this.item.isEquipped) {
-        this.action.innerHTML = "Unequip";
+        this.action.innerHTML = "Unequip"; 
     } else {
-        this.action.innerHTML = "Equip";
+        this.action.innerHTML = "Equip"; 
     }
-}
-
-Warrior.prototype.deductCoin = function (amount) {
-    if (this.inventory.coin >= amount) {
-        this.inventory.coin -= amount;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-Warrior.prototype.addCoin = function (amount) {
-    this.inventory.coin += amount;
 }
 
 Warrior.prototype.recieveItem = function (item) {
-    this.inventory.addItem(item);
+    this.inventory.addItem(item); 
 }
 
 Warrior.prototype.removeItem = function (item_name, qty) {
@@ -2256,7 +2311,7 @@ Warrior.prototype.removeItem = function (item_name, qty) {
 }
 
 Inventory = function (game, coin, max_items) {
-    this.game = game;
+    this.game = game; 
     this.coin = coin;
     this.html_coin = document.getElementById("coin");
     this.max_items = max_items;
@@ -2278,9 +2333,22 @@ Inventory = function (game, coin, max_items) {
 Inventory.prototype.initHtmlItems = function () {
     var html_elements = document.getElementById("items").getElementsByTagName('DIV');
     for (var i = 0; i < html_elements.length; i++) {
-        var new_object = new HTML_Item(html_elements[i]);
+        var new_object = new HTML_Item(html_elements[i]); 
         this.html_items.push(new_object);
     }
+}
+
+Inventory.prototype.deductCoin = function (amount) {
+    if (this.coin >= amount) {
+        this.coin -= amount;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+Inventory.prototype.addCoin = function (amount) {
+    this.coin += amount;
 }
 
 Inventory.prototype.showInventory = function (flag) {
@@ -2307,10 +2375,16 @@ Inventory.prototype.draw = function (ctx) {
         if (this.items[i]) {
             var img = this.items[i].img;
             this.html_items[i].element.innerHTML = img.outerHTML;
+            if (this.items[i].qty && this.items[i].qty > 1) {
+                var qty = document.createElement('p');
+                qty.innerHTML = this.items[i].qty
+                this.html_items[i].element.innerHTML += qty.outerHTML;
+            }
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
             this.html_items[i].actionInput();
+            
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
@@ -2319,12 +2393,12 @@ Inventory.prototype.draw = function (ctx) {
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
     this.selectInput();
-
+    
 }
 
 Inventory.prototype.update = function () {
     if (this.game.key_i) {
-
+        
     } else if (this.open === true && this.game.esc) {
         this.showInventory(false);
         this.game.key_i = 0;
@@ -2336,17 +2410,19 @@ Inventory.prototype.addItem = function (item) {
     if (this.items && item.isStackable) {
         for (var i = 0; i < this.items.length; i++) {
             if (this.items[i].name === item.name) {
-                if ((this.items[i].qty += item.qty) <= this.stacking_limit) {
-
+                if ((this.items[i].qty + item.qty) <= this.stacking_limit) {
+                    this.items[i].qty += item.qty;
+                    found = true;
                 }
-                this.items[i].qty += item.qty;
-                found = true;
             }
         }
     }
     if (!found) {
-        if (this.items.length < this.max_items) {
+        if (this.items.length < this.max_items && typeof (item) == "object") {
             this.items.push(item);
+        } else if (typeof(item) == "number") {
+            // add coin
+            this.addCoin(item);
         } else {
             // wont fit in inventory
         }
@@ -2365,7 +2441,9 @@ Inventory.prototype.removeItem = function (item_name, qty) {
                 item = this.splitStack(item_name, qty)
             } else if (this.items[i].qty === qty) {
                 item = this.items[i];
-                item.unequipOldArmor(true);
+                if (item.type) {
+                    item.unequipOldArmor(true);
+                }
                 this.items.splice(i, 1);
             } else {
                 // can't remove item. 
@@ -2379,28 +2457,28 @@ Inventory.prototype.removeItem = function (item_name, qty) {
 // returns new item object of the qty requested while keeping the remaining in the inventory
 // use only when the qty of the item in the inventory is greater than the stack being requested. 
 Inventory.prototype.splitStack = function (item_name, qty) {
-    var new_stack = null;
+    var new_stack = null; 
     for (var i = 0; i < this.items.length; i++) {
         if (this.items[i].name === item_name) {
-            new_stack = new Item(item_name, items[i].price, items[i].qty, items[i].img, items[i].stackable);
-            items[i].qty -= qty;
+            new_stack = new Item(item_name, this.items[i].price, qty, this.items[i].img, this.items[i].stackable);
+            this.items[i].qty -= qty; 
         }
     }
     return new_stack;
 }
 
 Inventory.prototype.selectInput = function () {
-    var that = this;
+    var that = this; 
     for (var i = 0; i < this.html_items.length; i++) {
         var item = that.html_items[i].element;
         var html = that.html_items[i];
         item.index = i;
-        item.pressed = false;
-        item.addEventListener("keydown", function ItemMenu(e) {
+        item.pressed = false; 
+        item.addEventListener("keydown", function ItemMenu (e) {
             var new_index = null;
             var index = this.index;
             if (!this.pressed) {
-                this.actionListener = ItemMenu;
+                this.actionListener = ItemMenu; 
                 if (e.which === 37) { // left 
                     // if at the beginning of a row, send focus to the end of row. 
                     if ((index % 5) < 1) {
@@ -2421,7 +2499,7 @@ Inventory.prototype.selectInput = function () {
                     }
                 } else if (e.which === 39) { // right
                     // if at the end of a row, send focus to the beginning of row. 
-                    if (((index + 1) % 5) === 0) {
+                    if (((index + 1) % 5 ) === 0) {
                         new_index = index - 4;
                         that.changeFocus(new_index);
                     } else {
@@ -2445,15 +2523,15 @@ Inventory.prototype.selectInput = function () {
                     }
                 } else if (e.which === 27 || e.which === 73) {
                     that.showInventory(false);
-                    that.open = false;
+                    that.open = false; 
                 }
-                this.pressed = true;
+                this.pressed = true; 
             }
             e.preventDefault();
         });
 
         item.addEventListener("keyup", function () {
-            this.pressed = false;
+            this.pressed = false; 
         });
     }
 }
@@ -2469,7 +2547,7 @@ HTML_Item.prototype.actionInput = function () {
                 that.item.doAction.call(that.item);
                 that.showItemMenu(false);
                 window.setTimeout(that.element.focus(), 0);
-            }
+            } 
         }
         this.pressed = true;
         e.preventDefault();
@@ -2510,10 +2588,10 @@ HTML_Item.prototype.actionInput = function () {
     this.return.addEventListener("keyup", function (e) {
         this.pressed = false;
     }, false);
-
+    
 }
 
 Inventory.prototype.changeFocus = function (index) {
-    var element = this.html_items[index].element;
+    var element = this.html_items[index].element; 
     window.setTimeout(element.focus(), 0);
 }
