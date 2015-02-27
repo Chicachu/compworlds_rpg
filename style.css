@@ -42,7 +42,7 @@ body {
     text-align: right; 
     position: relative;
     z-index: 2; 
-    top: -443px;
+    top: -438px;
     visibility: hidden; 
     pointer-events: none;
 }
@@ -51,7 +51,7 @@ body {
     list-style-type: none;
     display: inline-block;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
-    font-size: 25px;
+    font-size: 20px;
     background-image: url("./imgs/menu_background.png"); 
     text-align: center; 
     height: 280px; 
@@ -130,7 +130,7 @@ body {
 
 #item_menu {
     top: -450px;
-    width: 75px; 
+    width: auto; 
     height: auto; 
 }
 
@@ -190,6 +190,16 @@ body {
 
 .item {
     float: left; 
+}
+
+.item p {
+    font-size: 10px; 
+    color: #FFFFFF;
+    position: absolute; 
+    height: 10px; 
+    width: 10px;
+    left: 22px;
+    top: -12px;
 }
 
 #equipment {
