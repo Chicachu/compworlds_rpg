@@ -56,8 +56,11 @@ ASSET_MANAGER.downloadAll(function () {
     var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
 <<<<<<< HEAD
+<<<<<<< HEAD
                                         "We must do something! I saw the dragon fly to the southeast *points determinedly*",
 =======
+=======
+>>>>>>> origin/origin
                                         "... except the store keeper. I'm not sure how he made it out alive.",
                                         "We must do something! I saw the dragon fly to the southeast *points determindly*",
 >>>>>>> origin/origin
