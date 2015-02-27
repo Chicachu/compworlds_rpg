@@ -1413,7 +1413,7 @@ NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quest){
 	this.spriteSheet = this,animations.right.spriteSheet;
 	
 }
-
+}
 
 /* QUEST OBJECT abstract class
  Parameters: giverName (who gave the quest), 
