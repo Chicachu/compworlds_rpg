@@ -1403,7 +1403,7 @@ NPC.prototype.reposition = function () {
     }
 }
 
-/*NPC_QUEST
+/*NPC_QUEST object
 This is an NPC with a quest object
 game: game engine
 name: name of the NPC_QUEST
