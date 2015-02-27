@@ -279,40 +279,61 @@ GameEngine.prototype.queueActions = function () {
         //if event is null and there is an animation in the queue, set animation to the first item in the queue
         if (!event && this.animation_queue.length > 0) {
             event = this.animation_queue[0];
-            event.entity.setAnimation(event.animation);
+            if (event.entity) {
+                event.entity.setAnimation(event.animation);
+            }
         }
-        //If event is not null, check if the current event has gone through a full loop
-        if (event) {
-            if (event.entity.curr_anim.looped) {
+        if (event && event.entity === null) {
+            if (event.wait && !event.hanging) {
+                var that = this;
+                var that_event = event;
+                event.hanging = true;
+                event.hang_timer = setTimeout(function () {
+                    that_event.executeCallback();
+                    if (that.animation_queue.length >= 0) {
+                        that_event = that.animation_queue.shift();
+                    }
+                    clearInterval(that_event.hang_timer);
+                }, that_event.wait);
+            }
+            else if (!event.hanging) {
+                event.executeCallback();
                 if (this.animation_queue.length >= 0) {
-                    //if loop has been made, dequeue off the queue and set it to event
-
-                    //Sets the events entitiy's animation
-                    if (event.wait && !event.hanging) {
-                        var that = this;
-                        var that_event = event;
-                        event.hanging = true;
-                        event.hang_timer = setTimeout(function () {
-                            that_event.hanging = false;
-                            that_event.executeCallback();
-                            clearInterval(that_event.hang_timer);
-                            that_event = that.animation_queue.shift();
-                            if (that_event) {
-                                that_event.entity.setAnimation(that_event.animation);
-                                that_event.entity.curr_anim.looped = false;
-                            }
-                        }, event.wait);
-                    }
-                    else if (!event.hanging) {
-                        event.executeCallback();
-                        event = this.animation_queue.shift();
-                        event.entity.setAnimation(event.animation);
-                        event.entity.curr_anim.looped = false;
-                    }
-
+                    event = this.animation_queue.shift();
                 }
-                else {
-                    event.entity.setAnimation(event.entity.stop_move_animation);
+            }
+        }
+        else if (event) {
+            //if loop has been made, dequeue off the queue and set it to event
+
+            //Sets the events entitiy's animation
+            if (!event.hanging && event.wait) {
+                var that = this;
+                var that_event = event;
+                event.hanging = true;
+                event.hang_timer = setTimeout(function () {
+                    that_event.hanging = false;
+                    that_event.executeCallback();
+                    clearInterval(that_event.hang_timer);
+                    if (that.animation_queue.length >= 0) {
+                        that_event = that.animation_queue.shift();
+                        if (that_event.entity) {
+                            that_event.entity.setAnimation(that_event.animation);
+                            that_event.entity.curr_anim.looped = false;
+                        }
+                    }
+                }, event.wait);
+            }
+            else if (!event.wait) {
+                if (event.entity.curr_anim.looped) {
+                    event.executeCallback();
+                    if (this.animation_queue.length >= 0) {
+                        event = this.animation_queue.shift();
+                        if (event.entity) {
+                            event.entity.setAnimation(event.animation);
+                        }
+                    }
+                    event.entity.curr_anim.looped = false;
                 }
             }
         }
@@ -336,6 +357,7 @@ Fades out the screen and then invokes the callback function and fadeIn
 */
 GameEngine.prototype.fadeOut = function (game, args, callback) {
     var that = game;
+    game.canControl = false;
     that.timerId = setInterval(function () {
         that.context.globalAlpha -= .05;
         if (that.context.globalAlpha < .05) {
@@ -419,16 +441,12 @@ GameEngine.prototype.endBattle = function (game)
 GameEngine.prototype.battleOver = function (game) {
     var net_health_1 = 0;
     for (var i = 0 ; i < game.fiends.length; i++) {
-        net_health_1 += game.fiends[i].stats.health;
+        if (game.fiends[i]) {
+            net_health_1 += game.fiends[i].stats.health;
+        }
     }
-        //net_health_1 = game.fiends[0].stats.health;
     if (net_health_1 <= 0) {
         return true;
-            //game.canControl = false;
-            //game.timerId2 = setTimeout(function () {
-            //    game.fadeOut(game, game, game.endBattle);
-            //    clearInterval(game.timerId2);
-            //}, 2000);
     }
     else {
         return false;
@@ -460,20 +478,23 @@ GameEngine.prototype.decideFighters = function()
     this.fight_queue[0].is_turn = true;
 }
 
-GameEngine.prototype.removeFighters = function(player)
-{
-    for(var i = 0; i < this.fight_queue.length; i++)
-    {
-        if(this.fight_queue[i].id === player.id)
-        {
+GameEngine.prototype.removeFighters = function (player) {
+    for (var i = 0; i < this.fight_queue.length; i++) {
+        if (this.fight_queue[i].id === player.id) {
             this.fight_queue.splice(i, 1);
+        }
+    }
+    for (var i = 0; i < this.fiends.length; i++) {
+        if (this.fiends[i] && this.fiends[i].id === player.id) {
+            this.fiends[i].is_targeted = false;
+            this.fiends.splice(i, 1);
         }
     }
 }
 
-GameEngine.prototype.setNextFighter = function()
-{
-    this.fight_queue.shift();
+GameEngine.prototype.setNextFighter = function (game) {
+    game.fight_queue.shift();
+    game.fight_queue[0].is_turn = true;
 }
 
 GameEngine.prototype.selectTarget = function()
@@ -616,46 +637,39 @@ Entity.prototype.drawHealthBar = function(context)
     context.closePath();
 }
 
-Entity.prototype.doDamage = function(player, foes, game, is_multi_attack)
-{
+Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
-    if (foes.stats.health <= 0)
-    {
+    game.animation_queue.push(new Event(foes, foes.animations.hit));
+    if (foes.stats.health <= 0) {
         foes.stats.health = 0;
+        foes.is_dead = true;
         game.removeFighters(foes);
-        game.animation_queue.push(new Event(foes, foes.animations.hit));
         if (is_multi_attack) {
-            game.animation_queue.push(new Event(foes, foes.animations.death));
+            game.animation_queue.push(new Event(foes, foes.animations.death, 0));
         }
-        else
-        {
+        else {
             game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
-            if(game.battleOver(game))
-            {
+            if (game.battleOver(game)) {
                 game.canControl = false;
-                setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                if (game.is_battle) {
+                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                }
             }
-
         }
-        
     }
     else {
         if (is_multi_attack) {
-            game.animation_queue.push(new Event(foes, foes.animations.hit));
             game.animation_queue.push(new Event(foes, foes.stop_move_animation, 200));
         }
-        else
-        {
-            game.animation_queue.push(new Event(foes, foes.animations.hit));
+        else {
             game.animation_queue.push(new Event(foes, foes.stop_move_animation, 1000));
         }
-        
+
     }
     if (!is_multi_attack && !game.battleOver(game)) {
-        game.setNextFighter();
-        game.fight_queue[0].is_turn = true;
+        game.animation_queue.push(new Event(null, null, 500, game.setNextFighter, game));
     }
-    
+
 
 }
 
@@ -822,26 +836,24 @@ Hero.prototype.draw = function (context) {
     }
     else {
         this.drawHealthBar(context);
-        if (this.is_turn)
-        {
+        if (this.is_turn) {
             this.drawSelector(context, 'green');
         }
-        else if (this.is_targeted)
-        {
+        else if (this.is_targeted) {
             this.drawSelector(context, 'yellow');
         }
-        if (this.fleeing)
-        {
+        if (this.fleeing) {
             this.direction = Direction.RIGHT;
             this.curr_anim = this.animations.right;
-            if(context.canvas.width - this.curr_anim.frameWidth >= this.x)
-            {
+            if (context.canvas.width - this.curr_anim.frameWidth >= this.x) {
                 this.changeCoordinates(0, 0, 0, .3);
             }
             else {
                 this.fleeing = false;
                 var that = this;
-                this.game.fadeOut(this.game, this.game, this.game.endBattle);
+                if (this.game.is_battle) {
+                    this.game.fadeOut(this.game, this.game, this.game.endBattle);
+                }
             }
         }
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
@@ -854,7 +866,11 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 10000) >= 9999;
+    var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
+    if (Math.abs(distance_traveled) > 100) {
+        var x = 8;
+        return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1995;
+    }
 }
 
 Hero.prototype.update = function () {
@@ -961,7 +977,12 @@ Hero.prototype.canMove = function (direction) {
     var x2 = Math.floor(index_high.x / 32);
     var y1 = Math.floor(index_low.y / 32);
     var y2 = Math.floor(index_high.y / 32);
-    return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
+    if (this.game.is_battle) {
+        return true;
+    }
+    else {
+        return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
+    }
 }
 
 // changes x and/or y coordinates based on which quadrant of the map the character is in. Used for map collision detection
@@ -1106,31 +1127,36 @@ Warrior.prototype.update = function () {
     Hero.prototype.update.call(this);
 }
 
-Warrior.prototype.setAction = function(action, target)
-{
+Warrior.prototype.setAction = function (action, target) {
     var that = this;
-    switch(action)
-    {
+    switch (action) {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
-            this.game.animation_queue.push(new Event(this, this.stop_move_animation));    
-            //target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
-            //setTimeout(function () { that.doDamage(that, target[0], that.game, false); }, 1000);
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
             that.doDamage(that, target[0], that.game, false);
             break;
         case "Sweep":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            for (var i = 0; i < target.length; i++)
-            {
-                if (i === target.length - 1) {
-                    that.doDamage(that, target[i], that.game, false);
+            var last_index = 0;
+            var len = target.length;
+            for (var i = 0; i < len; i++) {
+                if (target.length < len) {
+                    len = target.length;
+                    i--;
+                }
+                if (target[i]) {
+                    if (i === target.length - 1 || !target[target.length - 1]) {
+                        that.doDamage(that, target[i], that.game, false);
+                    }
+                    else {
+                        that.doDamage(that, target[i], that.game, true);
+                    }
                 }
                 else {
-                    that.doDamage(that, target[i], that.game, true);
+                    //this.game.setNextFighter(this.game);
                 }
             }
-            //setTimeout(function () { that.doMultiDamage(that, target, that.game); }, 1000);
             break;
         default:
             break;
@@ -1199,7 +1225,6 @@ Enemy.prototype.setAction = function (action, target) {
         case "Single":
             this.game.animation_queue.push(new Event(this, this.animations.destroy));
             this.game.animation_queue.push(new Event(this, this.stop_move_animation));
-            //target[0].game.animation_queue.push(new Event(target[0], target[0].animations.hit, 0, this.doDamage, [this, target[0]]));
             this.doDamage(this, target[0], this.game, false);
             break;
         case "Sweep":
@@ -1211,9 +1236,6 @@ Enemy.prototype.setAction = function (action, target) {
                 target[i].stats.health = target[i].stats.health - ((this.stats.attack / target[i].stats.defense) * (Math.random() * 10));
             }
     }
-    //if (this.game.is_battle) {
-    //    this.game.battleOver(this.game);
-    //}
 }
 /* NPC 
 game : the game engine
@@ -1857,16 +1879,19 @@ BattleMenu = function (menu_element, game) {
 BattleMenu.prototype.init = function () {
     var that = this;
 
+
     this.attack.addEventListener("keydown", function (e) {
-        if (e.which === 40) {
-            window.setTimeout(that.use_item.focus(), 0);
-        } else if (String.fromCharCode(e.which) === ' ') {
-            // opens attack sub_menu
-            that.changeTabIndex("main", false);
+        if (that.game.entities[0].is_turn && that.game.canControl) {
+            if (e.which === 40) {
+                window.setTimeout(that.use_item.focus(), 0);
+            } else if (String.fromCharCode(e.which) === ' ') {
+                // opens attack sub_menu
+                that.changeTabIndex("main", false);
 
-            that.changeTabIndex("attack", true); 
+                that.changeTabIndex("attack", true);
 
-            window.setTimeout(that.single_attack.focus(), 0);
+                window.setTimeout(that.single_attack.focus(), 0);
+            }
         }
         e.preventDefault();
     });
@@ -1881,11 +1906,16 @@ BattleMenu.prototype.init = function () {
         e.preventDefault();
     });
     this.flee.addEventListener("keydown", function (e) {
-        if (e.which === 38) {
-            window.setTimeout(that.use_item.focus(), 0);
-        } else if (String.fromCharCode(e.which) === ' ') {
-            that.game.entities[0].flee(true);
-            // characters flee
+        if (that.game.entities[0].is_turn) {
+            if (e.which === 38) {
+                window.setTimeout(that.use_item.focus(), 0);
+            } else if (String.fromCharCode(e.which) === ' ') {
+                if (that.game.entities[0].is_turn) {
+                    that.game.entities[0].is_turn = false;
+                    that.game.entities[0].flee(true);
+                }
+                // characters flee
+            }
         }
         e.preventDefault();
     });
@@ -1893,39 +1923,122 @@ BattleMenu.prototype.init = function () {
     // ATTACK MENU CONTROLS 
     this.single_attack.addEventListener("keydown", function (e) {
         if (e.which === 40) {
-            window.setTimeout(that.aoe_attack.focus(), 0);
-        } else if (String.fromCharCode(e.which) === ' ') {
-            // stuff to make character do a single attack 
-            if (that.game.entities[0].is_turn) {
-                if (that.game.fight_queue[0]) {
-                    that.game.fight_queue[0].setAction("Single", [that.target_queue[0]]);
-                    that.game.entities[0].is_turn = false;
+            if (that.is_selecting) {
+                if (that.game.fiends[that.next_target]) {
+                    that.game.fiends[that.next_target].is_targeted = false;
+                    that.next_target += 1;
+                    if (that.next_target > that.game.fiends.length - 1) {
+                        that.next_target = that.game.fiends.length - 1;
+                    }
+                    that.game.fiends[that.next_target].is_targeted = true;
                 }
             }
-            that.target_queue.push(that.target_queue.shift());
-            that.changeTabIndex("attack", false);
-            that.changeTabIndex("main", true);
-            window.setTimeout(that.attack.focus(), 0);
+            else {
+                window.setTimeout(that.aoe_attack.focus(), 0);
+            }
+        }
+        else if (e.which === 38) {
+            if (that.is_selecting) {
+                if (that.game.fiends[that.next_target]) {
+                    that.game.fiends[that.next_target].is_targeted = false;
+                    that.next_target -= 1;
+                    if (that.next_target < 0) {
+                        that.next_target = 0;
+                    }
+                    that.game.fiends[that.next_target].is_targeted = true;
+                }
+            }
+        } else if (e.which === 27) {
+            if (that.is_selecting) {
+                that.is_selecting = false;
+                for (var i = 0; i < that.game.fiends.length; i++) {
+                    if (that.game.fiends[i]) {
+                        that.game.fiends[i].is_targeted = false;
+                    }
+                }
+                window.setTimeout(that.single_attack.focus(), 0);
+            }
+        }
+        else if (String.fromCharCode(e.which) === ' ') {
+            // stuff to make character do a single attack 
+
+            if (that.is_selecting) {
+                if (that.game.entities[0].is_turn) {
+                    if (that.game.fight_queue[0]) {
+                        that.game.fight_queue[0].setAction("Single", [that.game.fiends[that.next_target]]);
+                        if (that.game.fiends[that.next_target]) {
+                            that.game.fiends[that.next_target].is_targeted = false;
+                        }
+                        that.is_selecting = false;
+                        that.game.entities[0].is_turn = false;
+                        that.changeTabIndex("attack", false);
+                        that.changeTabIndex("main", true);
+                        window.setTimeout(that.attack.focus(), 0);
+                    }
+                }
+            }
+            else {
+                that.next_target = 0;
+                for (var i = 0; i < that.game.fiends.length; i++) {
+                    if (that.game.fiends[i] && !that.game.fiends[i].is_dead) {
+                        that.game.fiends[i].is_targeted = true;
+                        that.next_target = i;
+                        break;
+                    }
+                }
+                that.is_selecting = true;
+            }
+
         }
         e.preventDefault();
     });
 
     this.aoe_attack.addEventListener("keydown", function (e) {
         if (e.which === 40) {
-            window.setTimeout(that.back.focus(), 0);
+            if (!that.is_selecting) {
+                window.setTimeout(that.back.focus(), 0);
+            }
         } else if (e.which === 38) {
-            window.setTimeout(that.single_attack.focus(), 0);
-        } else if (String.fromCharCode(e.which) === ' ') {
-            if (that.game.entities[0].is_turn) {
-                if (that.game.fight_queue[0]) {
-                    that.game.fight_queue[0].setAction("Sweep", that.target_queue);
-                    that.game.entities[0].is_turn = false;
+            if (!that.is_selecting) {
+                window.setTimeout(that.single_attack.focus(), 0);
+            }
+        } else if (e.which === 27) {
+            if (that.is_selecting) {
+                that.is_selecting = false;
+                for (var i = 0; i < that.game.fiends.length; i++) {
+                    if (that.game.fiends[i]) {
+                        that.game.fiends[i].is_targeted = false;
+                    }
+                }
+                window.setTimeout(that.aoe_attack.focus(), 0);
+            }
+        }
+        else if (String.fromCharCode(e.which) === ' ') {
+            if (that.is_selecting) {
+                if (that.game.entities[0].is_turn) {
+                    if (that.game.fight_queue[0]) {
+                        that.game.fight_queue[0].setAction("Sweep", that.game.fiends);
+                        for (var i = 0; i < that.game.fiends.length; i++) {
+                            if (that.game.fiends[i]) {
+                                that.game.fiends[i].is_targeted = false;
+                            }
+                        }
+                        that.is_selecting = false;
+                        that.game.entities[0].is_turn = false;
+                        that.changeTabIndex("attack", false);
+                        that.changeTabIndex("main", true);
+                        window.setTimeout(that.attack.focus(), 0);
+                    }
                 }
             }
-            that.target_queue.push(that.target_queue.shift());
-            that.changeTabIndex("attack", false);
-            that.changeTabIndex("main", true);
-            window.setTimeout(that.attack.focus(), 0);
+            else {
+                for (var i = 0; i < that.game.fiends.length; i++) {
+                    if (that.game.fiends[i] && !that.game.fiends[i].is_dead) {
+                        that.game.fiends[i].is_targeted = true;
+                    }
+                }
+                that.is_selecting = true;
+            }
         }
         e.preventDefault();
     });
