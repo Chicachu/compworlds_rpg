@@ -2031,13 +2031,13 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
-//Storekeeper = function (game, dialogue, anims, path, pause, name) {
-//    this.name = name;
-//    NPC.call(this, game, dialogue, anims, path, 0, pause);
-//}
+Storekeeper = function (game, dialogue, anims, path, pause, name) {
+    this.name = name;
+    NPC.call(this, game, dialogue, anims, path, 0, pause);
+}
 
-//Storekeeper.prototype = new NPC();
-//Storekeeper.prototype.constructor = Storekeeper;
+Storekeeper.prototype = new NPC();
+Storekeeper.prototype.constructor = Storekeeper;
 
 //Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
 //    var item = null;
