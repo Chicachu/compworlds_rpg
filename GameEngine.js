@@ -1950,13 +1950,14 @@ BattleMenu = function (menu_element, game) {
     this.aoe_attack = document.getElementById("aoe_attack");
     this.back = document.getElementById("back");
 
-    this.use_item_list = new UseItemMenu(this.game); 
+    this.use_item_list = new UseItemMenu(this.game, this); 
     
     this.target_queue = [];
 }
 
-UseItemMenu = function (game) {
+UseItemMenu = function (game, parent) {
     this.game = game;
+    this.parent = parent; 
     this.menu = document.getElementById("useitem_menu");
     this.list = this.menu.children[0];
     this.open = false;
@@ -1972,48 +1973,96 @@ UseItemMenu.prototype.showMenu = function () {
         this.menu.tabIndex = 1;
         this.menu.style.display = "block";
         this.menu.style.visibility = "visible";
-        //this.updateItems();
+
+        this.parent.menu.tabIndex = 0;
+        this.parent.attack.tabIndex = 0;
+        this.parent.use_item.tabIndex = 0;
+        this.parent.flee.tabIndex = 0; 
+        this.updateItems();
+        this.changeFocus(0);
+        this.open = true; 
     } else {
         this.menu.style.display = "none";
         this.menu.style.visibility = "hidden";
-        this.menu.tabIndex = 0; 
+        this.menu.tabIndex = 0;
+        this.parent.menu.tabIndex = 1;
+        this.parent.attack.tabIndex = 1;
+        this.parent.use_item.tabIndex = 1;
+        this.parent.flee.tabIndex = 1;
+        this.parent.attack.focus();
         this.game.context.canvas.tabIndex = 1;
+        this.open = false; 
+    }
+}
+
+UseItemMenu.prototype.hasUsuableItems = function () {
+    for (var i = 0; i < this.game.entities[0].inventory.items.length; i++) {
+        if (this.game.entities[0].inventory.items[i].usable) {
+            return true; 
+        }
+    }
+    return false; 
+}
+
+UseItemMenu.prototype.changeFocus = function (index) {
+    if (this.list_items[index]) {
+        var li_item2 = this.list_items[index].html;
+        li_item2.focus();
     }
 }
 
 UseItemMenu.prototype.updateItems = function () {
     this.list_items = [];
+    this.list.innerHTML = ""; 
     for (var i = 0; i < this.items.length; i++) {
         if (this.items[i].usable) {
             var new_li = document.createElement('li');
-            var text = document.createElement('p');
-            text.innerHTML = this.items[i].name; 
+            var p = document.createElement('p');
+            p.innerHTML = this.items[i].name; 
             new_li.innerHTML = this.items[i].img.outerHTML;
-            new_li.innerHTML += text.outerHTML;
+            new_li.innerHTML += p.outerHTML;
+            new_li.tabIndex = 1;
+            var li = new List_item(this.game, this.items[i], i);
             this.list.innerHTML += new_li.outerHTML; 
-            this.list_items.push(new List_item(this.game, this.items[i], new_li, i)); 
+            this.list_items.push(li); 
         }
+    }
+    for (var i = 0; i < this.list_items.length; i++) {
+        this.list_items[i].html = this.menu.children[0].children[i];
+        this.list_items[i].input();
     }
 }
 
-List_item = function (game, item, html, index) {
+List_item = function (game, item, index) {
     this.game = game; 
     this.item = item;
-    this.html = html;
+    this.html = null;
     this.index = index; 
 }
 
 List_item.prototype.input = function () {
-
+    var that = this; 
     this.html.addEventListener("keydown", function (e) {
         if (e.which === 40) {
             // select next item down
+            if (that.index < that.parent.list_items.length - 1) {
+                window.setTimeout(that.game.menu.use_item_list.changeFocus(that.index + 1));
+            }
         } else if (e.which === 38) {
             // select next item up 
+            if (that.index > 1) {
+                window.setTimeout(that.game.menu.use_item_list.changeFocus(that.index - 1));
+            }
         } else if (String.fromCharCode(e.which) === ' ') {
             // use item
+            that.item.doAction();
+            //window.setTimeout(that.item.doAction(), 0);
+            that.game.menu.use_item_list.updateItems();
+            window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
         }
-    });
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    }, false);
 }
 
 BattleMenu.prototype.init = function () {
@@ -2035,6 +2084,12 @@ BattleMenu.prototype.init = function () {
         }
         e.preventDefault();
     });
+
+    //this.use_item.addEventListener("blur", function (e) {
+    //    window.setTimeout(that.use_item_list.changeFocus(0), 0);
+    //    e.preventDefault();
+    //    e.stopImmediatePropagation();
+    //}, false); 
     this.use_item.addEventListener("keydown", function (e) {
         this.pressed = false; 
         if (e.which === 40) {
@@ -2042,9 +2097,9 @@ BattleMenu.prototype.init = function () {
         } else if (e.which === 38) {
             window.setTimeout(that.attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            that.use_item_list.showMenu();
-            that.use_item_list.updateItems();
-                
+            if (that.use_item_list.hasUsuableItems()) {
+                that.use_item_list.showMenu();
+            } 
         }
         
         e.preventDefault();

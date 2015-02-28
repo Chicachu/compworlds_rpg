@@ -70,7 +70,7 @@ body {
     pointer-events: none;
 }
 
-#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus, #item_menu a:focus {
+#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus, #item_menu a:focus,  #useitem_menu li:focus {
     color: white;
     outline: solid 1px #d8bca1;
     pointer-events: none;
@@ -254,6 +254,11 @@ body {
     height: 35px;
     width: auto;
     top: -25px;
+}
+
+#useitem_menu a {
+    height: 35px;
+    width: auto; 
 }
 
 #useitem_menu img {
