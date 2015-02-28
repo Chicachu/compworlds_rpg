@@ -227,9 +227,11 @@ body {
 }
 
 #useitem_menu { 
+    position: relative; 
     height: auto;
     width: auto; 
-    position: relative; 
+    display: none; 
+    visibility: hidden; 
 }
 
 #useitem_menu ul {
@@ -238,12 +240,18 @@ body {
     width: 125px;
     border-radius: 15px;
     padding: 10px;
+    padding-bottom: 25px;
+    padding-top: 1px;
+    position: relative; 
+    margin: 0 auto; 
+    top: -330px;
+    left: 150px;
 }
 
 #useitem_menu li {
-    height: 30px;
+    height: 35px;
     width: auto;
-    top: -15px;
+    top: -25px;
 }
 
 #useitem_menu img {

@@ -1970,8 +1970,46 @@ BattleMenu = function (menu_element, game) {
     this.single_attack = document.getElementById("single_attack");
     this.aoe_attack = document.getElementById("aoe_attack");
     this.back = document.getElementById("back");
+
+    this.use_item_list = new UseItemMenu(this.game); 
     
     this.target_queue = [];
+}
+
+UseItemMenu = function (game) {
+    this.game = game;
+    this.menu = document.getElementById("useitem_menu");
+    this.open = false; 
+}
+
+UseItemMenu.prototype.showMenu = function () {
+    if (!this.open) { 
+        this.game.context.canvas.tabIndex = 0;
+        this.menu.tabIndex = 1; 
+    } else {
+        this.menu.tabIndex = 0; 
+        this.game.context.canvas.tabIndex = 1;
+    }
+}
+
+List_item = function (game, item, html, index) {
+    this.game = game; 
+    this.item = item;
+    this.html = html;
+    this.index = index; 
+}
+
+List_item.prototype.input = function () {
+
+    this.html.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            // select next item down
+        } else if (e.which === 38) {
+            // select next item up 
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // use item
+        }
+    });
 }
 
 BattleMenu.prototype.init = function () {
@@ -1999,7 +2037,7 @@ BattleMenu.prototype.init = function () {
         } else if (e.which === 38) {
             window.setTimeout(that.attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            // opens item sub_menu
+            
         }
         e.preventDefault();
     });
@@ -2236,7 +2274,7 @@ GeneralMenu.prototype.init = function () {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.showMenu(false);
-            that.hero.inventory.showInventory(true); 
+            that.hero.inventory.showInventory.call(that.hero.inventory);
         }
         e.preventDefault();
     });
@@ -2705,13 +2743,14 @@ Inventory.prototype.hasItem = function (item_name) {
 }
 
 Inventory.prototype.showInventory = function (flag) {
-    if (flag && this.open === false) {
+    if (this.open === false) {
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
         this.html_items[0].element.focus();
         this.open = true;
+        this.game.key_i = 0;
     } else {
         this.open = false;
         this.interface.style.visibility = "hidden";
@@ -2719,7 +2758,8 @@ Inventory.prototype.showInventory = function (flag) {
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
-    }
+        this.game.key_i = 0;
+    }    
 }
 
 HTML_Item.prototype.updateShowItemMenu = function () {
@@ -2762,10 +2802,9 @@ Inventory.prototype.draw = function (ctx) {
 
 Inventory.prototype.update = function () {
     if (this.game.key_i) {
-        
-    } else if (this.open === true && this.game.esc) {
-        this.showInventory(false);
-        this.game.key_i = 0;
+        this.showInventory();
+    } else if (this.game.esc) {
+        this.showInventory();
     }
 }
 
@@ -2886,8 +2925,7 @@ Inventory.prototype.selectInput = function () {
                         that.html_items[index].showItemMenu(true, that);
                     }
                 } else if (e.which === 27 || e.which === 73) {
-                    that.showInventory(false);
-                    that.open = false; 
+                    that.showInventory();
                 }
                 this.pressed = true; 
             }
