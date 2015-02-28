@@ -1679,14 +1679,15 @@ Environment.prototype.initInteractables = function () {
     // chests
     var loot1 = [new Armor(this.game, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
     var loot2 = [new Potion(this.game, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55];
-	var loot3 = [new Book(this.game, "Book of Spells",0, 1 , ASSET_MANAGER.getAsset("./imgs/items/book.png"))];
+	var loot3 = [new Book(this.game, "Book of Spells", 0, 1 , ASSET_MANAGER.getAsset("./imgs/items/book.png"))];
 	
     this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
     this.interactables.push(new Chest(5, 10, 2, this.game, loot2, true));
 	this.interactables.push(new Chest(10, 4, 5, this.game, loot3, false));
 
     // healing berry bushes
-
+	
+	
     // logs
     this.interactables.push(new Log(12, 10, 4, this.game));
 }
