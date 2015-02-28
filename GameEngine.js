@@ -1702,7 +1702,7 @@ Environment.prototype.initInteractables = function () {
     // logs
     this.interactables.push(new Log(12, 10, 4, this.game));
 
-    this.interactables.push(new DragonCave(17, 6, 5, this.game));
+    this.interactables.push(new DragonCave(16, 6, 5, this.game));
 }
 
 Interactable = function (x, y, quad, game) {
@@ -1819,8 +1819,8 @@ Chest.prototype.startInteraction = function () {
         if (this.closed) {
             if (!this.locked) {
                 this.lootChest();
-            } else if (this.locked && this.game.entities[0].inventory.hasItem("chest_key", 1)) {
-                var key = this.game.entities[0].inventory.removeItem("chest_key", 1);
+            } else if (this.locked && this.game.entities[0].inventory.hasItem("Key", 1)) {
+                var key = this.game.entities[0].inventory.removeItem("Key", 1);
                 // open chest
                 // give loot
                 this.lootChest()
