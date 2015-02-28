@@ -667,6 +667,8 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     if (foes.stats.health <= 0) {
         foes.stats.health = 0;
         foes.is_dead = true;
+        // check to see if foe is one for a kill quest
+        this.game.entities[0].checkKillQuest(foes); 
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -852,7 +854,7 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 10000) >= 38947203874293874;
+    return Math.round(Math.random() * 5000) >= 4999;
 
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
     if (Math.abs(distance_traveled) > 100) {
@@ -1119,9 +1121,21 @@ Warrior.prototype.update = function () {
 
 
 Warrior.prototype.addQuest = function (quest) {
-    this.quests.push(quest); 
+    this.quests.push(quest);
+    var that = this.game; 
+    window.setTimeout(that.alertHero("You have started a new quest!"), 5000);
 }
 
+Warrior.prototype.checkKillQuest = function (enemy) {
+    for (var i = 0; i < this.quests.length; i++) {
+        if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
+            this.quests[i].enemies_killed++;
+            if (this.quests[i].number_enemies === this.quests[i].enemies_killed) {
+                this.quests[i].complete = true;
+            }
+        }
+    }
+}
 
 Warrior.prototype.setAction = function (action, target) {
     var that = this;
@@ -1162,11 +1176,12 @@ Warrior.prototype.setAction = function (action, target) {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game, stats, anims, loop_while_standing) {
+Enemy = function (game, stats, anims, loop_while_standing, name) {
     this.game = game;
     this.spriteSheet = anims.destroy.spriteSheet;
     this.x = 50;
     this.y = 150;
+    this.name = name; 
     this.animations = {
         down: anims.down,
         up: anims.up,
@@ -1175,7 +1190,6 @@ Enemy = function (game, stats, anims, loop_while_standing) {
         destroy: anims.destroy,
         hit: anims.hit,
         death: anims.death
-        // TODO: Move stop_move_animation and death_animation to here and fight animations
     };
 
     //this.animations.death.elapsedTime = .25;
@@ -1488,6 +1502,7 @@ item_found: if the item has been retrieved
  RETRIEVE_ITEM_QUEST = function(game, giverName, reward, item) {
 	this.item = item;
 	this.item_found = false;
+	this.type = "item";
 	QUEST.call(this, game, giverName, reward);
  }
 
@@ -1503,6 +1518,7 @@ number_enemies: how many enemies our hero should kill
      this.enemy_to_kill = enemy_to_kill;
      this.number_enemies = number_enemies;
      this.enemies_killed = 0;
+     this.type = "kill";
      QUEST.call(this, game, giverName, reward);
  }
 
@@ -2299,6 +2315,9 @@ Storekeeper.prototype.startInteraction = function () {
 }
 
 Storekeeper.prototype.showDialog = function () {
+    if (this.part === 1 && this.quest.complete) {
+        this.part++; 
+    }
     this.reposition();
     var text_box = document.getElementById("dialogue_box");
 
@@ -2344,9 +2363,13 @@ Storekeeper.prototype.updateDialogue = function () {
                 this.interacting = false;
                 if (this.part === 0) {
                     this.part++;
-                    this.game.entities[0].addQuest(this.quest); 
-                } else if (this.part === 1 && this.quest.complete) {
-                    this.part++;
+                    this.game.entities[0].addQuest(this.quest);
+                }
+                if (this.part === 2) {
+                    this.game.entities[0].inventory.addItem(this.quest.reward);
+                    this.part++; 
+                } else if (this.part === 3) {
+                    this.part++; 
                 }
             }
             this.game.next = false;

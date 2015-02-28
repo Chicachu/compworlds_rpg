@@ -49,7 +49,7 @@ ASSET_MANAGER.downloadAll(function () {
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
     //    );
-    var warrior = new Warrior(gameEngine, new Statistics(50, 1, 1, 4, 3, 1));
+    var warrior = new Warrior(gameEngine, new Statistics(50, 200, 200, 4, 3, 1));
 
     var sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -75,7 +75,14 @@ ASSET_MANAGER.downloadAll(function () {
                                              "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*"],
                                            ["Look kid, I'd really love to sell you some gear but those skeletons are making it impossible to keep the store open.",
                                              "You're the last person in the village I'd want to ask, but since you basically ARE the last person in the village...",
-                                             "I'll have a reward for you when you're done helping me out."]], storekeeper_sprites,
+                                             "I'll have a reward for you when you're done helping me out."],
+                                           ["Hey! You did a great job at reducing my skeleton problem. I can finally get to work on reparing the store!",
+                                           "Why are you still standing there?",
+                                           "Oh... I suppose you want that reward. Here you go; this ax has been in my family for generations! Take good care of it."],
+                                           ["Hello again, kid. You've been a great help to the town so far.",
+                                            "Not to brag or anything, but this town's economy relies solely on the health of this store.",
+                                            "However, I cannot and will not open it back up again until that dragon is slain."],
+                                            ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
                                             [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest);
 
 										//var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
