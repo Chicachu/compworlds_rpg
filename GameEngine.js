@@ -1186,13 +1186,13 @@ Warrior.prototype.setAction = function (action, target) {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game, stats, anims, spriteSheet, name) {
+Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing) {
     this.x = 50;
     this.y = 150;
     Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
     this.game = game;
     this.name = name;
-    //this.loop_while_standing = loop_while_standing;
+    this.loop_while_standing = loop_while_standing;
     //this.animations = anims;
     //this.animations = {
     //    down: anims.down,
@@ -1278,7 +1278,7 @@ Skeleton.prototype = new Enemy();
 Skeleton.prototype.constructor = Enemy;
 
 
-Malboro = function(game, stats, anims, loop_while_standing)
+Malboro = function(game, stats, loop_while_standing)
 {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
@@ -1295,6 +1295,25 @@ Malboro = function(game, stats, anims, loop_while_standing)
     
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Enemy;
+
+Dragon1 = function(game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 300, 300, 0.1, 8, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 1, 216, 200, 0.1, 12, true, false),
+        hit: new Animation(this.spriteSheet, 0, 1, 216, 200, 0.1, 8, true, false),
+        death: new Animation(this.spriteSheet, 0, 1, 216, 200, 0.1, 8, true, false)
+    }
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1");
+}
+
+Dragon1.prototype = new Enemy();
+Dragon1.prototype.constructor = Enemy;
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
@@ -1728,7 +1747,7 @@ Environment = function (game) {
     this.interactables = [];
     this.initInteractables();
 
-    this.fiends = ["skeleton", "malboro"];
+    this.fiends = ["skeleton", "malboro", "dragon"];
 }
 
 Environment.prototype.initInteractables = function () {
@@ -1982,6 +2001,9 @@ Environment.prototype.initNewFiend = function (fiend) {
             break;
         case "malboro":
             return (new Malboro(this.game, new Statistics(75, 15, 10), false));
+            break;
+        case "dragon":
+            return (new Dragon1(this.game, new Statistics(200, 30, 40), true));
             break;
         default:
             return null;

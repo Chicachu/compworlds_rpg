@@ -13,7 +13,7 @@ ASSET_MANAGER.queueDownload("./imgs/malboro.png");
 ASSET_MANAGER.queueDownload("./imgs/storekeeper.png");
 ASSET_MANAGER.queueDownload("./imgs/witch.png");
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
-
+ASSET_MANAGER.queueDownload("./imgs/dragon_1.png");
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
