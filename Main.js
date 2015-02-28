@@ -10,11 +10,8 @@ ASSET_MANAGER.queueDownload("./imgs/tiles.png");
 ASSET_MANAGER.queueDownload("./imgs/fire.png");
 ASSET_MANAGER.queueDownload("./imgs/fire2.png");
 ASSET_MANAGER.queueDownload("./imgs/malboro.png");
-<<<<<<< HEAD
 ASSET_MANAGER.queueDownload("./imgs/storekeeper.png");
-=======
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
->>>>>>> origin/origin
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
@@ -62,14 +59,8 @@ ASSET_MANAGER.downloadAll(function () {
     //var skeleton = new Enemy(gameEngine, new Statistics(50, 15, 5), skeleton_anims);
     var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
-<<<<<<< HEAD
                                         "... except the store keeper. I'm not sure how he made it out alive.",
                                         "We must do something about the dragon! I saw it fly to the southeast *points determinedly*",
-=======
-                                        "We must do something! I saw the dragon fly to the southeast *points determinedly*",
-                                        "... except the store keeper. I'm not sure how he made it out alive.",
-                                        "We must do something! I saw the dragon fly to the southeast *points determindly*",
->>>>>>> origin/origin
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
                                         "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0]);
 
