@@ -27,6 +27,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/shield2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
 
 
+
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
     var context = canvas.getContext("2d");
