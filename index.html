@@ -5,14 +5,17 @@
     <meta charset="utf-8" />
     <title>Master of Dragons</title>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script type="text/javascript" src="./buzz.js"></script>
-    <script type="text/javascript" src="./buzz.min.js"></script>
+    <script type="text/javascript" src="./howler.js"></script>
+    <script type="text/javascript" src="./howler.min.js"></script>
     <script type="text/javascript" src="./AssetManager.js"></script>
     <script type="text/javascript" src="./GameEngine.js"></script>
     <script type="text/javascript" src="./Main.js"></script>
+
 </head>
 <body>
     <canvas id="gameworld" tabindex="1" width="608" height="416"></canvas>
+    <audio id="world_theme" src="./sounds/AncientForest.wav" preload="auto" autoplay loop></audio>
+    <audio id="battle_theme" src="./sounds/FirstBattle.mp3" preload="auto" loop></audio>
     <div id="battle_menu">
         <ul>
             <li><a id="attack">Attack</a></li>
