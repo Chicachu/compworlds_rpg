@@ -2344,6 +2344,90 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
+/*
+GHOST NPC_QUEST
+*/
+Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest){
+	this.part = 0; 
+	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+	this.curr_anim = this.animations.down;
+	this.lastX = this.x;
+	}
+	
+Ghost.prototype = new NPC_QUEST();
+Ghost.prototype.constructor = Ghost;
+
+Ghost.prototype.draw = function (context) {
+    if (this.game.environment.curr_quadrant === 2) {
+        this.x = 224; 
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    } 
+}
+
+Ghost.prototype.startInteraction = function () {
+    if (this.game.stage.part1 === false) {
+        // if before dragon is dead, have Ghost give hero a quest. 
+        this.showDialog();
+    }
+}
+Ghost.prototype.showDialog = function () {
+    if (this.part === 1 && this.quest.complete) {
+        this.part++; 
+    }
+    this.reposition();
+    var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.game.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true;
+    this.game.canControl = false;
+}
+
+Ghost.prototype.updateDialogue = function () {
+    if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = document.createElement('p');
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                this.game.canControl = true;
+                this.interacting = false;
+                if (this.part === 0) {
+                    this.part++;
+                    this.game.entities[0].addQuest(this.quest);
+                }
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+Ghost.prototype.update = function () {
+    if (!this.interacting) {
+        this.curr_anim = this.animations.down;
+        this.direction = Direction.DOWN;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+/* One of the NPC-quests
+*/
 Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
     this.part = 0; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
