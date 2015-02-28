@@ -806,13 +806,8 @@ Hero.prototype.flee = function(flee)
     this.fleeing = flee;
 }
 Hero.prototype.checkSurroundings = function () {
-<<<<<<< HEAD
-     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
-=======
-    // return true or false
-
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
->>>>>>> origin/origin
+
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
         return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2997;
