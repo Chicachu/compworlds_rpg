@@ -25,7 +25,6 @@ ASSET_MANAGER.queueDownload("./imgs/items/sword1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/shield1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/shield2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
-
 ASSET_MANAGER.queueDownload("./imgs/items/quest_potion.png");
 
 
@@ -87,17 +86,22 @@ ASSET_MANAGER.downloadAll(function () {
                                             "Not to brag or anything, but this town's economy relies solely on the health of this store.",
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
                                             ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
-                                            [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest);
+                                            [new Point(485, 207)], .1, false, [3,4], storekeeper_quest);
 
-    var quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });
+  
 
 										//var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 										
-		var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 1, 0, 48, 32, 0.05, 1, true, false), 
+	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 1, 0, 48, 32, 0.05, 1, true, false), 
                                             new Animation(ghost_spritesheet, 1, 3, 48, 32, 0.05, 1, true, false),
                                             new Animation(ghost_spritesheet, 1, 1, 48, 32, 0.05, 1, true, false),
                                             new Animation(ghost_spritesheet, 1, 2, 48, 32, 0.05, 1, true, false), null, null, null);
-		
+											
+	var ghost_quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
+	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { });	
+	var ghost_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", ghost_quest_reward, ghost_quest_potion);
+	var ghost = new Ghost(gameEngine, "Ghost", ["Set my soul free, Brave Warrior!"], ghost_sprites, [new Point(928, 30)], .1,false, [3,4], ghost_quest);
+	
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
         // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
@@ -111,6 +115,7 @@ ASSET_MANAGER.downloadAll(function () {
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
     gameEngine.addEntity(storekeeper);
+	gameEngine.addEntity(ghost);
 
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
