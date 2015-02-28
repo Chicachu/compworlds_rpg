@@ -104,7 +104,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", witch_quest_reward, witch_quest_book);
 	var witch = new Witch(gameEngine, "Witch", [["Long Time, since I have seen Living Human Being!",
 												"I know why you are here and I will give you what you want, only",
-												"if you bring me the Holy Book of Spells somewhere in the village"],
+												"if you bring me the Holy Book of Spells hidden somewhere in the forest"],
 												["Bring me the Holy Book of Spells, young man!"]], 
 												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest);
 	
