@@ -90,6 +90,7 @@ GameEngine = function () {
     this.next = false; // used to detect space when advancing dialogue with NPCs.
     this.sound_manager = null;
     this.stage = null;
+    this.loot_dispenser = null;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -109,6 +110,7 @@ GameEngine.prototype.init = function (context) {
         part2: false,
         part3: false
     }
+    this.loot_dispenser = new LootDispenser(this);
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
@@ -385,6 +387,8 @@ GameEngine.prototype.endBattle = function (game)
     game.fight_queue = [];
     game.animation_queue = [];
     game.sound_manager.playSong("world1");
+    game.loot_dispenser.increment();
+    game.loot_dispenser.dispenseLoot(game.entities[0]);
 }
 
 GameEngine.prototype.gameOver = function (game)
@@ -463,6 +467,21 @@ GameEngine.prototype.selectTarget = function()
 
 }
 
+LootDispenser = function(game)
+{
+    this.encounters = 0;
+    this.game = game;
+}
+
+LootDispenser.prototype.dispenseLoot = function(hero)
+{
+        hero.recieveItem(new SpecialItem(this.game, "key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
+}
+
+LootDispenser.prototype.increment= function()
+{
+    this.encounters++;
+}
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
