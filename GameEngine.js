@@ -80,7 +80,8 @@ GameEngine = function () {
     this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
-    this.environment = null;
+    this.environment = [];
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -102,7 +103,6 @@ GameEngine.prototype.init = function (context) {
     this.menu = new BattleMenu(document.getElementById("battle_menu"), this);
     this.menu.init();
     this.context.canvas.focus();
-    this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
     this.sound_manager = new SoundManager(this);
     this.stage = {
@@ -112,6 +112,11 @@ GameEngine.prototype.init = function (context) {
     }
     this.loot_dispenser = new LootDispenser(this);
 }
+
+GameEngine.prototype.addEnvironment = function (name, environment_object) {
+    this.environment[name] = environment_object; 
+}
+
 GameEngine.prototype.startInput = function () {
     var that = this;
     //Temporary, space bar invokes attack
@@ -190,7 +195,6 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-
 GameEngine.prototype.clearEntities = function(save_entities)
 {
         if (save_entities) {
@@ -220,7 +224,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     if (this.curr_background && this.is_battle) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
-        this.environment.draw(1);
+        this.environment[this.current_environment].draw();
     }
     var hero_drawn = false; 
     this.queueActions();
@@ -383,7 +387,7 @@ GameEngine.prototype.setBattle = function (game) {
     player.changeMoveAnimation();
     player.changeLocation();
     game.animation_queue.push(new Event(player, player.stop_move_animation, 0));
-    game.fiends = game.environment.generateFiend(game, game.fiends).splice(0);
+    game.fiends = game.environment[this.current_environment].generateFiend(game, game.fiends).splice(0);
     game.clearEntities(true);
     var space_out = ((game.height / 2) / game.fiends.length) * 1.2;
     var next_y = space_out;
@@ -765,11 +769,11 @@ Hero.prototype.checkForUserInteraction = function () {
             min_index = i;
         }
     }
-    for (var i = 0; i < this.game.environment.interactables.length; i++) {
-        var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 5));
-        var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 45));
+    for (var i = 0; i < this.game.environment[this.game.current_environment].interactables.length; i++) {
+        var ent_x_difference = Math.abs((this.game.environment[this.game.current_environment].interactables[i].x) - (this.x + 5));
+        var ent_y_difference = Math.abs((this.game.environment[this.game.current_environment].interactables[i].y) - (this.y + 45));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment.interactables[i])) {
+        if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
             min_distance = ent_distance;
             min_index = i;
             array = 1;
@@ -778,7 +782,7 @@ Hero.prototype.checkForUserInteraction = function () {
     if (array === 0) {
         return { ent: this.game.entities[min_index], reposition: true };
     } else {
-        return { ent: this.game.environment.interactables[min_index] }
+        return { ent: this.game.environment[this.game.current_environment].interactables[min_index] }
     }
 }
 
@@ -868,7 +872,7 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    if (this.game.environment.curr_quadrant != 0 && this.game.environment.curr_quadrant != 3) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
         this.preBattle();
     }
     this.checkBoundaries();
@@ -895,13 +899,13 @@ Hero.prototype.reposition = function (other) {
 }
 
 Hero.prototype.preBattle = function () {
-    if (this.moving && this.checkSurroundings()) {
-        this.game.canControl = false;
-        this.game.key = 0;
-        this.game.space = 0; 
-        // lock user input controls here.
-        this.game.fadeOut(this.game, this.game, this.game.setBattle);
-    }
+    //if (this.moving && this.checkSurroundings()) {
+    //    this.game.canControl = false;
+    //    this.game.key = 0;
+    //    this.game.space = 0; 
+    //    // lock user input controls here.
+    //    this.game.fadeOut(this.game, this.game, this.game.setBattle);
+    //}
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
@@ -959,7 +963,7 @@ Hero.prototype.canMove = function (direction) {
     }
 
     // change x and/or y according to quadrant.
-    if (this.game.environment.curr_quadrant !== 0) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant !== 0) {
         this.changeBound(index_low);
         this.changeBound(index_high);
     }
@@ -978,13 +982,13 @@ Hero.prototype.canMove = function (direction) {
 
 // changes x and/or y coordinates based on which quadrant of the map the character is in. Used for map collision detection
 Hero.prototype.changeBound = function (index_object) {
-    if (this.game.environment.curr_quadrant !== 0) {
-        if (this.game.environment.curr_quadrant >= 3) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant !== 0) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant >= 3) {
             index_object.y += 11 * 32;
         }
-        if (this.game.environment.curr_quadrant === 1 || this.game.environment.curr_quadrant === 4) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant === 1 || this.game.environment[this.game.current_environment].curr_quadrant === 4) {
             index_object.x += 11 * 32;
-        } else if (this.game.environment.curr_quadrant === 2 || this.game.environment.curr_quadrant === 5) {
+        } else if (this.game.environment[this.game.current_environment].curr_quadrant === 2 || this.game.environment[this.game.current_environment].curr_quadrant === 5) {
             index_object.x += 23 * 32;
         }
     }
@@ -1032,10 +1036,10 @@ Hero.prototype.boundaryDown = function () {
 }
 
 Hero.prototype.checkBoundaries = function () {
-    var quadrant = this.game.environment.curr_quadrant;
+    var quadrant = this.game.environment[this.game.current_environment].curr_quadrant;
     if (this.boundaryRight()) {
         if (quadrant !== 2 && quadrant !== 5) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 1);
+            this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 1);
             if (quadrant === 1 || quadrant === 4) {
                 this.x -= 12 * 32;
             } else {
@@ -1044,7 +1048,7 @@ Hero.prototype.checkBoundaries = function () {
         }
     }  else if (this.boundaryLeft()) {
         if (quadrant !== 0 && quadrant !== 3) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 1);
+            this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant -= 1);
             if (quadrant === 2 || quadrant === 5) {
                 this.x += 12 * 32;
             } else {
@@ -1053,12 +1057,12 @@ Hero.prototype.checkBoundaries = function () {
         }
     } else if (this.boundaryUp()) {
         if (quadrant !== 0 && quadrant !== 1 && quadrant !== 2) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant -= 3);
+            this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant -= 3);
             this.y += 11 * 32; 
         }
     } else if (this.boundaryDown()) {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
-            this.game.environment.setQuadrant(this.game.environment.curr_quadrant += 3);
+            this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 3);
             this.y -= 11 * 32; 
         }
     }
@@ -1067,15 +1071,15 @@ Hero.prototype.checkBoundaries = function () {
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
 Hero.prototype.getTile = function (x, y) {
     if (y < 24) {
-        return this.game.environment.map[y][x];
+        return this.game.environment[this.game.current_environment].map[y][x];
     } else {
         console.log(y);
-        return this.game.environment.map[y - 1][x];
+        return this.game.environment[this.game.current_environment].map[y - 1][x];
     }
 }
 
 Hero.prototype.isPassable = function (tile, index) {
-    if (this.game.environment.level === 1) {
+    if (this.game.current_environment = "level1" ) {
         if (tile === 0 || (tile >= 7 && tile <= 14) || tile === 80) {
             return true;
         } else if (tile === 66 || tile === 105) {
@@ -1186,13 +1190,13 @@ Warrior.prototype.setAction = function (action, target) {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing) {
+Enemy = function (game, stats, anims, spriteSheet, name) {
     this.x = 50;
     this.y = 150;
     Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
     this.game = game;
     this.name = name;
-    this.loop_while_standing = loop_while_standing;
+    //this.loop_while_standing = loop_while_standing;
     //this.animations = anims;
     //this.animations = {
     //    down: anims.down,
@@ -1271,14 +1275,14 @@ Skeleton = function(game, stats, loop_while_standing)
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton");
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Skeleton");
 }
     
 Skeleton.prototype = new Enemy();
 Skeleton.prototype.constructor = Enemy;
 
 
-Malboro = function(game, stats, loop_while_standing)
+Malboro = function(game, stats, anims, loop_while_standing)
 {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
@@ -1295,25 +1299,6 @@ Malboro = function(game, stats, loop_while_standing)
     
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Enemy;
-
-Dragon1 = function(game, stats, loop_while_standing)
-{
-    this.game = game;
-    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
-    this.animations = {
-        down: null,
-        up: null,
-        left: null,
-        right: new Animation(this.spriteSheet, 0, 0, 300, 300, 0.1, 8, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 1, 216, 200, 0.1, 12, true, false),
-        hit: new Animation(this.spriteSheet, 0, 1, 216, 200, 0.1, 8, true, false),
-        death: new Animation(this.spriteSheet, 0, 1, 216, 200, 0.1, 8, true, false)
-    }
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1");
-}
-
-Dragon1.prototype = new Enemy();
-Dragon1.prototype.constructor = Enemy;
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
@@ -1360,7 +1345,7 @@ NPC.prototype.draw = function (context) {
     // only draw if NPC is in the current quadrant on the map
     var found = false;
     for (var i = 0; i < this.quad.length; i++) {
-        if (this.game.environment.curr_quadrant === this.quad[i]) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
             found = true;
         }
     }
@@ -1373,7 +1358,7 @@ NPC.prototype.update = function () {
     // only update if NPC is in the current quadrant on the map
     var found = false;
     for (var i = 0; i < this.quad.length; i++) {
-        if (this.game.environment.curr_quadrant === this.quad[i]) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
             found = true; 
         }
     }
@@ -1497,7 +1482,7 @@ NPC.prototype.startInteraction = function () {
     // only update if NPC is in the current quadrant on the map
     var found = false;
     for (var i = 0; i < this.quad.length; i++) {
-        if (this.game.environment.curr_quadrant === this.quad[i]) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
             found = true;
         }
     }
@@ -1634,152 +1619,57 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     }
     this.tileSize = tileSize;
     this.sheetWidth = sheetWidth;
-    this.tiles = []; // array of Tile objects, NOT used for the tile images, just information about the tile. 
 }
 
-Environment = function (game) {
+Quadrants = {
+    first: [0, 0, 18, 12],
+    second: [11, 0, 29, 12],
+    third: [23, 0, 41, 12],
+    fourth: [0, 11, 18, 23],
+    fifth: [11, 11, 29, 23],
+    sixth: [23, 11, 41, 23]
+}
+
+Environment = function (game, map, animations, tilesheet, quads, interactables) {
     this.game = game;
-    this.level = 1;
     // "Map" will be a double array of integer values. 
-    this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 90, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 62, 15, 17, 15, 0, 17, 3, 4, 62],
-                [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 92, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 16, 18, 15, 16, 5, 6, 63],
-                [70, 71, 72, 95, 90, 91, 95, 70, 71, 72, 95, 90, 91, 95, 70, 71, 72, 94, 92, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 17, 15, 18, 17, 0, 62, 20],
-                [73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 95, 0, 0, 0, 0, 0, 94, 28, 94, 28, 28, 0, 3, 4, 0, 0, 0, 18, 16, 18, 15, 16, 0, 0, 19],
-                [76, 76, 78, 95, 90, 91, 95, 76, 78, 76, 95, 90, 91, 95, 76, 78, 76, 94, 0, 0, 0, 0, 0, 95, 29, 95, 29, 29, 0, 5, 6, 28, 28, 0, 0, 0, 1, 18, 0, 0, 3, 4],
-                [77, 77, 79, 85, 92, 93, 85, 77, 79, 77, 87, 92, 93, 87, 77, 79, 77, 95, 0, 0, 0, 0, 94, 94, 117, 118, 119, 120, 3, 4, 28, 29, 29, 0, 0, 0, 2, 0, 0, 28, 5, 6],
-                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 0, 0, 0, 94, 94, 95, 95, 121, 122, 123, 124, 5, 6, 29, 0, 0, 0, 28, 0, 0, 0, 28, 29, 62, 64],
-                [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 29, 0, 3, 4],
-                [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 0, 0, 0, 5, 6],
-                [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 0, 0, 0],
-                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 0, 0, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 0],
-                [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 103],
-                [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
-                [76, 78, 76, 95, 94, 0, 0, 0, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 0, 0, 3, 4, 65, 32, 63, 32, 31, 31],
-                [77, 79, 77, 0, 95, 0, 0, 0, 0, 77, 79, 77, 0, 95, 95, 92, 93, 95, 9, 10, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 81, 82, 0, 0, 5, 6, 63, 33, 30, 33, 65, 65],
-                [0, 80, 0, 25, 26, 27, 0, 0, 0, 0, 80, 0, 90, 91, 133, 106, 107, 108, 104, 104, 0, 0, 3, 4, 0, 21, 22, 20, 11, 12, 83, 84, 0, 0, 81, 82, 81, 82, 31, 96, 97, 32],
-                [0, 0, 0, 0, 0, 25, 26, 27, 0, 0, 0, 0, 92, 93, 109, 110, 111, 112, 0, 0, 0, 0, 5, 6, 0, 23, 24, 19, 13, 14, 104, 104, 0, 0, 83, 84, 83, 84, 65, 98, 99, 33],
-                [39, 39, 40, 41, 0, 25, 26, 27, 36, 34, 36, 0, 0, 0, 113, 114, 115, 116, 0, 3, 4, 28, 20, 28, 3, 4, 0, 28, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 96, 97],
-                [46, 46, 47, 48, 0, 0, 42, 43, 44, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 29, 19, 29, 5, 6, 64, 29, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 98, 99],
-                [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 65, 64, 62, 3, 4, 62, 64, 0, 0, 65, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
-                [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 0, 0, 0, 5, 6, 37, 38, 0, 0, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
-                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 37, 38, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
-                [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
-                [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
-    ];
+    this.map = map;
+    this.animations = animations;
+    this.tileSheet = tilesheet;
+    this.quads = quads; 
 
-    this.house_floor = [[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
-                        [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
-                        [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-                        [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1],
-                        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
-                        [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
-                        [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-                        [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1],
-                        [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
-                        [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
-                        [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-                        [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1]];
-
-    this.house_interior = [[28, 29, 30, 31, 32, 33, 34, 0, 0, 58, 59, 0, 0, 52, 52, 52, 52, 52],
-                           [35, 36, 37, 38, 39, 40, 41, 0, 0, 60, 61, 0, 0, 23, 21, 21, 42, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 22, 22, 43, 0],
-                           [7, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 44, 0],
-                           [6, 9, 0, 0, 0, 0, 47, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [5, 8, 0, 0, 0, 0, 26, 27, 0, 0, 66, 66, 66, 66, 66, 66, 0, 49],
-                           [0, 0, 0, 0, 0, 17, 15, 16, 18, 0, 66, 62, 63, 62, 63, 66, 0, 50],
-                           [12, 14, 0, 0, 0, 0, 48, 48, 0, 0, 66, 64, 65, 64, 65, 66, 0, 51],
-                           [11, 13, 0, 0, 0, 0, 0, 0, 0, 0, 66, 62, 63, 62, 63, 66, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 64, 65, 64, 65, 66, 0, 49],
-                           [45, 0, 0, 53, 0, 0, 53, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 0, 50],
-                           [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51]];
-
-    this.house_floor2 = [[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67],
-                         [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 68, 67],
-                         [67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 68, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67],
-                         [67, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67],
-                         [68, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 68, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 68, 68]];
-
-    this.house_interior2 = [[88, 85, 70, 71, 70, 71, 70, 72, 88, 85, 73, 70, 71, 70, 71, 70, 88, 88],
-                            [84, 87, 77, 78, 77, 78, 77, 79, 84, 83, 80, 77, 78, 77, 78, 77, 84, 84],
-                            [87, 0, 0, 0, 0, 0, 0, 0, 87, 86, 0, 0, 0, 0, 86, 0, 87, 87],
-                            [0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0],
-                            [85, 0, 0, 0, 69, 75, 0, 0, 0, 0, 86, 0, 0, 0, 83, 0, 86, 0],
-                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 0, 0],
-                            [0, 86, 0, 0, 83, 0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0],
-                            [83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 85, 0, 0, 81, 0, 85],
-                            [0, 0, 0, 0, 0, 74, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 0],
-                            [0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0]];
-
-    this.dragon_cave = [[5, 6, 1, 2, 11, 9, 5, 6, 11, 13, 5, 6, 9, 12, 5, 6, 13, 11, 5, 6, 13, 13, 5, 6, 9, 11, 5, 6, 10, 12, 5, 6, 9, 13, 5, 6, 12, 10, 5, 6, 13, 9],
-                        [7, 8, 3, 4, 10, 13, 7, 8, 9, 10, 7, 8, 11, 10, 7, 8, 10, 12, 7, 8, 11, 10, 7, 8, 9, 13, 7, 8, 10, 12, 7, 8, 9, 13, 7, 8, 9, 13, 7, 8, 12, 10],
-                        [1, 2, 5, 6, 1, 2, 12, 11, 1, 2, 12, 10, 1, 2, 12, 9, 1, 2, 12, 11, 1, 2, 12, 13, 1, 2, 9, 13, 1, 2, 9, 13, 1, 2, 13, 12, 1, 2, 9, 13, 1, 2],
-                        [3, 4, 7, 8, 3, 4, 13, 10, 3, 4, 9, 13, 3, 4, 13, 12, 3, 4, 9, 10, 3, 4, 9, 12, 3, 4, 10, 12, 3, 4, 12, 10, 3, 4, 9, 10, 3, 4, 12, 10, 3, 4],
-                        [5, 6, 1, 2, 12, 10, 5, 6, 9, 10, 5, 6, 10, 9, 5, 6, 9, 13, 5, 6, 12, 10, 5, 6, 10, 13, 5, 6, 9, 10, 5, 6, 10, 13, 5, 6, 13, 10, 5, 6, 10, 9],
-                        [7, 8, 3, 4, 9, 13, 7, 8, 12, 9, 7, 8, 12, 11, 7, 8, 10, 9, 7, 8, 9, 12, 7, 8, 12, 9, 7, 8, 13, 12, 7, 8, 12, 9, 7, 8, 9, 12, 7, 8, 13, 12],
-                        [1, 2, 5, 6, 1, 2, 10, 12, 1, 2, 9, 12, 1, 2, 10, 12, 1, 2, 10, 11, 1, 2, 10, 9, 1, 2, 10, 12, 1, 2, 9, 10, 1, 2, 9, 13, 1, 2, 12, 9, 1, 2],
-                        [3, 4, 7, 8, 3, 4, 9, 10, 3, 4, 11, 10, 3, 4, 9, 13, 3, 4, 12, 9, 3, 4, 11, 10, 3, 4, 13, 10, 3, 4, 13, 12, 3, 4, 10, 9, 3, 4, 13, 10, 3, 4],
-                        [5, 6, 1, 2, 12, 10, 5, 6, 9, 12, 5, 6, 10, 13, 5, 6, 9, 12, 5, 6, 10, 13, 5, 6, 9, 11, 5, 6, 9, 12, 5, 6, 11, 10, 5, 6, 10, 12, 5, 6, 12, 13],
-                        [7, 8, 3, 4, 13, 9, 7, 8, 13, 10, 7, 8, 12, 9, 7, 8, 10, 11, 7, 8, 9, 12, 7, 8, 10, 9, 7, 8, 12, 13, 7, 8, 12, 10, 7, 8, 9, 11, 7, 8, 12, 9],
-                        [1, 2, 5, 6, 1, 2, 10, 9, 1, 2, 12, 9, 1, 2, 13, 10, 1, 2, 13, 12, 1, 2, 11, 12, 1, 2, 10, 12, 1, 2, 9, 13, 1, 2, 9, 12, 1, 2, 12, 10, 1, 2],
-                        [3, 4, 7, 8, 3, 4, 12, 11, 3, 4, 10, 11, 3, 4, 12, 9, 3, 4, 9, 10, 3, 4, 9, 12, 3, 4, 11, 12, 3, 4, 12, 10, 3, 4, 11, 10, 3, 4, 11, 9, 3, 4]];
-
-    this.tileSheet = new Tilesheet("./imgs/tiles.png", 32, 26);
-    var firesheet1 = ASSET_MANAGER.getAsset("./imgs/fire.png");
-    var firesheet2 = ASSET_MANAGER.getAsset("./imgs/fire2.png");
-    this.flame1_animation = new Animation(firesheet1, 0, 0, 32, 64, 0.5, 9, true, false);
-    this.flame2_animation = new Animation(firesheet2, 0, 0, 32, 32, 0.5, 4, true, false);
-    this.flame1_locations = [[0, 4], [1, 4], [7, 4], [14, 4], [16, 4]];
-    this.flame2_locations = [[2, 1], [14, 1], [1, 2], [16, 2], [0, 11], [10, 12]];
-    this.flame3_locations = [[2,2], [9, 2], [11, 2]];
-    this.flame4_locations = [[0,0], [10, 1]];
-    this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
     this.curr_quadrant = 0;
     
-    this.interactables = [];
-    this.initInteractables();
-
-    this.fiends = ["skeleton", "malboro", "dragon"];
+    this.interactables = interactables;
+    //Environment.initInteractables.call(this, this.interactables);
 }
 
-Environment.prototype.initInteractables = function () {
-    // doors and sign
-    this.interactables.push(new Door(2 , 6 , 0, this.game)); // door 1
-    this.interactables.push(new Door(8, 6, 0, this.game)); // door 2 
-    //this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
-    this.interactables.push(new Door(15, 6, [0,1], this.game)); // door 3
+EnvironmentAnimation = function (animation, coords, quads) {
+    this.animation = animation;
+    this.coords = coords;
+    this.quads = quads; 
+}
 
-    this.interactables.push(new Door(1, 4, 3, this.game));
-    this.interactables.push(new Door(10, 4, 3, this.game));
+OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends) {
+    this.indoor_maps = indoor_maps;
+    this.fiends = fiends; 
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables);
+}
 
-    // chests
-    var loot1 = [new Armor(this.game, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
-    var loot2 = [new Potion(this.game, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55];
-	var loot3 = [new Book(this.game, "Book of Spells", 0, 1 , ASSET_MANAGER.getAsset("./imgs/items/book.png"))];
-	
-    this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
-    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, true));
-	this.interactables.push(new Chest(18, 11, 2, this.game, loot3, false));
+OutdoorEnvironment.prototype = new Environment();
+OutdoorEnvironment.prototype.constructor = OutdoorEnvironment;
 
-    // healing berry bushes
-	this.interactables.push(new HealBerry(7, 4, 4, this.game));
-	this.interactables.push(new HealBerry(8, 4, 4, this.game));
-	this.interactables.push(new HealBerry(7, 5, 5, this.game));
-	this.interactables.push(new HealBerry(8, 5, 5, this.game));
-	this.interactables.push(new HealBerry(11, 8, 5, this.game));
-	
-    // logs
-    this.interactables.push(new Log(12, 10, 4, this.game));
+IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables) {
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables);
+}
 
-    this.interactables.push(new DragonCave(16, 6, 5, this.game));
+IndoorEnvironment.prototype = new Environment();
+IndoorEnvironment.prototype.constructor = IndoorEnvironment; 
+
+Environment.prototype.initInteractables = function (interactables) {
+    for (var i = 0; i < interactables.length; i++) {
+        this.interactables.push(interactables[i]);
+    }
 }
 
 Interactable = function (x, y, quad, game) {
@@ -1793,12 +1683,12 @@ Interactable.prototype.startInteraction = function () {
     var found = false;
     if (this.quad.length) {
         for (var i = 0; i < this.quad.length; i++) {
-            if (this.game.environment.curr_quadrant === this.quad[i]) {
+            if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
                 found = true; 
             }
         }
     } else {
-        return this.game.environment.curr_quadrant === this.quad; 
+        return this.game.environment[this.game.current_environment].curr_quadrant === this.quad;
     }
 
     return found; 
@@ -1819,8 +1709,8 @@ Log.prototype.startInteraction = function () {
             var loc_point = this.game.changeXYForQuad(new Point(this.x / 32, this.y / 32), 4);
             var ax = this.game.entities[0].inventory.getItem("Ax");
             ax.doAction();
-            this.game.environment.map[loc_point.y][loc_point.x] = 0;
-            this.game.environment.map[loc_point.y][loc_point.x - 1] = 0;
+            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 0;
+            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x - 1] = 0;
         } else {
             this.game.alertHero("This log requires an ax to break.");
         }
@@ -1862,14 +1752,14 @@ Door.prototype.startInteraction = function () {
         } else {
             if (this.is_closed) {
                 // close door
-                this.game.environment.map[loc_point.y][loc_point.x] = 105;
-                this.game.environment.map[loc_point.y - 1][loc_point.x] = 102;
-                this.game.environment.map[loc_point.y - 2][loc_point.x] = 101;
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 105;
+                this.game.environment[this.game.current_environment].map[loc_point.y - 1][loc_point.x] = 102;
+                this.game.environment[this.game.current_environment].map[loc_point.y - 2][loc_point.x] = 101;
             } else {
                 // open door
-                this.game.environment.map[loc_point.y][loc_point.x] = 80;
-                this.game.environment.map[loc_point.y - 1][loc_point.x] = 79;
-                this.game.environment.map[loc_point.y - 2][loc_point.x] = 78;
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 80;
+                this.game.environment[this.game.current_environment].map[loc_point.y - 1][loc_point.x] = 79;
+                this.game.environment[this.game.current_environment].map[loc_point.y - 2][loc_point.x] = 78;
             }
             this.is_closed = !this.is_closed;
         }
@@ -1916,7 +1806,7 @@ Chest.prototype.startInteraction = function () {
             
         }
         if (!this.closed) {
-            this.game.environment.map[loc_point.y][loc_point.x] = 100;
+            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
         }
     }
 }
@@ -1971,7 +1861,7 @@ HealBerry.prototype.startInteraction = function () {
         if (!this.picked) {
             this.game.entities[0].recieveItem(this.berry);
             this.picked = true;
-            this.game.environment.map[loc_point.y][loc_point.x] = 134;
+            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 134;
         } else {
             this.game.alertHero("You've already picked the berries off of this plant.");
         }
@@ -1996,18 +1886,25 @@ Environment.prototype.generateFiend = function (game)
 
 Environment.prototype.initNewFiend = function (fiend) {
     switch (fiend) {
-        case "skeleton":
+        case "Skeleton":
             return (new Skeleton(this.game, new Statistics(50, 10, 5), false));
             break;
-        case "malboro":
+        case "Malboro":
             return (new Malboro(this.game, new Statistics(75, 15, 10), false));
-            break;
-        case "dragon":
-            return (new Dragon1(this.game, new Statistics(200, 30, 40), true));
             break;
         default:
             return null;
     }
+}
+
+// used to check if the curr_quad exists in an objects quad array. 
+includes = function (array, index) {
+    for (var i = 0; i < array.length; i++) {
+        if (i === index) {
+            return true; 
+        }
+    }
+    return false; 
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
@@ -2016,21 +1913,20 @@ Environment.prototype.draw = function (scaleBy) {
     var scaleBy = (scaleBy || 1);
 
     this.drawTiles(scaleBy);
-    this.drawFlames();
-    
+    this.drawEnvironmentAnimations();
 }
 
 Environment.prototype.drawTiles = function (scaleBy) {
     //draw tiles
-    for (var i = this.quadrants[this.curr_quadrant][1]; i <= this.quadrants[this.curr_quadrant][3]; i++) { // length of each row
-        for (var j = this.quadrants[this.curr_quadrant][0]; j <= this.quadrants[this.curr_quadrant][2]; j++) { // length of each column
+    for (var i = this.quads[this.curr_quadrant][1]; i <= this.quads[this.curr_quadrant][3]; i++) { // length of each column
+        for (var j = this.quads[this.curr_quadrant][0]; j <= this.quads[this.curr_quadrant][2]; j++) { // length of each row
             var tile_index = this.map[i][j];
 
             var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
             var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
             var amount_clip = this.tileSheet.tileSize;
-            var x_coord = (this.tileSheet.tileSize * j) - (this.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
-            var y_coord = (this.tileSheet.tileSize * i) - (this.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
+            var x_coord = (this.tileSheet.tileSize * j) - (this.quads[this.curr_quadrant][0] * this.tileSheet.tileSize);
+            var y_coord = (this.tileSheet.tileSize * i) - (this.quads[this.curr_quadrant][1] * this.tileSheet.tileSize);
             var draw_size = this.tileSheet.tileSize * scaleBy;
 
             this.context.drawImage(this.tileSheet.sheet,
@@ -2042,32 +1938,50 @@ Environment.prototype.drawTiles = function (scaleBy) {
     }
 }
 
-Environment.prototype.drawFlames = function () {
-    // draw flames
-    if (this.curr_quadrant === 0) {
-        for (var i = 0; i < this.flame1_locations.length; i++) {
-            var x = this.flame1_locations[i][0];
-            var y = this.flame1_locations[i][1];
-            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
-        }
-        for (var i = 0; i < this.flame2_locations.length; i++) {
-            var x = this.flame2_locations[i][0];
-            var y = this.flame2_locations[i][1];
-            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-        }
-    } else if (this.curr_quadrant === 3) {
-        for (var i = 0; i < this.flame3_locations.length; i++) {
-            var x = this.flame3_locations[i][0];
-            var y = this.flame3_locations[i][1];
-            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
-        }
-        for (var i = 0; i < this.flame4_locations.length; i++) {
-            var x = this.flame4_locations[i][0];
-            var y = this.flame4_locations[i][1];
-            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+Environment.prototype.drawEnvironmentAnimations = function () {
+    var loc_point = null;
+    for (var i = 0; i < this.animations.length; i++) {
+        // only draw if the animation belongs in the current quad
+        if (includes(this.animations[i].quads, this.curr_quadrant)) {
+            for (var j = 0; j < this.animations[i].coords.length; j++) {
+                var coord = this.animations[i].coords[j];
+                var coord_point = new Point(coord[0], coord[1]); 
+                if (this.curr_quadrant !== 0) {
+                    // if not in the 0 quad, change x and y to fit new quad. 
+                    coord_point = this.game.changeXYForQuad(coord_point, this.curr_quadrant);
+                }
+                this.animations[i].animation.drawFrame(this.game.clockTick, this.game.context, coord_point.x * 32, coord_point.y * 32, 1.3);
+            }
         }
     }
 }
+
+//Environment.prototype.drawFlames = function () {
+//    // draw flames
+//    if (this.curr_quadrant === 0) {
+//        for (var i = 0; i < this.flame1_locations.length; i++) {
+//            var x = this.flame1_locations[i][0];
+//            var y = this.flame1_locations[i][1];
+//            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
+//        }
+//        for (var i = 0; i < this.flame2_locations.length; i++) {
+//            var x = this.flame2_locations[i][0];
+//            var y = this.flame2_locations[i][1];
+//            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+//        }
+//    } else if (this.curr_quadrant === 3) {
+//        for (var i = 0; i < this.flame3_locations.length; i++) {
+//            var x = this.flame3_locations[i][0];
+//            var y = this.flame3_locations[i][1];
+//            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
+//        }
+//        for (var i = 0; i < this.flame4_locations.length; i++) {
+//            var x = this.flame4_locations[i][0];
+//            var y = this.flame4_locations[i][1];
+//            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
+//        }
+//    }
+//}
 
 Environment.prototype.update = function () {
 
@@ -2630,7 +2544,7 @@ Ghost.prototype.updateDialogue = function () {
 }
 
 Ghost.prototype.draw = function (context) {
-    if (this.game.environment.curr_quadrant === 2) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant === 2) {
         this.x = 320; 
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
     } 
@@ -2725,10 +2639,10 @@ Storekeeper.prototype.updateDialogue = function () {
 }
 
 Storekeeper.prototype.draw = function (context) {
-    if (this.game.environment.curr_quadrant === 3) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant === 3) {
         this.x = 485; 
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
-    } else if (this.game.environment.curr_quadrant === 4) {
+    } else if (this.game.environment[this.game.current_environment].curr_quadrant === 4) {
         this.x = 133;
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
     }
@@ -2772,7 +2686,12 @@ Witch.prototype.showDialog = function () {
     var text_box = document.getElementById("dialogue_box");
 
     var text = document.createElement('p');
-    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    if (this.part === 0 && this.game.entities[0].hasQuest("Ghost")) {
+        this.part++;
+    }
+    if (this.part) {
+        text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    }
     text_box.innerHTML = text.outerHTML;
     text_box.style.visibility = "visible";
     text_box.style.display = "block";
@@ -2798,6 +2717,7 @@ Witch.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
+            
             if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
                 text.innerHTML = this.dialogue[this.part][this.dialogue_index];
@@ -2811,14 +2731,18 @@ Witch.prototype.updateDialogue = function () {
                 this.game.context.canvas.focus();
                 this.game.canControl = true;
                 this.interacting = false;
-                if (this.part === 0) {
+                if (this.part === 1) {
+                    console.log(this.part);
                     this.part++;
                     this.game.entities[0].addQuest(this.quest);
-                }
-                if (this.part === 2) {
-                    this.game.entities[0].inventory.addItem(this.quest.reward);
-                    this.part++; 
-                } else if (this.part === 3) {
+                 }
+                if (this.part === 2 && this.game.entities[0].inventory.hasItem("Book of Spells")) {
+                     console.log(this.part);
+                     this.game.entities[0].inventory.addItem(this.quest.reward);
+                     this.part++; 
+                     this.showDialog();
+                 } else if (this.part === 3) {
+                     console.log(this.part);
                     this.part++; 
                 }
             }
@@ -2828,10 +2752,10 @@ Witch.prototype.updateDialogue = function () {
 }
 
 Witch.prototype.draw = function (context) {
-    if (this.game.environment.curr_quadrant === 1) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant === 1) {
         this.x = 458; 
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
-    } else if (this.game.environment.curr_quadrant === 2) {
+    } else if (this.game.environment[this.game.current_environment].curr_quadrant === 2) {
         this.x = 64;
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
     }
