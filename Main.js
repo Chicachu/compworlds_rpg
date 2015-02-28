@@ -79,10 +79,10 @@ ASSET_MANAGER.downloadAll(function () {
                                             ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
                                             [new Point(485, 207)], .1, false, [3,4], storekeeper_quest);
 										
-	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 10, 0, 32, 32, 0.05, 1, true, false), 
-                                        new Animation(ghost_spritesheet, 10, 3, 32, 32, 0.05, 1, true, false),
-                                        new Animation(ghost_spritesheet, 10, 1, 32, 32, 0.05, 1, true, false),
-                                        new Animation(ghost_spritesheet, 10, 2, 32, 32, 0.05, 1, true, false), null, null, null);
+	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 
+                                        new Animation(ghost_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
+                                        new Animation(ghost_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
+                                        new Animation(ghost_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 											
 	var ghost_quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
 	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { });	
@@ -105,7 +105,7 @@ ASSET_MANAGER.downloadAll(function () {
 												"I know why you are here and I will give you what you want, only",
 												"if you bring me the Holy Book of Spells somewhere in the village"],
 												["Bring me the Holy Book of Spells, young man!"]], 
-												witch_sprites, [new Point(685, 270)], .1, false, [1,2], witch_quest);
+												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest);
 	
 	
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
@@ -116,7 +116,6 @@ ASSET_MANAGER.downloadAll(function () {
     var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
-    warrior.recieveItem(sk_quest_reward);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
