@@ -92,6 +92,7 @@ GameEngine = function () {
     this.sound_manager = null;
     this.stage = null;
     this.loot_dispenser = null;
+    this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
 }
 
 GameEngine.prototype.init = function (context) {
@@ -1621,15 +1622,6 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
 }
 
-Quadrants = {
-    first: [0, 0, 18, 12],
-    second: [11, 0, 29, 12],
-    third: [23, 0, 41, 12],
-    fourth: [0, 11, 18, 23],
-    fifth: [11, 11, 29, 23],
-    sixth: [23, 11, 41, 23]
-}
-
 Environment = function (game, map, animations, tilesheet, quads, interactables) {
     this.game = game;
     // "Map" will be a double array of integer values. 
@@ -1900,7 +1892,7 @@ Environment.prototype.initNewFiend = function (fiend) {
 // used to check if the curr_quad exists in an objects quad array. 
 includes = function (array, index) {
     for (var i = 0; i < array.length; i++) {
-        if (i === index) {
+        if (array[i] === index) {
             return true; 
         }
     }
@@ -1916,17 +1908,40 @@ Environment.prototype.draw = function (scaleBy) {
     this.drawEnvironmentAnimations();
 }
 
+Environment.prototype.changeXY = function (point, quad) {
+    switch (quad) {
+        case 1:
+            point.x -= 11; 
+            break;
+        case 2:
+            point.x -= 12; 
+            break;
+        case 3:
+            point.y -= 11; 
+            break;
+        case 4:
+            point.y -= 11;
+            point.x -= 11;
+            break;
+        case 5:
+            point.y -= 11;
+            point.x -= 12;
+            break;
+    }
+    return point;
+}
+
 Environment.prototype.drawTiles = function (scaleBy) {
     //draw tiles
-    for (var i = this.quads[this.curr_quadrant][1]; i <= this.quads[this.curr_quadrant][3]; i++) { // length of each column
-        for (var j = this.quads[this.curr_quadrant][0]; j <= this.quads[this.curr_quadrant][2]; j++) { // length of each row
+    for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
+        for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
             var tile_index = this.map[i][j];
 
             var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
             var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
             var amount_clip = this.tileSheet.tileSize;
-            var x_coord = (this.tileSheet.tileSize * j) - (this.quads[this.curr_quadrant][0] * this.tileSheet.tileSize);
-            var y_coord = (this.tileSheet.tileSize * i) - (this.quads[this.curr_quadrant][1] * this.tileSheet.tileSize);
+            var x_coord = (this.tileSheet.tileSize * j) - (this.game.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
+            var y_coord = (this.tileSheet.tileSize * i) - (this.game.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
             var draw_size = this.tileSheet.tileSize * scaleBy;
 
             this.context.drawImage(this.tileSheet.sheet,
@@ -1948,7 +1963,7 @@ Environment.prototype.drawEnvironmentAnimations = function () {
                 var coord_point = new Point(coord[0], coord[1]); 
                 if (this.curr_quadrant !== 0) {
                     // if not in the 0 quad, change x and y to fit new quad. 
-                    coord_point = this.game.changeXYForQuad(coord_point, this.curr_quadrant);
+                    coord_point = this.changeXY(coord_point, this.curr_quadrant);
                 }
                 this.animations[i].animation.drawFrame(this.game.clockTick, this.game.context, coord_point.x * 32, coord_point.y * 32, 1.3);
             }
