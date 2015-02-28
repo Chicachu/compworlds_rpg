@@ -28,6 +28,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
 
 ASSET_MANAGER.queueDownload("./imgs/items/quest_potion.png");
 
+
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
     var context = canvas.getContext("2d");
