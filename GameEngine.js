@@ -806,7 +806,9 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    this.preBattle();
+    if (this.game.environment.curr_quadrant != 0 && this.game.environment.curr_quadrant != 3) {
+        this.preBattle();
+    }
     this.checkBoundaries();
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
