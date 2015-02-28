@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <title>Master of Dragons</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="./buzz.js"></script>
+    <script type="text/javascript" src="./buzz.min.js"></script>
     <script type="text/javascript" src="./AssetManager.js"></script>
     <script type="text/javascript" src="./GameEngine.js"></script>
     <script type="text/javascript" src="./Main.js"></script>
@@ -18,10 +20,63 @@
             <li><a id="flee">Flee</a></li>
         </ul>
     </div>
+    <div id="attack_sub">
+        <ul>
+            <li><a id="single_attack">Slash</a></li>
+            <li><a id="aoe_attack">Sweep</a></li>
+            <li><a id="back">Back</a></li>
+        </ul>
+    </div>
+    <div id="dialogue_box" onkeydown="NPC.prototype.updateDialogue()">
+        <p></p>
+    </div>
+    <div id="esc_menu">
+        <ul>
+            <li><a id="inventory">Inventory</a></li>
+            <li><a id="save_game">Save Game</a></li>
+            <li><a id="load_game">Load Game</a></li>
+            <li><a id="return">Return</a></li>
+        </ul>
+    </div>
+    <div id="inventory_sack">
+        <div id="items">
+            <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
+            <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
+            <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
+            <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
+            
+                <img src="./imgs/items/coin.png" style="height: 20px; width: 20px;" />
+            <p id="coin">
+            </p>
+        </div>
+        <div id="equipment">
+            <div class="equip" id="equip_armor"></div>
+            <div class="equip" id="equip_accessory"></div>
+            <div class="equip" id="equip_mainhand"></div>
+            <div class="equip" id="equip_offhand"></div>
+        </div>
+    </div>
+    <div id="useitem_menu">
+        <ul>
+        </ul>
+    </div>
+    <div id="item_menu">
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
     <div id="instructions">
+<<<<<<< HEAD
         <p>Focus is already on canvas. If it's not for some reason, use F5 to refresh.</p>
         <p>Use arrow keys to move.</p>
         <p>In battle mode, use the space to fight. There are currently no other options for attacking, and use item and flee do not function.</p>
+=======
+        <p>Focus is already on canvas. Trying to make it so that you can't lose focus.</p>
+        <p>Use arrow keys to move and space bar to interact. Double tap I to open inventory.</p>
+        <p></p>
+>>>>>>> origin/origin
     </div>
     
 </body>

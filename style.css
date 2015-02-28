@@ -1,4 +1,10 @@
-﻿#gameworld {   
+﻿::-webkit-scrollbar { 
+    width: 0; 
+}
+body {
+    overflow: hidden; 
+}
+#gameworld {   
     border: 1px solid black; 
     display: block; 
     margin: auto; 
@@ -6,32 +12,54 @@
     z-index: -1;
 }
 
-#battle_menu {
+#dialogue_box {
+    margin: 0 auto;
+    width: 500px; 
+    height: 75px;
+    text-align: center; 
+    position: relative;
+    z-index: 2; 
+    top: -130px;
+    pointer-events: none;
+    background-image: url("./imgs/menu_background.png"); 
+    border-radius: 15px;
+    visibility: hidden;
+    display: none; 
+}
+
+#dialogue_box p {
+    color: #d8bca1;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+    display: inline-block;
+    vertical-align: middle; 
+}
+
+#battle_menu, #attack_sub {
+    display: none; 
     margin: 0 auto;
     width: 608px; 
     height: 417px;
     text-align: right; 
     position: relative;
     z-index: 2; 
-    top: -443px;
-    visibility: hidden;
+    top: -438px;
+    visibility: hidden; 
     pointer-events: none;
 }
 
-#battle_menu ul {
+#battle_menu ul, #attack_sub ul {
     list-style-type: none;
     display: inline-block;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
-    font-size: 25px;
+    font-size: 20px;
     background-image: url("./imgs/menu_background.png"); 
     text-align: center; 
     height: 280px; 
     width: 100px; 
     padding-top: 138px;
-    pointer-events: none;
 }
 
-#battle_menu li { 
+#battle_menu li, #attack_sub li { 
     position: relative;
     left: -40px;
     width: 120px; 
@@ -42,16 +70,205 @@
     pointer-events: none;
 }
 
-#battle_menu a:focus {
+#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus, #item_menu a:focus,  #useitem_menu li:focus {
     color: white;
     outline: solid 1px #d8bca1;
     pointer-events: none;
 }
 
 #instructions {
-    position: relative; 
+    position: fixed; 
     width: 300px;
     text-align: center; 
+    left: 50%;
+    top: 420px;
+    margin-left: -150px;
+}
+
+#esc_menu, #item_menu {
+    position: relative;
+    z-index: 2; 
+    visibility: hidden; 
+    display: none;
     margin: 0 auto;
-    top: -415px;
+    width: 608px; 
+    height: 467px;
+    top: -300px;
+    text-align: center; 
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+}
+
+#esc_menu ul, #item_menu ul {
+    list-style-type: none;
+    display: inline-block;
+    height: auto; 
+    width: 145px;
+    background-image: url("./imgs/menu_background.png"); 
+    text-align: center; 
+    font-size: 20px;
+    border-radius: 15px;
+}
+
+#esc_menu ul {
+    padding: 5px;
+}
+
+#esc_menu li, #item_menu li {
+    position: relative;
+    width: auto; 
+    height: auto;
+    color: #d8bca1; 
+    padding: 5px;
+    right: 13px;
+    overflow: visible;
+    margin-left: -10px;
+}
+
+#esc_menu li {
+    margin-left: 27px;
+}
+
+#item_menu {
+    top: -450px;
+    width: auto; 
+    height: auto; 
+}
+
+#item_menu ul {
+    width: auto;
+    font-size: 15px;
+    border:  1px double #d8bca1;
+}
+
+
+#inventory_sack {
+    height: 194px; 
+    width: 324px; 
+    position: relative; 
+    background-image: url("./imgs/menu_background.png"); 
+    margin: 0 auto; 
+    display: none;
+    top: -280px;  
+    visibility: hidden;
+}
+
+#items {
+    position: relative; 
+    height: 144px; 
+    width: 180px;
+    border:  1px double #d8bca1;
+    padding: 25px;
+    display: inline-block; 
+    left: 1px;
+    top: -10px;
+}
+
+#items p {
+    display: block; 
+    position: relative; 
+    text-align: right; 
+    color: #d8bca1;
+    margin-bottom: 3px;
+    font-weight: 900;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+}
+
+#items img, #equipment img {
+   float: right; 
+   display: block; 
+}
+
+.item, .equip {
+    height: 34px; 
+    width: 34px; 
+    border:  1px solid #d8bca1;
+}
+
+.item:focus {
+    border-color: white; 
+}
+
+.item {
+    float: left; 
+}
+
+.item p {
+    font-size: 10px; 
+    color: #FFFFFF;
+    position: absolute; 
+    height: 10px; 
+    width: 10px;
+    left: 22px;
+    top: -12px;
+}
+
+#equipment {
+    position: relative; 
+    display: inline-block; 
+    padding: 25px; 
+    border:  1px double #d8bca1;
+    left: -1px; 
+}
+
+#equip_armor {
+    background-image: url("./imgs/equipment/armor.png");
+}
+
+#equip_accessory {
+    background-image: url("./imgs/equipment/accessory.png");
+}
+
+#equip_mainhand {
+    background-image: url("./imgs/equipment/main_hand.png");
+}
+
+#equip_offhand {
+    background-image: url("./imgs/equipment/offhand.png");
+}
+
+#useitem_menu { 
+    position: relative; 
+    height: auto;
+    width: auto; 
+    display: none; 
+    visibility: hidden; 
+    z-index: 15; 
+}
+
+#useitem_menu ul {
+    list-style-type: none;
+    background-image: url("./imgs/menu_background.png"); 
+    width: 125px;
+    border: 1px solid #d8bca1;
+    border-radius: 15px;
+    padding: 10px;
+    padding-bottom: 25px;
+    padding-top: 1px;
+    position: relative; 
+    margin: 0 auto; 
+    top: -730px;
+    left: 150px;
+}
+
+#useitem_menu li {
+    height: 35px;
+    width: auto;
+    top: -25px;
+}
+
+#useitem_menu a {
+    height: 35px;
+    width: auto; 
+}
+
+#useitem_menu img {
+    float: left; 
+}
+
+#useitem_menu p {
+    clear: right;
+    padding-top: 10px;
+    left: -10px;
+    color: #d8bca1;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
