@@ -46,7 +46,7 @@ ASSET_MANAGER.downloadAll(function () {
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
     //    new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
     //    );
-    var warrior = new Warrior(gameEngine, new Statistics(50, 1, 1, 4, 3, 1));
+    var warrior = new Warrior(gameEngine, new Statistics(50, 15, 10, 4, 3, 1));
 
     var sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
