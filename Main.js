@@ -101,7 +101,7 @@ ASSET_MANAGER.downloadAll(function () {
 											
 	var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { });	
 	var witch_quest_reward = ghost_quest_potion;
-	var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", witch_quest_reward, witch_quest_book);
+	var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Witch", witch_quest_reward, witch_quest_book);
 	var witch = new Witch(gameEngine, "Witch", [["Long Time, since I have seen Living Human Being!",
 												"I know why you are here and I will give you what you want, only",
 												"if you bring me the Holy Book of Spells hidden somewhere in the forest"],

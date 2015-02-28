@@ -742,7 +742,7 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs((this.game.environment.interactables[i].x) - (this.x + 5));
         var ent_y_difference = Math.abs((this.game.environment.interactables[i].y) - (this.y + 45));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance) {
+        if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment.interactables[i])) {
             min_distance = ent_distance;
             min_index = i;
             array = 1;
@@ -868,13 +868,13 @@ Hero.prototype.reposition = function (other) {
 }
 
 Hero.prototype.preBattle = function () {
-    if (this.moving && this.checkSurroundings()) {
-        this.game.canControl = false;
-        this.game.key = 0;
-        this.game.space = 0; 
-        // lock user input controls here.
-        this.game.fadeOut(this.game, this.game, this.game.setBattle);
-    }
+    //if (this.moving && this.checkSurroundings()) {
+    //    this.game.canControl = false;
+    //    this.game.key = 0;
+    //    this.game.space = 0; 
+    //    // lock user input controls here.
+    //    this.game.fadeOut(this.game, this.game, this.game.setBattle);
+    //}
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
@@ -1601,12 +1601,12 @@ Environment = function (game) {
                 [73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 95, 0, 0, 0, 0, 0, 94, 28, 94, 28, 28, 0, 3, 4, 0, 0, 0, 18, 16, 18, 15, 16, 0, 0, 19],
                 [76, 76, 78, 95, 90, 91, 95, 76, 78, 76, 95, 90, 91, 95, 76, 78, 76, 94, 0, 0, 0, 0, 0, 95, 29, 95, 29, 29, 0, 5, 6, 28, 28, 0, 0, 0, 1, 18, 0, 0, 3, 4],
                 [77, 77, 79, 85, 92, 93, 85, 77, 79, 77, 87, 92, 93, 87, 77, 79, 77, 95, 0, 0, 0, 0, 94, 94, 117, 118, 119, 120, 3, 4, 28, 29, 29, 0, 0, 0, 2, 0, 0, 28, 5, 6],
-                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 0, 0, 0, 94, 94, 95, 95, 121, 122, 123, 124, 5, 6, 29, 0, 0, 0, 28, 0, 0, 0, 0, 29, 62, 64],
-                [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 28, 0, 3, 4],
-                [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 65, 29, 20, 5, 6],
-                [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 19, 0, 28],
-                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 0, 0, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
-                [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 65],
+                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 0, 0, 0, 94, 94, 95, 95, 121, 122, 123, 124, 5, 6, 29, 0, 0, 0, 28, 0, 0, 0, 28, 29, 62, 64],
+                [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 29, 0, 3, 4],
+                [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 0, 0, 0, 5, 6],
+                [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 0, 0, 0],
+                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 0, 0, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 0],
+                [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 103],
                 [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
                 [76, 78, 76, 95, 94, 0, 0, 0, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 0, 0, 3, 4, 65, 32, 63, 32, 31, 31],
                 [77, 79, 77, 0, 95, 0, 0, 0, 0, 77, 79, 77, 0, 95, 95, 92, 93, 95, 9, 10, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 81, 82, 0, 0, 5, 6, 63, 33, 30, 33, 65, 65],
@@ -1721,10 +1721,14 @@ Environment.prototype.initInteractables = function () {
 	
     this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
     this.interactables.push(new Chest(5, 10, 2, this.game, loot2, true));
-	this.interactables.push(new Chest(10, 4, 5, this.game, loot3, false));
+	this.interactables.push(new Chest(18, 11, 2, this.game, loot3, false));
 
     // healing berry bushes
-	
+	this.interactables.push(new HealBerry(7, 5, 4, this.game));
+	this.interactables.push(new HealBerry(8, 4, 4, this.game));
+	this.interactables.push(new HealBerry(7, 5, 5, this.game));
+	this.interactables.push(new HealBerry(8, 5, 5, this.game));
+	this.interactables.push(new HealBerry(11, 8, 5, this.game));
 	
     // logs
     this.interactables.push(new Log(12, 10, 4, this.game));
@@ -1842,25 +1846,43 @@ Chest.prototype.startInteraction = function () {
         var x = this.x / 32;
 
         var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
-
-        if (this.closed) {
-            if (!this.locked) {
+        if (this.loot[0].name === "Book of Spells") {
+            if (this.game.entities[0].hasQuest("Witch")) {
                 this.lootChest();
-            } else if (this.locked && this.game.entities[0].inventory.hasItem("Key", 1)) {
-                var key = this.game.entities[0].inventory.removeItem("Key", 1);
-                // open chest
-                // give loot
-                this.lootChest()
             } else {
-                this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
+                this.game.alertHero("This chest is magically sealed.");
             }
         } else {
-            this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
+            if (this.closed) {
+                if (!this.locked) {
+                    this.lootChest();
+                } else if (this.locked && this.game.entities[0].inventory.hasItem("Key", 1)) {
+                    var key = this.game.entities[0].inventory.removeItem("Key", 1);
+                    // open chest
+                    // give loot
+                    this.lootChest()
+                } else {
+                    this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
+                }
+            } else {
+                this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
+            }
+            
         }
         if (!this.closed) {
             this.game.environment.map[loc_point.y][loc_point.x] = 100;
         }
     }
+}
+
+Warrior.prototype.hasQuest = function (giver_name) {  
+    var found = false ; 
+    for (var i = 0; i < this.quests.length; i++) {
+        if (this.quests[i].giverName === giver_name) {
+            found = true; 
+        }
+    }
+    return found; 
 }
 
 Chest.prototype.lootChest = function () {
@@ -1884,9 +1906,9 @@ Chest.prototype.lootChest = function () {
     this.closed = false;
 }
 
-HealBerry = function (x, y, quad, game, berry) {
+HealBerry = function (x, y, quad, game) {
     this.picked = false;
-    this.berry = berry; 
+    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
 
     Interactable.call(this, x, y, quad, game);
 }
@@ -1896,9 +1918,14 @@ HealBerry.prototype.constructor = HealBerry;
 
 HealBerry.prototype.startInteraction = function () {
     if (Interactable.prototype.startInteraction.call(this)) {
+        var x = this.x / 32;
+        var y = this.y / 32;
+        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
+
         if (!this.picked) {
-            this.game.entities[0].addItem(this.berry);
+            this.game.entities[0].recieveItem(this.berry);
             this.picked = true;
+            this.game.environment.map[loc_point.y][loc_point.x] = 134;
         } else {
             this.game.alertHero("You've already picked the berries off of this plant.");
         }
