@@ -65,69 +65,6 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
-
-//sound part
-sounds.load([
-//  "sounds/AncientForest.wav"
-]);
-
-sounds.whenLoaded = setup;
-
-function setup() {
-    console.log("sounds loaded");
-
-    //Create the sounds
-    var music = sounds["sounds/AncientForest.wav"]
-
-    //Make the music loop
-    music.loop = true;
-
-    //Set the pan to the left
-    music.pan = -0.8;
-
-    //Set the music volume
-    music.volume = 0.5;
-
-    //Set a reverb effect on the bounce sound
-    //arguments: duration, decay, reverse?
-    //music.setReverb(2, 2, false);
-
-    //Set the sound's `reverb` property to `false` to turn it off
-    //music.reverb = false;
-
-    //Optionally set the music playback rate to half speed
-    //music.playbackRate = 0.5;
-
-    // if (game is not battle?)
-    if (true) {
-        music.play();
-    } else {
-        music.pause();
-    }
-
-
-
-    //Capture the keyboard events
-    //var k = keyboard(75);
-    //l = keyboard(76);
-
-    ////Control the sounds based on which keys are pressed
-
-    ////Play the loaded music sound
-    //k.press = function () {
-    //    if (!music.isPlaying) music.play();
-    //    if (music.pause) music.restart();
-    //    console.log("music playing");
-    //};
-
-    ////Pause the music 
-    //l.press = function () {
-    //    music.pause();
-    //    console.log("music paused");
-    //};
-}
-//end sound part
-
 GameEngine = function () {
     this.entities = [];
     this.context = null;
@@ -151,6 +88,7 @@ GameEngine = function () {
     this.fight_queue = [];
     this.fiends = [];
     this.next = false; // used to detect space when advancing dialogue with NPCs.
+    this.sound_manager = null;
     this.stage = null;
 }
 
@@ -165,6 +103,7 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
+    this.sound_manager = new SoundManager(this);
     this.stage = {
         part1: false, // part 1 will turn true after our hero kills the level 1 dragon
         part2: false,
@@ -395,13 +334,13 @@ GameEngine.prototype.fadeIn = function (game) {
     }, 50);
 
 }
-
 /*
 Takes the main player as a parameter. Sets up the battle by setting is_battle to true,
 setting the battle background, saving coordinates, and also generating a list or random fiends for the hero
 */
 GameEngine.prototype.setBattle = function (game) {
     var player = game.entities[0];
+    game.sound_manager.playSound("battle", true);
     game.is_battle = true;
     game.setBackground("./imgs/woods.png");
     player.save_x = game.entities[0].x;
@@ -1176,38 +1115,44 @@ Warrior.prototype.setAction = function (action, target) {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game, stats, anims, loop_while_standing, name) {
-    this.game = game;
-    this.spriteSheet = anims.destroy.spriteSheet;
+Enemy = function (game, stats, anims, spriteSheet, name) {
     this.x = 50;
     this.y = 150;
-    this.name = name; 
-    this.animations = {
-        down: anims.down,
-        up: anims.up,
-        left: anims.left,
-        right: anims.right,
-        destroy: anims.destroy,
-        hit: anims.hit,
-        death: anims.death
-    };
+    Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
+    this.game = game;
+    this.name = name;
+    //this.loop_while_standing = loop_while_standing;
+    //this.animations = anims;
+    //this.animations = {
+    //    down: anims.down,
+    //    up: anims.up,
+    //    left: anims.left,
+    //    right: anims.right,
+    //    destroy: anims.destroy,
+    //    hit: anims.hit,
+    //    death: anims.death
+    //    // TODO: Move stop_move_animation and death_animation to here and fight animations
+    //};
 
     //this.animations.death.elapsedTime = .25;
     //this.animations.death.totalTime = .5;
-    Entity.call(this, game, this.x, this.y, this.spriteSheet, this.animations, stats);
-    if (!loop_while_standing){
-        this.stop_move_animation = this.stopAnimation(this.animations.right);
-    }
-    else{
-        this.stop_move_animation = this.animations.right;
-    }
-    this.direction = Direction.RIGHT;
-    this.curr_anim = this.stop_move_animation;
+
 }
 
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
+Enemy.prototype.init = function()
+{
+    if (!this.loop_while_standing) {
+        this.stop_move_animation = this.stopAnimation(this.animations.right);
+    }
+    else {
+        this.stop_move_animation = this.animations.right;
+    }
+    this.direction = Direction.RIGHT;
+    this.curr_anim = this.stop_move_animation;
+}
 Enemy.prototype.draw = function (context) {
     this.drawHealthBar(context);
     if (this.is_targeted)
@@ -1240,6 +1185,44 @@ Enemy.prototype.setAction = function (action, target) {
             break;
     }
 }
+
+Skeleton = function(game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
+    this.animations = {
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 3, 64, 64, 0.1, 7, true, false),
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
+        death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
+    };
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton");
+}
+    
+Skeleton.prototype = new Enemy();
+Skeleton.prototype.constructor = Enemy;
+
+
+Malboro = function(game, stats, anims, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 82, 91, 0.05, 3, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 1, 82, 91, 0.1, 7, true, false),
+        hit: new Animation(this.spriteSheet, 0, 2, 82, 91, 0.1, 3, true, false),
+        death: new Animation(this.spriteSheet, 0, 3, 82, 91, 0.1, 1, true, false)};
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "malboro");
+}
+    
+Malboro.prototype = new Enemy();
+Malboro.prototype.constructor = Enemy;
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
@@ -1673,26 +1656,7 @@ Environment = function (game) {
     this.interactables = [];
     this.initInteractables();
 
-    this.fiends = [];
-    this.initSpriteSets();
-}
-
-Environment.prototype.initSpriteSets = function()
-{
-    var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
-    var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
-    this.fiends.push(new SpriteSet(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
-        new Animation(skeleton_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
-        new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
-        new Animation(skeleton_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
-        new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
-        new Animation(skeleton_sprites, 0, 20, 64, 64, 0.07, 5, true, false),
-        new Animation(skeleton_sprites, 0, 21, 64, 64, .1, 1, true, false)));
-    this.fiends.push(new SpriteSet(null, null, null, new Animation(malboro_sprites, 0, 0, 82, 91, .15, 3, true, false),
-        new Animation(malboro_sprites, 0, 1, 82, 91, .12, 6, true, false),
-        new Animation(malboro_sprites, 0, 2, 82, 91, .15, 3, true, false),
-        new Animation(malboro_sprites, 0, 3, 82, 91, .08, 1, true, false)
-        ));
+    this.fiends = ["skeleton", "malboro"];
 }
 
 Environment.prototype.initInteractables = function () {
@@ -1882,10 +1846,25 @@ Environment.prototype.generateFiend = function (game)
     var fiend_array = [];
     for (var i = 0; i < number_of_fiends; i++) {
         var fiend_number = Math.floor(Math.random() * (this.fiends.length - 0) + 0);
-        var fiend = this.fiends[fiend_number];
-        fiend_array.push(new Enemy(this.game, new Statistics(100, 15, 5, .2), this.fiends[Math.floor(Math.random() * (this.fiends.length - 0) + 0)], false));
+        var fiend = this.initNewFiend(this.fiends[fiend_number]);
+        fiend.init();
+        fiend_array.push(fiend);
+        
     }
     return fiend_array;
+}
+
+Environment.prototype.initNewFiend = function (fiend) {
+    switch (fiend) {
+        case "skeleton":
+            return (new Skeleton(this.game, new Statistics(50, 10, 5), false));
+            break;
+        case "malboro":
+            return (new Malboro(this.game, new Statistics(75, 15, 10), false));
+            break;
+        default:
+            return null;
+    }
 }
 
 /* Loops over double array called Map, then draws the image of the tile associated with the integer in the map array. */
@@ -2996,4 +2975,54 @@ HTML_Item.prototype.actionInput = function () {
 Inventory.prototype.changeFocus = function (index) {
     var element = this.html_items[index].element; 
     window.setTimeout(element.focus(), 0);
+}
+
+SoundManager = function(game)
+{
+    this.game = game;
+    this.world1_music = new buzz.sound("./sounds/AncientForest", {formats: ["wav"],
+        preload: true,
+        autoplay: true,
+        loop: true});
+    this.door = new buzz.sound("./sounds/door_open", {
+        formats: ["wav"],
+        preload: true,
+        autoplay: false,
+        loop: false
+    });
+    this.battle1_music = new buzz.sound("./sounds/BattleMusic", {
+        formats: ["wav"],
+        preload: false,
+        autoplay: false,
+        loop: true
+    });
+    this.curr_sound = this.world1_music;
+}
+
+SoundManager.prototype.playSound = function(sound, interrupt)
+{
+    if (interrupt) {
+        this.curr_sound.stop();
+    }
+    switch(sound) {
+        case "world1":
+            {
+                this.curr_sound = this.world1_music;
+                break;
+            }
+        case "door":
+            {
+                this.curr_sound = this.door;
+                break;
+            }
+        case "battle":
+            {
+                this.battle1_music.load();
+                this.curr_sound = this.battle1_music;
+                break;
+            }
+        default:
+            break;
+    }
+    this.curr_sound.play();
 }
