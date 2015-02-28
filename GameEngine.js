@@ -1452,10 +1452,10 @@ quest: what kind of quest it has
 pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quest) {
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest) {
     this.name = name;
     this.quest = quest; 
-    NPC.call(this, game, dialog, anims, path, speed, pause);
+    NPC.call(this, game, dialog, anims, path, speed, pause, quad);
 }
 
 NPC_QUEST.prototype = new NPC();
@@ -2278,9 +2278,9 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
-Storekeeper = function (game, name, dialog, anims, path, speed, pause, quest) {
+Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
     this.part = 0; 
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quest);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
 }
@@ -2344,6 +2344,7 @@ Storekeeper.prototype.updateDialogue = function () {
                 this.interacting = false;
                 if (this.part === 0) {
                     this.part++;
+                    this.game.entities[0].addQuest(this.quest); 
                 } else if (this.part === 1 && this.quest.complete) {
                     this.part++;
                 }

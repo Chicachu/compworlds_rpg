@@ -75,7 +75,8 @@ ASSET_MANAGER.downloadAll(function () {
                                              "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*"],
                                            ["Look kid, I'd really love to sell you some gear but those skeletons are making it impossible to keep the store open.",
                                              "You're the last person in the village I'd want to ask, but since you basically ARE the last person in the village...",
-                                             "I'll have a reward for you when you're done helping me out."]], storekeeper_sprites, [new Point(485, 207)], .1, false, [3,4]);
+                                             "I'll have a reward for you when you're done helping me out."]], storekeeper_sprites,
+                                            [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest);
 
 										//var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 
