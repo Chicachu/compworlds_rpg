@@ -103,7 +103,7 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
-    //this.sound_manager = new SoundManager();
+    this.sound_manager = new SoundManager(this);
     this.stage = {
         part1: false, // part 1 will turn true after our hero kills the level 1 dragon
         part2: false,
@@ -340,7 +340,7 @@ setting the battle background, saving coordinates, and also generating a list or
 */
 GameEngine.prototype.setBattle = function (game) {
     var player = game.entities[0];
-    //game.sound_manager.playSound("battle");
+    game.sound_manager.playSound("battle", true);
     game.is_battle = true;
     game.setBackground("./imgs/woods.png");
     player.save_x = game.entities[0].x;
@@ -2939,30 +2939,33 @@ Inventory.prototype.changeFocus = function (index) {
     window.setTimeout(element.focus(), 0);
 }
 
-SoundManager = function()
+SoundManager = function(game)
 {
-    this.curr_sound = null;
-    this.world1_music = new buzz.sound("./sounds/AncientForest.wav", {formats: ["wav"],
+    this.game = game;
+    this.world1_music = new buzz.sound("./sounds/AncientForest", {formats: ["wav"],
         preload: true,
         autoplay: true,
         loop: true});
-    this.door = new buzz.sound("./sounds/door_open.wav", {
+    this.door = new buzz.sound("./sounds/door_open", {
         formats: ["wav"],
         preload: true,
         autoplay: false,
         loop: false
     });
-    this.battle1_music = new buzz.sound("./sounds/BattleMusic.wav", {
+    this.battle1_music = new buzz.sound("./sounds/BattleMusic", {
         formats: ["wav"],
         preload: false,
         autoplay: false,
         loop: true
     });
+    this.curr_sound = this.world1_music;
 }
 
-SoundManager.prototype.playSound = function(sound)
+SoundManager.prototype.playSound = function(sound, interrupt)
 {
-    this.curr_sound.stop();
+    if (interrupt) {
+        this.curr_sound.stop();
+    }
     switch(sound) {
         case "world1":
             {
