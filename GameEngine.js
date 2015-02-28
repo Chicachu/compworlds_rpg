@@ -807,10 +807,7 @@ Hero.prototype.flee = function(flee)
     this.fleeing = flee;
 }
 Hero.prototype.checkSurroundings = function () {
-    // return true or false
-    return Math.round(Math.random() * 5000) >= 10000;
-
-    var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
+     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
         return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1995;
@@ -1704,6 +1701,8 @@ Environment.prototype.initInteractables = function () {
 
     // logs
     this.interactables.push(new Log(12, 10, 4, this.game));
+
+    this.interactables.push(new DragonCave(17, 6, 5, this.game));
 }
 
 Interactable = function (x, y, quad, game) {
@@ -1748,6 +1747,21 @@ Log.prototype.startInteraction = function () {
         } else {
             this.game.alertHero("This log requires an ax to break.");
         }
+    }
+}
+
+DragonCave = function (x, y, quad, game) {
+    Interactable.call(this, x, y, quad, game); 
+}
+
+DragonCave.prototype = new Interactable();
+DragonCave.prototype.constructor = DragonCave;
+
+DragonCave.prototype.startInteraction = function () {
+    if (this.game.entities[0].inventory.hasItem("Book of Spells")) {
+
+    } else {
+        this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
 }
 
