@@ -103,7 +103,7 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
-    //this.sound_manager = new SoundManager(this);
+    this.sound_manager = new SoundManager(this);
     this.stage = {
         part1: false, // part 1 will turn true after our hero kills the level 1 dragon
         part2: false,
@@ -183,20 +183,18 @@ GameEngine.prototype.addEntity = function (entity) {
 
 GameEngine.prototype.clearEntities = function(save_entities)
 {
-    //for(var i = 1; i < this.entities.length; i++)
-    //{
         if (save_entities) {
             this.auxillary_sprites = this.entities.splice(1, this.entities.length - 1);
         }
         else {
             this.entities = [this.entities[0]];
         }
-    //}
 }
 
 GameEngine.prototype.reLoadEntities = function()
 {
-    for(var i = 0; i < this.auxillary_sprites.length; i++)
+    var len = this.auxillary_sprites.length;
+    for(var i = 0; i < len; i++)
     {
         this.entities.push(this.auxillary_sprites.pop());
     }
@@ -344,7 +342,7 @@ setting the battle background, saving coordinates, and also generating a list or
 */
 GameEngine.prototype.setBattle = function (game) {
     var player = game.entities[0];
-    //game.sound_manager.playSound("battle", true);
+    game.sound_manager.playSong("battle");
     game.is_battle = true;
     game.setBackground("./imgs/woods.png");
     player.save_x = game.entities[0].x;
@@ -401,6 +399,7 @@ GameEngine.prototype.endBattle = function (game)
     game.fiends = [];
     game.fight_queue = [];
     game.animation_queue = [];
+    game.sound_manager.playSong("world1");
 }
 
 GameEngine.prototype.gameOver = function (game)
@@ -807,10 +806,16 @@ Hero.prototype.flee = function(flee)
     this.fleeing = flee;
 }
 Hero.prototype.checkSurroundings = function () {
+<<<<<<< HEAD
      var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
+=======
+    // return true or false
+
+    var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
+>>>>>>> origin/origin
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1995;
+        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2997;
     }
 }
 
@@ -3331,50 +3336,40 @@ Inventory.prototype.changeFocus = function (index) {
 
 SoundManager = function(game)
 {
+    this.curr_sound = null;
     this.game = game;
-    this.world1_music = new buzz.sound("./sounds/AncientForest", {formats: ["wav"],
-        preload: true,
-        autoplay: true,
-        loop: true});
-    this.door = new buzz.sound("./sounds/door_open", {
-        formats: ["wav"],
-        preload: true,
-        autoplay: false,
-        loop: false
-    });
-    this.battle1_music = new buzz.sound("./sounds/BattleMusic", {
-        formats: ["wav"],
-        preload: false,
-        autoplay: false,
-        loop: true
-    });
-    this.curr_sound = this.world1_music;
+    this.world1 = document.getElementById("world_theme");
+    this.battle1 = document.getElementById("battle_theme");
+    this.background = this.world1;
+    //this.background.play();
 }
 
-SoundManager.prototype.playSound = function(sound, interrupt)
+SoundManager.prototype.playSound = function(sound)
 {
-    if (interrupt) {
-        this.curr_sound.stop();
-    }
-    switch(sound) {
-        case "world1":
-            {
-                this.curr_sound = this.world1_music;
-                break;
-            }
+    switch (sound) {
         case "door":
-            {
-                this.curr_sound = this.door;
-                break;
-            }
-        case "battle":
-            {
-                this.battle1_music.load();
-                this.curr_sound = this.battle1_music;
-                break;
-            }
+            this.sound = this.door;
+            break;
         default:
             break;
     }
-    this.curr_sound.play();
+}
+
+SoundManager.prototype.playSong = function(sound)
+{
+    this.background.pause();
+    switch(sound) {
+        case "world1":
+                this.background = this.world1;
+                break;
+        case "door":
+                this.curr_sound = this.door;
+                break;
+        case "battle":
+                this.background = this.battle1;
+                break;
+        default:
+            break;
+    }
+    this.background.play();
 }
