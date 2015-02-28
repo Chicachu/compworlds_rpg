@@ -181,20 +181,18 @@ GameEngine.prototype.addEntity = function (entity) {
 
 GameEngine.prototype.clearEntities = function(save_entities)
 {
-    //for(var i = 1; i < this.entities.length; i++)
-    //{
         if (save_entities) {
             this.auxillary_sprites = this.entities.splice(1, this.entities.length - 1);
         }
         else {
             this.entities = [this.entities[0]];
         }
-    //}
 }
 
 GameEngine.prototype.reLoadEntities = function()
 {
-    for(var i = 0; i < this.auxillary_sprites.length; i++)
+    var len = this.auxillary_sprites.length;
+    for(var i = 0; i < len; i++)
     {
         this.entities.push(this.auxillary_sprites.pop());
     }
@@ -536,7 +534,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 Entity.prototype.changeLocation = function () {
     if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
-        this.changeCoordinates(.5, .5, .5, .5);
+        this.changeCoordinates(.15, .15, .15, .15);
     }
     else{
         this.moving = false;
@@ -798,7 +796,7 @@ Hero.prototype.checkSurroundings = function () {
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1999;
+        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2997;
     }
 }
 
