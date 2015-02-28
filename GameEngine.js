@@ -475,7 +475,9 @@ LootDispenser = function(game)
 
 LootDispenser.prototype.dispenseLoot = function(hero)
 {
-        hero.recieveItem(new SpecialItem(this.game, "key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
+    if (this.encounters % 6 === 0) {
+        hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
+    }
 }
 
 LootDispenser.prototype.increment= function()
@@ -1812,8 +1814,8 @@ Chest.prototype.startInteraction = function () {
         if (this.closed) {
             if (!this.locked) {
                 this.lootChest();
-            } else if (this.locked && this.game.entities[0].inventory.hasItem("chest_key", 1)) {
-                var key = this.game.entities[0].inventory.removeItem("chest_key", 1);
+            } else if (this.locked && this.game.entities[0].inventory.hasItem("Key", 1)) {
+                var key = this.game.entities[0].inventory.removeItem("Key", 1);
                 // open chest
                 // give loot
                 this.lootChest()

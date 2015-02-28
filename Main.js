@@ -30,6 +30,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
 ASSET_MANAGER.queueDownload("./imgs/items/quest_potion.png");
 ASSET_MANAGER.queueDownload("./imgs/items/stone.png");
 ASSET_MANAGER.queueDownload("./imgs/items/book.png");
+ASSET_MANAGER.queueDownload("./imgs/items/key.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
