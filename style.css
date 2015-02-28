@@ -272,3 +272,8 @@ body {
     color: #d8bca1;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
+
+battle_menu_instructions {
+    border: 1px solid black;
+    border-radius: 15px;
+}

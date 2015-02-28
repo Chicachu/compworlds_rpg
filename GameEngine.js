@@ -163,7 +163,15 @@ GameEngine.prototype.startInput = function () {
         if (String.fromCharCode(e.which) === ' ' && text_box.style.visibility === "visible") {
             that.next = false;
         }
-    }, false);
+    }, false);   
+}
+
+GameEngine.prototype.setWindowEvent = function (game) {
+    if (game) {
+        window.addEventListener("focus", function (e) {
+
+        });
+    }
 }
 
 GameEngine.prototype.setBackground = function (img) {
@@ -1724,7 +1732,7 @@ Environment.prototype.initInteractables = function () {
 	this.interactables.push(new Chest(18, 11, 2, this.game, loot3, false));
 
     // healing berry bushes
-	this.interactables.push(new HealBerry(7, 5, 4, this.game));
+	this.interactables.push(new HealBerry(7, 4, 4, this.game));
 	this.interactables.push(new HealBerry(8, 4, 4, this.game));
 	this.interactables.push(new HealBerry(7, 5, 5, this.game));
 	this.interactables.push(new HealBerry(8, 5, 5, this.game));
