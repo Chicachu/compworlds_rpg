@@ -26,6 +26,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/shield1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/shield2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
 
+
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
     var context = canvas.getContext("2d");
@@ -35,6 +36,7 @@ ASSET_MANAGER.downloadAll(function () {
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
+	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
 
     //var skeleton_anims = new SpriteSet(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false), 
     //    new Animation(skeleton_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -51,7 +53,7 @@ ASSET_MANAGER.downloadAll(function () {
     //    );
     var warrior = new Warrior(gameEngine, new Statistics(50, 200, 200, 4, 3, 1));
 
-    var sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
+    var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
@@ -62,7 +64,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         "... except the store keeper. I'm not sure how he made it out alive.",
                                         "We must do something about the dragon! I saw it fly to the southeast *points determinedly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
-                                        "And by rebuild, I mean repopulate. *wink wink*"], sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0]);
+                                        "And by rebuild, I mean repopulate. *wink wink*"], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0]);
 
     var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
@@ -86,6 +88,12 @@ ASSET_MANAGER.downloadAll(function () {
                                             [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest);
 
 										//var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
+										
+		var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 1, 0, 48, 32, 0.05, 1, true, false), 
+                                            new Animation(ghost_spritesheet, 1, 3, 48, 32, 0.05, 1, true, false),
+                                            new Animation(ghost_spritesheet, 1, 1, 48, 32, 0.05, 1, true, false),
+                                            new Animation(ghost_spritesheet, 1, 2, 48, 32, 0.05, 1, true, false), null, null, null);
+		
 
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
         // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
