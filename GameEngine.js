@@ -103,13 +103,7 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
-    //this.sounds = {
-    //    world: new Audio("./sounds/AncientForest.wav"),
-    //    battle: new Audio("./sounds/FirstBattle.mp3")
-    //};
     this.sound_manager = new SoundManager(this);
-    //var audio = new Audio('./sounds/AncientForest.wav');
-    //audio.play();
     this.stage = {
         part1: false, // part 1 will turn true after our hero kills the level 1 dragon
         part2: false,
@@ -800,12 +794,11 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    //return Math.round(Math.random() * 5000) >= 4999;
 
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1990;
+        return Math.ceil(Math.random() * (2000 - 0) - 0) >= 1999;
     }
 }
 
@@ -1081,6 +1074,15 @@ Warrior.prototype.checkKillQuest = function (enemy) {
             }
         }
     }
+}
+
+Warrior.prototype.checkItemQuest = function(item){
+	for(var i=0; i <this.quests.length;i++){
+		if(this.quests[i].type ==="item" && this.quests[i].item === item){
+			this.quests[i].item_found = true;
+			this.quests[i].complete = true;
+		}
+	}
 }
 
 Warrior.prototype.setAction = function (action, target) {
@@ -1557,17 +1559,17 @@ Environment = function (game) {
     this.game = game;
     this.level = 1;
     // "Map" will be a double array of integer values. 
-    this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 90, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 17, 15, 0, 17, 3, 4, 62],
+    this.map = [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 90, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 62, 15, 17, 15, 0, 17, 3, 4, 62],
                 [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 92, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 16, 18, 15, 16, 5, 6, 63],
                 [70, 71, 72, 95, 90, 91, 95, 70, 71, 72, 95, 90, 91, 95, 70, 71, 72, 94, 92, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 17, 15, 18, 17, 0, 62, 20],
                 [73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 94, 92, 93, 94, 73, 74, 75, 95, 0, 0, 0, 0, 0, 94, 28, 94, 28, 28, 0, 3, 4, 0, 0, 0, 18, 16, 18, 15, 16, 0, 0, 19],
-                [76, 76, 78, 95, 90, 91, 95, 76, 78, 76, 95, 90, 91, 95, 76, 78, 76, 0, 94, 0, 0, 0, 0, 95, 29, 95, 29, 29, 0, 5, 6, 28, 28, 0, 0, 0, 1, 18, 0, 0, 3, 4],
-                [77, 77, 79, 85, 92, 93, 85, 77, 79, 77, 87, 92, 93, 87, 77, 79, 77, 94, 95, 0, 0, 0, 0, 94, 117, 118, 119, 120, 3, 4, 28, 29, 29, 0, 0, 0, 2, 0, 0, 28, 5, 6],
-                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 95, 0, 0, 94, 94, 0, 95, 121, 122, 123, 124, 5, 6, 29, 0, 0, 0, 28, 0, 0, 0, 0, 29, 62, 64],
+                [76, 76, 78, 95, 90, 91, 95, 76, 78, 76, 95, 90, 91, 95, 76, 78, 76, 94, 0, 0, 0, 0, 0, 95, 29, 95, 29, 29, 0, 5, 6, 28, 28, 0, 0, 0, 1, 18, 0, 0, 3, 4],
+                [77, 77, 79, 85, 92, 93, 85, 77, 79, 77, 87, 92, 93, 87, 77, 79, 77, 95, 0, 0, 0, 0, 94, 94, 117, 118, 119, 120, 3, 4, 28, 29, 29, 0, 0, 0, 2, 0, 0, 28, 5, 6],
+                [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 0, 0, 0, 94, 94, 95, 95, 121, 122, 123, 124, 5, 6, 29, 0, 0, 0, 28, 0, 0, 0, 0, 29, 62, 64],
                 [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 28, 0, 3, 4],
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 65, 29, 20, 5, 6],
                 [0, 66, 0, 0, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 19, 0, 28],
-                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 37, 38, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
+                [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 0, 0, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 29],
                 [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 65],
                 [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
                 [76, 78, 76, 95, 94, 0, 0, 0, 95, 76, 78, 76, 95, 94, 94, 90, 91, 94, 7, 8, 11, 12, 11, 12, 11, 12, 11, 12, 11, 12, 83, 84, 0, 0, 3, 4, 65, 32, 63, 32, 31, 31],
@@ -1956,8 +1958,120 @@ BattleMenu = function (menu_element, game) {
     this.single_attack = document.getElementById("single_attack");
     this.aoe_attack = document.getElementById("aoe_attack");
     this.back = document.getElementById("back");
+
+    this.use_item_list = new UseItemMenu(this.game, this); 
     
     this.target_queue = [];
+}
+
+UseItemMenu = function (game, parent) {
+    this.game = game;
+    this.parent = parent; 
+    this.menu = document.getElementById("useitem_menu");
+    this.list = this.menu.children[0];
+    this.open = false;
+    if (this.game) {
+        this.items = this.game.entities[0].inventory.items;
+    }
+    this.list_items = []; 
+}
+
+UseItemMenu.prototype.showMenu = function () {
+    if (!this.open) { 
+        this.game.context.canvas.tabIndex = 0;
+        this.menu.tabIndex = 1;
+        this.menu.style.display = "block";
+        this.menu.style.visibility = "visible";
+
+        this.parent.menu.tabIndex = 0;
+        this.parent.attack.tabIndex = 0;
+        this.parent.use_item.tabIndex = 0;
+        this.parent.flee.tabIndex = 0; 
+        this.updateItems();
+        this.changeFocus(0);
+        this.open = true; 
+    } else {
+        this.menu.style.display = "none";
+        this.menu.style.visibility = "hidden";
+        this.menu.tabIndex = 0;
+        this.parent.menu.tabIndex = 1;
+        this.parent.attack.tabIndex = 1;
+        this.parent.use_item.tabIndex = 1;
+        this.parent.flee.tabIndex = 1;
+        this.parent.attack.focus();
+        this.game.context.canvas.tabIndex = 1;
+        this.open = false; 
+    }
+}
+
+UseItemMenu.prototype.hasUsuableItems = function () {
+    for (var i = 0; i < this.game.entities[0].inventory.items.length; i++) {
+        if (this.game.entities[0].inventory.items[i].usable) {
+            return true; 
+        }
+    }
+    return false; 
+}
+
+UseItemMenu.prototype.changeFocus = function (index) {
+    if (this.list_items[index]) {
+        var li_item2 = this.list_items[index].html;
+        li_item2.focus();
+    }
+}
+
+UseItemMenu.prototype.updateItems = function () {
+    this.list_items = [];
+    this.list.innerHTML = ""; 
+    for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].usable) {
+            var new_li = document.createElement('li');
+            var p = document.createElement('p');
+            p.innerHTML = this.items[i].name; 
+            new_li.innerHTML = this.items[i].img.outerHTML;
+            new_li.innerHTML += p.outerHTML;
+            new_li.tabIndex = 1;
+            var li = new List_item(this.game, this.items[i], i);
+            this.list.innerHTML += new_li.outerHTML; 
+            this.list_items.push(li); 
+        }
+    }
+    for (var i = 0; i < this.list_items.length; i++) {
+        this.list_items[i].html = this.menu.children[0].children[i];
+        this.list_items[i].input();
+    }
+}
+
+List_item = function (game, item, index) {
+    this.game = game; 
+    this.item = item;
+    this.html = null;
+    this.index = index; 
+}
+
+List_item.prototype.input = function () {
+    var that = this; 
+    this.html.addEventListener("keydown", function (e) {
+        if (e.which === 40) {
+            // select next item down
+            if (that.index < that.parent.list_items.length - 1) {
+                window.setTimeout(that.game.menu.use_item_list.changeFocus(that.index + 1));
+            }
+        } else if (e.which === 38) {
+            // select next item up 
+            if (that.index > 1) {
+                window.setTimeout(that.game.menu.use_item_list.changeFocus(that.index - 1));
+            }
+        } else if (String.fromCharCode(e.which) === ' ') {
+            // use item
+            that.item.doAction();
+            //window.setTimeout(that.item.doAction(), 0);
+            that.game.menu.use_item_list.updateItems();
+            window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
+        }
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    }, false);
 }
 
 BattleMenu.prototype.init = function () {
@@ -1979,16 +2093,30 @@ BattleMenu.prototype.init = function () {
         }
         e.preventDefault();
     });
+
+    //this.use_item.addEventListener("blur", function (e) {
+    //    window.setTimeout(that.use_item_list.changeFocus(0), 0);
+    //    e.preventDefault();
+    //    e.stopImmediatePropagation();
+    //}, false); 
     this.use_item.addEventListener("keydown", function (e) {
+        this.pressed = false; 
         if (e.which === 40) {
             window.setTimeout(that.flee.focus(), 0);
         } else if (e.which === 38) {
             window.setTimeout(that.attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            // opens item sub_menu
+            if (that.use_item_list.hasUsuableItems()) {
+                that.use_item_list.showMenu();
+            } 
         }
+        
         e.preventDefault();
-    });
+        e.stopImmediatePropagation();
+    }, false);
+    this.use_item.addEventListener("keyup", function (e) {
+        this.pressed = false; 
+    }, false);
     this.flee.addEventListener("keydown", function (e) {
         if (that.game.entities[0].is_turn) {
             if (e.which === 38) {
@@ -2222,7 +2350,7 @@ GeneralMenu.prototype.init = function () {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.showMenu(false);
-            that.hero.inventory.showInventory(true); 
+            that.hero.inventory.showInventory.call(that.hero.inventory);
         }
         e.preventDefault();
     });
@@ -2280,6 +2408,103 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
+/*
+GHOST NPC_QUEST
+*/
+Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest){
+	this.part = 0; 
+	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+	this.curr_anim = this.animations.down;
+	this.lastX = this.x;
+	}
+	
+Ghost.prototype = new NPC_QUEST();
+Ghost.prototype.constructor = Ghost;
+
+Ghost.prototype.startInteraction = function () {
+    if (this.game.stage.part1 === false) {
+        // if before dragon is dead, have Ghost give hero a quest. 
+        this.showDialog();
+    } else {
+		//nothing
+	}
+}
+
+Ghost.prototype.showDialog = function () {
+    if (this.part === 1 && this.quest.complete) {
+        this.part++; 
+    }
+    this.reposition();
+    var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.game.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true;
+    this.game.canControl = false;
+}
+
+Ghost.prototype.update = function () {
+    if (!this.interacting) {
+        this.curr_anim = this.animations.down;
+        this.direction = Direction.DOWN;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+
+Ghost.prototype.updateDialogue = function () {
+       if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = document.createElement('p');
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                this.game.canControl = true;
+                this.interacting = false;
+                if (this.part === 0) {
+                    this.part++;
+                    this.game.entities[0].addQuest(this.quest);
+                }
+                if (this.part === 2) {
+                    this.game.entities[0].inventory.addItem(this.quest.reward);
+                    this.part++; 
+                } else if (this.part === 3) {
+                    this.part++; 
+                }
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+Ghost.prototype.draw = function (context) {
+    if (this.game.environment.curr_quadrant === 2) {
+        this.x = 320; 
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    } 
+}
+
+
+
+
+/*StoreKeeper NPC_QUEST with KILL_QUEST
+*/
 Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
     this.part = 0; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
@@ -2378,6 +2603,101 @@ Storekeeper.prototype.showWares = function (flag) {
 
     } else {
 
+    }
+}
+
+/*WITCH NPC_QUEST with KILL_QUEST
+*/
+Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+    this.part = 0; 
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    this.curr_anim = this.animations.down;
+    this.lastX = this.x;
+}
+
+Witch.prototype = new NPC_QUEST();
+Witch.prototype.constructor = Witch;
+
+Witch.prototype.startInteraction = function () {
+    if (this.game.stage.part1 === false) {
+        // if before dragon is dead, have Witch give hero a quest. 
+        this.showDialog();
+    } else {
+        // after dragon is dead, show wares to the hero.
+        this.showWares(); 
+    }
+}
+
+Witch.prototype.showDialog = function () {
+    if (this.part === 1 && this.quest.complete) {
+        this.part++; 
+    }
+    this.reposition();
+    var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.game.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true;
+    this.game.canControl = false;
+}
+
+Witch.prototype.update = function () {
+    if (!this.interacting) {
+        this.curr_anim = this.animations.down;
+        this.direction = Direction.DOWN;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+
+Witch.prototype.updateDialogue = function () {
+    if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = document.createElement('p');
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                this.game.canControl = true;
+                this.interacting = false;
+                if (this.part === 0) {
+                    this.part++;
+                    this.game.entities[0].addQuest(this.quest);
+                }
+                if (this.part === 2) {
+                    this.game.entities[0].inventory.addItem(this.quest.reward);
+                    this.part++; 
+                } else if (this.part === 3) {
+                    this.part++; 
+                }
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+Witch.prototype.draw = function (context) {
+    if (this.game.environment.curr_quadrant === 1) {
+        this.x = 458; 
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    } else if (this.game.environment.curr_quadrant === 2) {
+        this.x = 64;
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
     }
 }
 
@@ -2521,6 +2841,7 @@ HTML_Item = function (element, game) {
     this.return = document.createElement("a");
     this.return.setAttribute("id", "return2");
     this.return.innerHTML = "Return";
+    this.og_children = this.menu.children[0].children;
 }
 
 HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
@@ -2532,14 +2853,22 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
         this.menu.tabIndex = 1;
         this.setActionText();
         this.insertATags();
-        this.action = document.getElementById("action");
-        this.destroy = document.getElementById("destroy");
+        if (!this.item.uses) {
+            this.action = document.getElementById("action");
+            this.destroy = document.getElementById("destroy");
+        }
         this.return = document.getElementById("return2");
-        this.destroy.tabIndex = 1;
+        if (!this.item.uses) {
+            this.destroy.tabIndex = 1;
+            this.action.tabIndex = 1;
+        }
         this.return.tabIndex = 1;
-        this.action.tabIndex = 1;
         this.actionInput();
-        this.action.focus();
+        if (!this.item.uses) {
+            this.action.focus();
+        } else {
+            this.return.focus();
+        }
     } else {
         this.menu.style.visibility = "hidden";
         this.menu.style.display = "none";
@@ -2551,10 +2880,27 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
 }
 
 HTML_Item.prototype.insertATags = function () {
-    var li_nodes = this.menu.children[0].children;
-    li_nodes[0].innerHTML = this.action.outerHTML;
-    li_nodes[1].innerHTML = this.destroy.outerHTML;
-    li_nodes[2].innerHTML = this.return.outerHTML;
+    var li_nodes = this.og_children;
+    if (!this.item.uses && li_nodes[0] && li_nodes[1]) {
+        li_nodes[0].innerHTML = this.action.outerHTML;
+        li_nodes[1].innerHTML = this.destroy.outerHTML
+        li_nodes[2].innerHTML = this.return.outerHTML;
+    } else if (!this.item.uses) {
+        var li_node1 = document.createElement("li");
+        var li_node2 = document.createElement("li");
+        var li_node3 = document.createElement("li");
+        li_node1.innerHTML = this.action.outerHTML;
+        li_node2.innerHTML = this.destroy.outerHTML;
+        li_node3.innerHTML = this.return.outerHTML;
+        this.menu.children[0].innerHTML = li_node1.outerHTML;
+        this.menu.children[0].innerHTML += li_node2.outerHTML;
+        this.menu.children[0].innerHTML += li_node3.outerHTML;
+    }
+    else {
+        var li_node = document.createElement("li");
+        li_node.innerHTML = this.return.outerHTML;
+        this.menu.children[0].innerHTML = li_node.outerHTML;
+    }
 }
 
 HTML_Item.prototype.setActionText = function () {
@@ -2567,6 +2913,9 @@ HTML_Item.prototype.setActionText = function () {
     } else if (this.item.usable) {
         this.action.innerHTML = "Use Item";
     }
+    //if (this.item.uses) {
+    //    this.destroy.innerHTML = "";
+    //}
 }
 
 Armor = function (game, name, price, img, type, stats) {
@@ -2691,13 +3040,14 @@ Inventory.prototype.hasItem = function (item_name) {
 }
 
 Inventory.prototype.showInventory = function (flag) {
-    if (flag && this.open === false) {
+    if (this.open === false) {
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
         this.html_items[0].element.focus();
         this.open = true;
+        this.game.key_i = 0;
     } else {
         this.open = false;
         this.interface.style.visibility = "hidden";
@@ -2705,7 +3055,8 @@ Inventory.prototype.showInventory = function (flag) {
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
-    }
+        this.game.key_i = 0;
+    }    
 }
 
 HTML_Item.prototype.updateShowItemMenu = function () {
@@ -2714,7 +3065,9 @@ HTML_Item.prototype.updateShowItemMenu = function () {
         if (String.fromCharCode(e.which) === ' ') {
             that.showItemMenu(true, that.game.entities[0].inventory);
         }
-    });
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }, false);
 }
 
 Inventory.prototype.draw = function (ctx) {
@@ -2734,9 +3087,6 @@ Inventory.prototype.draw = function (ctx) {
             this.html_items[i].actionInput();
             this.html_items[i].updateShowItemMenu(); 
         } else {
-            if (i === 5) {
-                console.log("fuck this");
-            }
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
         }
@@ -2748,10 +3098,9 @@ Inventory.prototype.draw = function (ctx) {
 
 Inventory.prototype.update = function () {
     if (this.game.key_i) {
-        
-    } else if (this.open === true && this.game.esc) {
-        this.showInventory(false);
-        this.game.key_i = 0;
+        this.showInventory();
+    } else if (this.game.esc) {
+        this.showInventory();
     }
 }
 
@@ -2872,11 +3221,11 @@ Inventory.prototype.selectInput = function () {
                         that.html_items[index].showItemMenu(true, that);
                     }
                 } else if (e.which === 27 || e.which === 73) {
-                    that.showInventory(false);
-                    that.open = false; 
+                    that.showInventory();
                 }
                 this.pressed = true; 
             }
+            e.stopImmediatePropagation();
             e.preventDefault();
         });
 
@@ -2889,34 +3238,36 @@ Inventory.prototype.selectInput = function () {
 HTML_Item.prototype.actionInput = function () {
     var that = this;
     var pressed = false;
-    this.action.addEventListener("keydown", function (e) {
-        if (!this.pressed) {
-            if (e.which === 40) {
-                window.setTimeout(that.destroy.focus(), 0);
-            } else if (e.which === 32) {
-                that.item.doAction.call(that.item);
-                that.showItemMenu(false);
-                window.setTimeout(that.element.focus(), 0);
-            } 
-        }
-        this.pressed = true;
-        e.preventDefault();
-    }, false);
-    this.destroy.addEventListener("keydown", function (e) {
-        if (!this.pressed) {
-            if (e.which === 40) {
-                window.setTimeout(that.return.focus(), 0);
-            } else if (e.which === 38) {
-                window.setTimeout(that.action.focus(), 0);
-            } else if (e.which === 32) {
-                that.showItemMenu(false);
-                window.setTimeout(that.element.focus(), 0);
-                that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+    if (!this.item.uses) {
+        this.action.addEventListener("keydown", function (e) {
+            if (!this.pressed) {
+                if (e.which === 40) {
+                    window.setTimeout(that.destroy.focus(), 0);
+                } else if (e.which === 32) {
+                    that.item.doAction.call(that.item);
+                    that.showItemMenu(false);
+                    window.setTimeout(that.element.focus(), 0);
+                }
             }
-        }
-        this.pressed = true;
-        e.preventDefault();
-    }, false);
+            this.pressed = true;
+            e.preventDefault();
+        }, false);
+        this.destroy.addEventListener("keydown", function (e) {
+            if (!this.pressed) {
+                if (e.which === 40) {
+                    window.setTimeout(that.return.focus(), 0);
+                } else if (e.which === 38) {
+                    window.setTimeout(that.action.focus(), 0);
+                } else if (e.which === 32) {
+                    that.showItemMenu(false);
+                    window.setTimeout(that.element.focus(), 0);
+                    that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+                }
+            }
+            this.pressed = true;
+            e.preventDefault();
+        }, false);
+    }
     this.return.addEventListener("keydown", function (e) {
         if (!this.pressed) {
             if (e.which === 38) {
@@ -2929,12 +3280,14 @@ HTML_Item.prototype.actionInput = function () {
         this.pressed = true;
         e.preventDefault();
     }, false);
-    this.action.addEventListener("keyup", function (e) {
-        this.pressed = false;
-    }, false);
-    this.destroy.addEventListener("keyup", function (e) {
-        this.pressed = false;
-    }, false);
+    if (!this.item.uses) {
+        this.action.addEventListener("keyup", function (e) {
+            this.pressed = false;
+        }, false);
+        this.destroy.addEventListener("keyup", function (e) {
+            this.pressed = false;
+        }, false);
+    }
     this.return.addEventListener("keyup", function (e) {
         this.pressed = false;
     }, false);

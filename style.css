@@ -70,7 +70,7 @@ body {
     pointer-events: none;
 }
 
-#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus, #item_menu a:focus {
+#battle_menu a:focus, #attack_sub a:focus, #esc_menu a:focus, #item_menu a:focus,  #useitem_menu li:focus {
     color: white;
     outline: solid 1px #d8bca1;
     pointer-events: none;
@@ -227,23 +227,38 @@ body {
 }
 
 #useitem_menu { 
+    position: relative; 
     height: auto;
     width: auto; 
-    position: relative; 
+    display: none; 
+    visibility: hidden; 
+    z-index: 15; 
 }
 
 #useitem_menu ul {
     list-style-type: none;
     background-image: url("./imgs/menu_background.png"); 
     width: 125px;
+    border: 1px solid #d8bca1;
     border-radius: 15px;
     padding: 10px;
+    padding-bottom: 25px;
+    padding-top: 1px;
+    position: relative; 
+    margin: 0 auto; 
+    top: -730px;
+    left: 150px;
 }
 
 #useitem_menu li {
-    height: 30px;
+    height: 35px;
     width: auto;
-    top: -15px;
+    top: -25px;
+}
+
+#useitem_menu a {
+    height: 35px;
+    width: auto; 
 }
 
 #useitem_menu img {

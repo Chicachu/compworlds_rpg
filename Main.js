@@ -11,9 +11,11 @@ ASSET_MANAGER.queueDownload("./imgs/fire.png");
 ASSET_MANAGER.queueDownload("./imgs/fire2.png");
 ASSET_MANAGER.queueDownload("./imgs/malboro.png");
 ASSET_MANAGER.queueDownload("./imgs/storekeeper.png");
+ASSET_MANAGER.queueDownload("./imgs/witch.png");
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
 
 // items
+ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
 ASSET_MANAGER.queueDownload("./imgs/items/amulet1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/amulet2.png");
@@ -25,8 +27,9 @@ ASSET_MANAGER.queueDownload("./imgs/items/sword1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/shield1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/shield2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
-
 ASSET_MANAGER.queueDownload("./imgs/items/quest_potion.png");
+ASSET_MANAGER.queueDownload("./imgs/items/stone.png");
+ASSET_MANAGER.queueDownload("./imgs/items/book.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
@@ -39,20 +42,7 @@ ASSET_MANAGER.downloadAll(function () {
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
-
-    //var skeleton_anims = new SpriteSet(new Animation(skeleton_sprites, 0, 10, 64, 64, 0.05, 9, true, false), 
-    //    new Animation(skeleton_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
-    //    new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
-    //    new Animation(skeleton_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
-    //    new Animation(skeleton_sprites, 0, 19, 64, 64, 0.05, 13, true, false),
-    //    new Animation(skeleton_sprites, 0, 20, 64, 64, 0.07, 5, true, false),
-    //    new Animation(skeleton_sprites, 6, 20, 64, 64, .1, 1, true, false));
-
-    //var malboro_anims = new SpriteSet(null, null, null, new Animation(malboro_sprites, 0, 0, 71, 91, .15, 3, true, false),
-    //    new Animation(malboro_sprites, 0, 1, 71, 91, .12, 6, true, false),
-    //    new Animation(malboro_sprites, 0, 2, 71, 91, .15, 3, true, false),
-    //    new Animation(malboro_sprites, 0, 2, 71, 91, .08, 6, true, false)
-    //    );
+	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
     var warrior = new Warrior(gameEngine, new Statistics(50, 200, 200, 4, 3, 1));
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
@@ -60,7 +50,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.05, 9, true, false),
                                             new Animation(npc_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
                                             null, null, null);
-    //var skeleton = new Enemy(gameEngine, new Statistics(50, 15, 5), skeleton_anims);
+											
     var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "... except the store keeper. I'm not sure how he made it out alive.",
@@ -87,18 +77,37 @@ ASSET_MANAGER.downloadAll(function () {
                                             "Not to brag or anything, but this town's economy relies solely on the health of this store.",
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
                                             ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
-                                            [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest);
-
-    var quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });
-
-										//var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
+                                            [new Point(485, 207)], .1, false, [3,4], storekeeper_quest);
 										
-		var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 1, 0, 48, 32, 0.05, 1, true, false), 
-                                            new Animation(ghost_spritesheet, 1, 3, 48, 32, 0.05, 1, true, false),
-                                            new Animation(ghost_spritesheet, 1, 1, 48, 32, 0.05, 1, true, false),
-                                            new Animation(ghost_spritesheet, 1, 2, 48, 32, 0.05, 1, true, false), null, null, null);
-		
-
+	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 
+                                        new Animation(ghost_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
+                                        new Animation(ghost_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
+                                        new Animation(ghost_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
+											
+	var ghost_quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
+	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { });	
+	var ghost_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", ghost_quest_reward, ghost_quest_potion);
+	var ghost = new Ghost(gameEngine, "Ghost", [["Set my soul free, Brave Warrior!", 
+												"Go to Witch and get me that Tasty Heaven Potion!",
+												"In reward, you will receive the King Arthur's Stone that opens any Dragon Cave!"],
+												["Go to Witch and get me that Tasty Heaven Potion!"]], 
+												ghost_sprites, [new Point(928, 30)], .1, false, [2,2], ghost_quest);
+	
+	var witch_sprites = new SpriteSet(new Animation(witch_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 
+                                        new Animation(witch_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
+                                        new Animation(witch_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
+                                        new Animation(witch_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
+											
+	var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { });	
+	var witch_quest_reward = ghost_quest_potion;
+	var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", witch_quest_reward, witch_quest_book);
+	var witch = new Witch(gameEngine, "Witch", [["Long Time, since I have seen Living Human Being!",
+												"I know why you are here and I will give you what you want, only",
+												"if you bring me the Holy Book of Spells somewhere in the village"],
+												["Bring me the Holy Book of Spells, young man!"]], 
+												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest);
+	
+	
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
         // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
@@ -107,10 +116,13 @@ ASSET_MANAGER.downloadAll(function () {
     var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
+    warrior.recieveItem(sk_quest_reward);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
     gameEngine.addEntity(storekeeper);
+	gameEngine.addEntity(ghost);
+	gameEngine.addEntity(witch);
 
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
