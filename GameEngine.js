@@ -1942,7 +1942,7 @@ HealBerry.prototype.startInteraction = function () {
 
  /*Generates an array of random length between 1 and 2 with fiends that belong to that environment*/
 
-ype.generateFiend = function (game)
+Environment.prototype.generateFiend = function (game)
 {
     var number_of_fiends = Math.floor(Math.random() * (4 - 1)) + 1;
     var fiend_array = [];
@@ -2160,6 +2160,8 @@ List_item.prototype.input = function () {
             that.item.doAction();
             //window.setTimeout(that.item.doAction(), 0);
             that.game.menu.use_item_list.updateItems();
+            window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
+        } else if (e.which === 27) {
             window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
         }
         e.stopImmediatePropagation();
