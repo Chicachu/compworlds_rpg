@@ -793,7 +793,7 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 5000) >= 50;
+    return Math.round(Math.random() * 5000) >= 10000;
 
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
     if (Math.abs(distance_traveled) > 100) {
@@ -1074,6 +1074,15 @@ Warrior.prototype.checkKillQuest = function (enemy) {
             }
         }
     }
+}
+
+Warrior.prototype.checkItemQuest = function(item){
+	for(var i=0; i <this.quests.length;i++){
+		if(this.quests[i].type ==="item" && this.quests[i].item === item){
+			this.quests[i].item_found = true;
+			this.quests[i].complete = true;
+		}
+	}
 }
 
 Warrior.prototype.setAction = function (action, target) {
@@ -2412,19 +2421,15 @@ Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest){
 Ghost.prototype = new NPC_QUEST();
 Ghost.prototype.constructor = Ghost;
 
-Ghost.prototype.draw = function (context) {
-    if (this.game.environment.curr_quadrant === 2) {
-        this.x = 224; 
-        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
-    } 
-}
-
 Ghost.prototype.startInteraction = function () {
     if (this.game.stage.part1 === false) {
         // if before dragon is dead, have Ghost give hero a quest. 
         this.showDialog();
-    }
+    } else {
+		//nothing
+	}
 }
+
 Ghost.prototype.showDialog = function () {
     if (this.part === 1 && this.quest.complete) {
         this.part++; 
@@ -2444,8 +2449,18 @@ Ghost.prototype.showDialog = function () {
     this.game.canControl = false;
 }
 
+Ghost.prototype.update = function () {
+    if (!this.interacting) {
+        this.curr_anim = this.animations.down;
+        this.direction = Direction.DOWN;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+
 Ghost.prototype.updateDialogue = function () {
-    if (this.game) {
+       if (this.game) {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
@@ -2466,22 +2481,29 @@ Ghost.prototype.updateDialogue = function () {
                     this.part++;
                     this.game.entities[0].addQuest(this.quest);
                 }
+                if (this.part === 2) {
+                    this.game.entities[0].inventory.addItem(this.quest.reward);
+                    this.part++; 
+                } else if (this.part === 3) {
+                    this.part++; 
+                }
             }
             this.game.next = false;
         }
     }
 }
 
-Ghost.prototype.update = function () {
-    if (!this.interacting) {
-        this.curr_anim = this.animations.down;
-        this.direction = Direction.DOWN;
-    } else {
-        this.curr_anim = this.stopAnimation(this.curr_anim);
-        this.updateDialogue();
-    }
+Ghost.prototype.draw = function (context) {
+    if (this.game.environment.curr_quadrant === 2) {
+        this.x = 320; 
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    } 
 }
-/* One of the NPC-quests
+
+
+
+
+/*StoreKeeper NPC_QUEST with KILL_QUEST
 */
 Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
     this.part = 0; 
@@ -2581,6 +2603,101 @@ Storekeeper.prototype.showWares = function (flag) {
 
     } else {
 
+    }
+}
+
+/*WITCH NPC_QUEST with KILL_QUEST
+*/
+Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+    this.part = 0; 
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    this.curr_anim = this.animations.down;
+    this.lastX = this.x;
+}
+
+Witch.prototype = new NPC_QUEST();
+Witch.prototype.constructor = Witch;
+
+Witch.prototype.startInteraction = function () {
+    if (this.game.stage.part1 === false) {
+        // if before dragon is dead, have Witch give hero a quest. 
+        this.showDialog();
+    } else {
+        // after dragon is dead, show wares to the hero.
+        this.showWares(); 
+    }
+}
+
+Witch.prototype.showDialog = function () {
+    if (this.part === 1 && this.quest.complete) {
+        this.part++; 
+    }
+    this.reposition();
+    var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.game.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true;
+    this.game.canControl = false;
+}
+
+Witch.prototype.update = function () {
+    if (!this.interacting) {
+        this.curr_anim = this.animations.down;
+        this.direction = Direction.DOWN;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+
+Witch.prototype.updateDialogue = function () {
+    if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = document.createElement('p');
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                this.game.canControl = true;
+                this.interacting = false;
+                if (this.part === 0) {
+                    this.part++;
+                    this.game.entities[0].addQuest(this.quest);
+                }
+                if (this.part === 2) {
+                    this.game.entities[0].inventory.addItem(this.quest.reward);
+                    this.part++; 
+                } else if (this.part === 3) {
+                    this.part++; 
+                }
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+Witch.prototype.draw = function (context) {
+    if (this.game.environment.curr_quadrant === 1) {
+        this.x = 455; 
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    } else if (this.game.environment.curr_quadrant === 2) {
+        this.x = 71;
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
     }
 }
 
@@ -2970,9 +3087,6 @@ Inventory.prototype.draw = function (ctx) {
             this.html_items[i].actionInput();
             this.html_items[i].updateShowItemMenu(); 
         } else {
-            if (i === 5) {
-                console.log("fuck this");
-            }
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
         }
