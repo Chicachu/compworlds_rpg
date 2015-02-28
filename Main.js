@@ -111,6 +111,7 @@ ASSET_MANAGER.downloadAll(function () {
     var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
+    warrior.recieveItem(sk_quest_reward);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);

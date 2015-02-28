@@ -2724,6 +2724,7 @@ HTML_Item = function (element, game) {
     this.return = document.createElement("a");
     this.return.setAttribute("id", "return2");
     this.return.innerHTML = "Return";
+    this.og_children = this.menu.children[0].children;
 }
 
 HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
@@ -2735,14 +2736,22 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
         this.menu.tabIndex = 1;
         this.setActionText();
         this.insertATags();
-        this.action = document.getElementById("action");
-        this.destroy = document.getElementById("destroy");
+        if (!this.item.uses) {
+            this.action = document.getElementById("action");
+            this.destroy = document.getElementById("destroy");
+        }
         this.return = document.getElementById("return2");
-        this.destroy.tabIndex = 1;
+        if (!this.item.uses) {
+            this.destroy.tabIndex = 1;
+            this.action.tabIndex = 1;
+        }
         this.return.tabIndex = 1;
-        this.action.tabIndex = 1;
         this.actionInput();
-        this.action.focus();
+        if (!this.item.uses) {
+            this.action.focus();
+        } else {
+            this.return.focus();
+        }
     } else {
         this.menu.style.visibility = "hidden";
         this.menu.style.display = "none";
@@ -2754,10 +2763,27 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
 }
 
 HTML_Item.prototype.insertATags = function () {
-    var li_nodes = this.menu.children[0].children;
-    li_nodes[0].innerHTML = this.action.outerHTML;
-    li_nodes[1].innerHTML = this.destroy.outerHTML;
-    li_nodes[2].innerHTML = this.return.outerHTML;
+    var li_nodes = this.og_children;
+    if (!this.item.uses && li_nodes[0] && li_nodes[1]) {
+        li_nodes[0].innerHTML = this.action.outerHTML;
+        li_nodes[1].innerHTML = this.destroy.outerHTML
+        li_nodes[2].innerHTML = this.return.outerHTML;
+    } else if (!this.item.uses) {
+        var li_node1 = document.createElement("li");
+        var li_node2 = document.createElement("li");
+        var li_node3 = document.createElement("li");
+        li_node1.innerHTML = this.action.outerHTML;
+        li_node2.innerHTML = this.destroy.outerHTML;
+        li_node3.innerHTML = this.return.outerHTML;
+        this.menu.children[0].innerHTML = li_node1.outerHTML;
+        this.menu.children[0].innerHTML += li_node2.outerHTML;
+        this.menu.children[0].innerHTML += li_node3.outerHTML;
+    }
+    else {
+        var li_node = document.createElement("li");
+        li_node.innerHTML = this.return.outerHTML;
+        this.menu.children[0].innerHTML = li_node.outerHTML;
+    }
 }
 
 HTML_Item.prototype.setActionText = function () {
@@ -2770,6 +2796,9 @@ HTML_Item.prototype.setActionText = function () {
     } else if (this.item.usable) {
         this.action.innerHTML = "Use Item";
     }
+    //if (this.item.uses) {
+    //    this.destroy.innerHTML = "";
+    //}
 }
 
 Armor = function (game, name, price, img, type, stats) {
@@ -2919,7 +2948,9 @@ HTML_Item.prototype.updateShowItemMenu = function () {
         if (String.fromCharCode(e.which) === ' ') {
             that.showItemMenu(true, that.game.entities[0].inventory);
         }
-    });
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }, false);
 }
 
 Inventory.prototype.draw = function (ctx) {
@@ -3080,6 +3111,7 @@ Inventory.prototype.selectInput = function () {
                 }
                 this.pressed = true; 
             }
+            e.stopImmediatePropagation();
             e.preventDefault();
         });
 
@@ -3092,34 +3124,36 @@ Inventory.prototype.selectInput = function () {
 HTML_Item.prototype.actionInput = function () {
     var that = this;
     var pressed = false;
-    this.action.addEventListener("keydown", function (e) {
-        if (!this.pressed) {
-            if (e.which === 40) {
-                window.setTimeout(that.destroy.focus(), 0);
-            } else if (e.which === 32) {
-                that.item.doAction.call(that.item);
-                that.showItemMenu(false);
-                window.setTimeout(that.element.focus(), 0);
-            } 
-        }
-        this.pressed = true;
-        e.preventDefault();
-    }, false);
-    this.destroy.addEventListener("keydown", function (e) {
-        if (!this.pressed) {
-            if (e.which === 40) {
-                window.setTimeout(that.return.focus(), 0);
-            } else if (e.which === 38) {
-                window.setTimeout(that.action.focus(), 0);
-            } else if (e.which === 32) {
-                that.showItemMenu(false);
-                window.setTimeout(that.element.focus(), 0);
-                that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+    if (!this.item.uses) {
+        this.action.addEventListener("keydown", function (e) {
+            if (!this.pressed) {
+                if (e.which === 40) {
+                    window.setTimeout(that.destroy.focus(), 0);
+                } else if (e.which === 32) {
+                    that.item.doAction.call(that.item);
+                    that.showItemMenu(false);
+                    window.setTimeout(that.element.focus(), 0);
+                }
             }
-        }
-        this.pressed = true;
-        e.preventDefault();
-    }, false);
+            this.pressed = true;
+            e.preventDefault();
+        }, false);
+        this.destroy.addEventListener("keydown", function (e) {
+            if (!this.pressed) {
+                if (e.which === 40) {
+                    window.setTimeout(that.return.focus(), 0);
+                } else if (e.which === 38) {
+                    window.setTimeout(that.action.focus(), 0);
+                } else if (e.which === 32) {
+                    that.showItemMenu(false);
+                    window.setTimeout(that.element.focus(), 0);
+                    that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+                }
+            }
+            this.pressed = true;
+            e.preventDefault();
+        }, false);
+    }
     this.return.addEventListener("keydown", function (e) {
         if (!this.pressed) {
             if (e.which === 38) {
@@ -3132,12 +3166,14 @@ HTML_Item.prototype.actionInput = function () {
         this.pressed = true;
         e.preventDefault();
     }, false);
-    this.action.addEventListener("keyup", function (e) {
-        this.pressed = false;
-    }, false);
-    this.destroy.addEventListener("keyup", function (e) {
-        this.pressed = false;
-    }, false);
+    if (!this.item.uses) {
+        this.action.addEventListener("keyup", function (e) {
+            this.pressed = false;
+        }, false);
+        this.destroy.addEventListener("keyup", function (e) {
+            this.pressed = false;
+        }, false);
+    }
     this.return.addEventListener("keyup", function (e) {
         this.pressed = false;
     }, false);
