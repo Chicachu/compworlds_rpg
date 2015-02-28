@@ -868,13 +868,13 @@ Hero.prototype.reposition = function (other) {
 }
 
 Hero.prototype.preBattle = function () {
-    //if (this.moving && this.checkSurroundings()) {
-    //    this.game.canControl = false;
-    //    this.game.key = 0;
-    //    this.game.space = 0; 
-    //    // lock user input controls here.
-    //    this.game.fadeOut(this.game, this.game, this.game.setBattle);
-    //}
+    if (this.moving && this.checkSurroundings()) {
+        this.game.canControl = false;
+        this.game.key = 0;
+        this.game.space = 0; 
+        // lock user input controls here.
+        this.game.fadeOut(this.game, this.game, this.game.setBattle);
+    }
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
