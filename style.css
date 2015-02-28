@@ -232,19 +232,21 @@ body {
     width: auto; 
     display: none; 
     visibility: hidden; 
+    z-index: 15; 
 }
 
 #useitem_menu ul {
     list-style-type: none;
     background-image: url("./imgs/menu_background.png"); 
     width: 125px;
+    border: 1px solid #d8bca1;
     border-radius: 15px;
     padding: 10px;
     padding-bottom: 25px;
     padding-top: 1px;
     position: relative; 
     margin: 0 auto; 
-    top: -330px;
+    top: -730px;
     left: 150px;
 }
 

@@ -103,7 +103,7 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
-    this.sound_manager = new SoundManager(this);
+    //this.sound_manager = new SoundManager(this);
     this.stage = {
         part1: false, // part 1 will turn true after our hero kills the level 1 dragon
         part2: false,
@@ -340,7 +340,7 @@ setting the battle background, saving coordinates, and also generating a list or
 */
 GameEngine.prototype.setBattle = function (game) {
     var player = game.entities[0];
-    game.sound_manager.playSound("battle", true);
+    //game.sound_manager.playSound("battle", true);
     game.is_battle = true;
     game.setBackground("./imgs/woods.png");
     player.save_x = game.entities[0].x;
@@ -793,7 +793,7 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 5000) >= 4999;
+    return Math.round(Math.random() * 5000) >= 50;
 
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
     if (Math.abs(distance_traveled) > 100) {
@@ -1958,16 +1958,41 @@ BattleMenu = function (menu_element, game) {
 UseItemMenu = function (game) {
     this.game = game;
     this.menu = document.getElementById("useitem_menu");
-    this.open = false; 
+    this.list = this.menu.children[0];
+    this.open = false;
+    if (this.game) {
+        this.items = this.game.entities[0].inventory.items;
+    }
+    this.list_items = []; 
 }
 
 UseItemMenu.prototype.showMenu = function () {
     if (!this.open) { 
         this.game.context.canvas.tabIndex = 0;
-        this.menu.tabIndex = 1; 
+        this.menu.tabIndex = 1;
+        this.menu.style.display = "block";
+        this.menu.style.visibility = "visible";
+        //this.updateItems();
     } else {
+        this.menu.style.display = "none";
+        this.menu.style.visibility = "hidden";
         this.menu.tabIndex = 0; 
         this.game.context.canvas.tabIndex = 1;
+    }
+}
+
+UseItemMenu.prototype.updateItems = function () {
+    this.list_items = [];
+    for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].usable) {
+            var new_li = document.createElement('li');
+            var text = document.createElement('p');
+            text.innerHTML = this.items[i].name; 
+            new_li.innerHTML = this.items[i].img.outerHTML;
+            new_li.innerHTML += text.outerHTML;
+            this.list.innerHTML += new_li.outerHTML; 
+            this.list_items.push(new List_item(this.game, this.items[i], new_li, i)); 
+        }
     }
 }
 
@@ -2011,15 +2036,23 @@ BattleMenu.prototype.init = function () {
         e.preventDefault();
     });
     this.use_item.addEventListener("keydown", function (e) {
+        this.pressed = false; 
         if (e.which === 40) {
             window.setTimeout(that.flee.focus(), 0);
         } else if (e.which === 38) {
             window.setTimeout(that.attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
-            
+            that.use_item_list.showMenu();
+            that.use_item_list.updateItems();
+                
         }
+        
         e.preventDefault();
-    });
+        e.stopImmediatePropagation();
+    }, false);
+    this.use_item.addEventListener("keyup", function (e) {
+        this.pressed = false; 
+    }, false);
     this.flee.addEventListener("keydown", function (e) {
         if (that.game.entities[0].is_turn) {
             if (e.which === 38) {
