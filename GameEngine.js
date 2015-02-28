@@ -42,6 +42,10 @@ Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
     } else {
         index = that.currentFrame();
     }
+
+    if (index === 0) {
+        index = this.startX;
+    }
     
 
     var locX = x;
@@ -147,6 +151,7 @@ GameEngine = function () {
     this.fight_queue = [];
     this.fiends = [];
     this.next = false; // used to detect space when advancing dialogue with NPCs.
+    this.stage = null;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -160,6 +165,11 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.environment = new Environment(this);
     this.esc_menu = new GeneralMenu(this);
+    this.stage = {
+        part1: false, // part 1 will turn true after our hero kills the level 1 dragon
+        part2: false,
+        part3: false
+    }
 }
 GameEngine.prototype.startInput = function () {
     var that = this;
@@ -740,7 +750,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
     this.width = 43;
     this.height = 64;
-    this.sight = 20; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
+    this.sight = 30; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
     // pick up on any interaction. 
     this.fleeing = false;
 }
@@ -854,7 +864,7 @@ Hero.prototype.flee = function(flee)
 }
 Hero.prototype.checkSurroundings = function () {
     // return true or false
-    return Math.round(Math.random() * 10000) >= 9999;
+    return Math.round(Math.random() * 10000) >= 38947203874293874;
 }
 
 Hero.prototype.update = function () {
@@ -1089,6 +1099,8 @@ Warrior = function (game, stats) {
     };
     this.x = 10;
     this.y = 215;
+
+    this.quests = [];
     
     this.inventory = new Inventory(this.game, 100, 20);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
@@ -1104,6 +1116,10 @@ Warrior.prototype.draw = function (context) {
 Warrior.prototype.update = function () {
     this.inventory.update(); 
     Hero.prototype.update.call(this);
+}
+
+Warrior.prototype.addQuest = function (quest) {
+    this.quests.push(quest); 
 }
 
 Warrior.prototype.setAction = function(action, target)
@@ -1173,7 +1189,6 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.draw = function (context) {
-     
     this.drawHealthBar(context);
     if (this.is_targeted)
     {
@@ -1221,7 +1236,7 @@ dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, speed, pause) {
+NPC = function (game, dialogue, anims, path, speed, pause, quad) {
     if (game && dialogue && anims && path) {
         this.game = game;
 
@@ -1245,6 +1260,7 @@ NPC = function (game, dialogue, anims, path, speed, pause) {
         this.dialogue = dialogue;
         this.dialogue_index = 0;
         this.setNextCoords();
+        this.quad = quad; 
     }
 }
 
@@ -1257,70 +1273,85 @@ NPC.prototype.setNextCoords = function()
         this.path.push(this.next_point);
 }
 NPC.prototype.draw = function (context) {
-    if (this.game.environment.curr_quadrant === 0) {
+    // only draw if NPC is in the current quadrant on the map
+    var found = false;
+    for (var i = 0; i < this.quad.length; i++) {
+        if (this.game.environment.curr_quadrant === this.quad[i]) {
+            found = true;
+        }
+    }
+    if (found) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
     }
 }
 
 NPC.prototype.update = function () {
-    if (!this.interacting) {
-        if (this.next_point.getX() > this.x) {
-            this.curr_anim = this.animations.right;
-            this.direction = Direction.RIGHT;
-            if (this.next_point.getX() - this.x < this.speed) {
-                this.x = this.next_point.getX();
+    // only update if NPC is in the current quadrant on the map
+    var found = false;
+    for (var i = 0; i < this.quad.length; i++) {
+        if (this.game.environment.curr_quadrant === this.quad[i]) {
+            found = true; 
+        }
+    }
+
+    if (found) {
+        if (!this.interacting) {
+            if (this.next_point.getX() > this.x) {
+                this.curr_anim = this.animations.right;
+                this.direction = Direction.RIGHT;
+                if (this.next_point.getX() - this.x < this.speed) {
+                    this.x = this.next_point.getX();
+                }
+                else {
+                    this.changeCoordinates(0, 0, 0, this.speed);
+                }
+            }
+            else if (this.next_point.getX() < this.x) {
+                this.curr_anim = this.animations.left;
+                this.direction = Direction.LEFT;
+                if (this.x - this.next_point.getX() < this.speed) {
+                    this.x = this.next_point.getX();
+                }
+                else {
+                    this.changeCoordinates(0, 0, this.speed, 0);
+                }
+            }
+            else if (this.next_point.getY() > this.y) {
+                this.curr_anim = this.animations.down;
+                this.direction = Direction.DOWN;
+                if (this.next_point.getY() - this.y < this.speed) {
+                    this.y = this.next_point.getY();
+                }
+                else {
+                    this.changeCoordinates(this.speed, 0, 0, 0);
+                }
+            }
+            else if (this.next_point.getY() < this.y) {
+                this.curr_anim = this.animations.up;
+                this.direction = Direction.UP;
+                if (this.y - this.next_point.getY() < this.speed) {
+                    this.changeCoordinates(0, this.speed, 0, 0);
+                }
             }
             else {
-                this.changeCoordinates(0, 0, 0, this.speed);
-            }
-        }
-        else if (this.next_point.getX() < this.x) {
-            this.curr_anim = this.animations.left;
-            this.direction = Direction.LEFT;
-            if (this.x - this.next_point.getX() < this.speed) {
-                this.x = this.next_point.getX();
-            }
-            else {
-                this.changeCoordinates(0, 0, this.speed, 0);
-            }
-        }
-        else if (this.next_point.getY() > this.y) {
-            this.curr_anim = this.animations.down;
-            this.direction = Direction.DOWN;
-            if (this.next_point.getY() - this.y < this.speed) {
-                this.y = this.next_point.getY();
-            }
-            else {
-                this.changeCoordinates(this.speed, 0, 0, 0);
-            }
-        }
-        else if (this.next_point.getY() < this.y) {
-            this.curr_anim = this.animations.up;
-            this.direction = Direction.UP;
-            if (this.y - this.next_point.getY() < this.speed) {
-                this.changeCoordinates(0, this.speed, 0, 0);
+                if (this.pause) {
+                    var that = this;
+                    this.curr_anim = this.stopAnimation(this.curr_anim);
+                    setTimeout(function () {
+                        that.setNextCoords();
+                        that.hanging = false;
+                    }, 1000);
+                }
+                else {
+                    this.setNextCoords();
+                }
+
             }
         }
         else {
-            if (!this.pause_timer && this.pause) {
-                var that = this;
-                this.curr_anim = this.stopAnimation(this.curr_anim);
-                this.pause_timer = setTimeout(function () {
-                    that.setNextCoords();
-                    that.hanging = false;
-                    clearInterval(that.pause_timer);
-                    that.pause_timer = null;
-                }, 1000);
-            }
-            else {
-                this.setNextCoords();
-            }
-
+            this.curr_anim = this.stopAnimation(this.curr_anim);
+            this.updateDialogue();
         }
-    }
-    else {
-        this.curr_anim = this.stopAnimation(this.curr_anim);
-        this.updateDialogue();
     }
 }
 
@@ -1342,6 +1373,7 @@ GameEngine.prototype.alertHero = function (dialogue) {
             that.context.canvas.tabIndex = 1;
             that.context.canvas.focus();
             that.canControl = true;
+            that.next = false; 
             text_box.removeEventListener("keydown", _func);
         }
         e.preventDefault();
@@ -1378,19 +1410,28 @@ NPC.prototype.updateDialogue = function () {
 
 // loops through dialogue for the given NPC.
 NPC.prototype.startInteraction = function () {
-    this.reposition();
-    var text_box = document.getElementById("dialogue_box");
+    // only update if NPC is in the current quadrant on the map
+    var found = false;
+    for (var i = 0; i < this.quad.length; i++) {
+        if (this.game.environment.curr_quadrant === this.quad[i]) {
+            found = true;
+        }
+    }
+    if (found) {
+        this.reposition();
+        var text_box = document.getElementById("dialogue_box");
 
-    var text = document.createElement('p');
-    text.innerHTML = this.dialogue[this.dialogue_index];
-    text_box.innerHTML = text.outerHTML;
-    text_box.style.visibility = "visible";
-    text_box.style.display = "block";
-    this.game.context.canvas.tabIndex = 0;
-    text_box.tabIndex = 1;
-    text_box.focus();
-    this.interacting = true;
-    this.game.canControl = false;
+        var text = document.createElement('p');
+        text.innerHTML = this.dialogue[this.dialogue_index];
+        text_box.innerHTML = text.outerHTML;
+        text_box.style.visibility = "visible";
+        text_box.style.display = "block";
+        this.game.context.canvas.tabIndex = 0;
+        text_box.tabIndex = 1;
+        text_box.focus();
+        this.interacting = true;
+        this.game.canControl = false;
+    }
 }
 
 NPC.prototype.reposition = function () {
@@ -1413,27 +1454,31 @@ path: path of the object
 speed: speed of the movement
 quest: what kind of quest it has
 */
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quest){
-
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quest) {
+    this.name = name;
+    this.quest = quest; 
+    NPC.call(this, game, dialog, anims, path, speed, pause);
 }
+
+NPC_QUEST.prototype = new NPC();
+NPC_QUEST.prototype.constructor = NPC_QUEST;
 
 
 /* QUEST OBJECT abstract class
  Parameters: giverName (who gave the quest), 
              reward (what the reward is for finishing that quest)
-			 game (the game engine)
-			 
+			 game (the game engine)			 
 */
-QUEST = function(game, giverName, reward, complete){
+
+QUEST = function(game, giverName, reward) {
 	this.game = game;
 	this.giverName = giverName;
 	this.reward = reward;
-	this.complete = complete;
+	this.complete = false;
 	if(this.complete){ // if the quest has been complete
-		this.game.alertHero("Your mission is complete, Dear Young Hero! ");
+		this.game.alertHero("Your mission is complete, dear young hero!");
 	}
 }
-
 
 /*RETRIEVE_ITEM_QUEST
 game: game engine
@@ -1442,26 +1487,39 @@ reward: what is the reward for finishing this quest
 item: the item to retrieve or find
 item_found: if the item has been retrieved
  */
- RETRIEVE_ITEM_QUEST = function(game, giverName, reward, item, item_found){
+ RETRIEVE_ITEM_QUEST = function(game, giverName, reward, item) {
 	this.item = item;
-	this.item_found = item_found;
-	QUEST.call(this, giverName, reward);
+	this.item_found = false;
+	QUEST.call(this, game, giverName, reward);
  }
+
+ RETRIEVE_ITEM_QUEST.prototype = new QUEST();
+ RETRIEVE_ITEM_QUEST.prototype.constructor = RETRIEVE_ITEM_QUEST; 
 
  /*KILL_QUEST 
 enemy_to_kill : whom our hero has to kill
-enemies_killed[number_enemies]: array of already killed enemies
+enemies_killed: number of killed enemies
 number_enemies: how many enemies our hero should kill
  */
+ KILL_QUEST = function (game, giverName, reward, enemy_to_kill, number_enemies) {
+     this.enemy_to_kill = enemy_to_kill;
+     this.number_enemies = number_enemies;
+     this.enemies_killed = 0;
+     QUEST.call(this, game, giverName, reward);
+ }
 
+ KILL_QUEST.prototype = new QUEST();
+ KILL_QUEST.prototype.constructor = KILL_QUEST;
  
 Point = function (x, y) {
     this.x = x;
     this.y = y;
 }
+
 Point.prototype.getX = function () {
     return this.x;
 }
+
 Point.prototype.getY = function () {
     return this.y;
 }
@@ -1516,7 +1574,7 @@ Environment = function (game) {
                 [46, 46, 47, 48, 0, 0, 42, 43, 44, 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 6, 29, 19, 29, 5, 6, 64, 29, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 13, 14, 98, 99],
                 [53, 53, 40, 41, 36, 0, 49, 50, 51, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 28, 0, 65, 64, 62, 3, 4, 62, 64, 0, 0, 65, 37, 38, 104, 63, 32, 96, 97, 63, 32, 30],
                 [36, 36, 47, 48, 94, 0, 54, 55, 56, 57, 0, 3, 4, 28, 28, 0, 28, 0, 65, 29, 29, 28, 0, 0, 0, 5, 6, 37, 38, 0, 0, 3, 4, 65, 65, 63, 33, 98, 99, 30, 33, 31],
-                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 0, 0, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
+                [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 37, 38, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
                 [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]
     ];
@@ -1628,18 +1686,21 @@ Environment.prototype.initInteractables = function () {
     this.interactables.push(new Door(2 , 6 , 0, this.game)); // door 1
     this.interactables.push(new Door(8, 6, 0, this.game)); // door 2 
     //this.interactables.push(new Interactable(7, 6, 0, this.game)); // sign in front of store
-    this.interactables.push(new Door(15, 6, 0, this.game)); // door 3
+    this.interactables.push(new Door(15, 6, [0,1], this.game)); // door 3
 
     this.interactables.push(new Door(1, 4, 3, this.game));
     this.interactables.push(new Door(10, 4, 3, this.game));
 
     // chests
-    var loot1 = [new Armor(this.game, "Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
+    var loot1 = [new Armor(this.game, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100];
     var loot2 = [new Potion(this.game, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55];
     this.interactables.push(new Chest(9, 12, 4, this.game, loot1, false));
-    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, false));
+    this.interactables.push(new Chest(5, 10, 2, this.game, loot2, true));
 
     // healing berry bushes
+
+    // logs
+    this.interactables.push(new Log(12, 10, 4, this.game));
 }
 
 Interactable = function (x, y, quad, game) {
@@ -1649,7 +1710,43 @@ Interactable = function (x, y, quad, game) {
     this.game = game;
 }
 
-Interactable.prototype.startInteraction = function () { }
+Interactable.prototype.startInteraction = function () {
+    var found = false;
+    if (this.quad.length) {
+        for (var i = 0; i < this.quad.length; i++) {
+            if (this.game.environment.curr_quadrant === this.quad[i]) {
+                found = true; 
+            }
+        }
+    } else {
+        return this.game.environment.curr_quadrant === this.quad; 
+    }
+
+    return found; 
+}
+
+// requires an ax to chop apart, usuaully to get to a chest or to a secret area. 
+Log = function (x, y, quad, game) {
+    Interactable.call(this, x, y, quad, game);
+}
+
+Log.prototype = new Interactable();
+Log.prototype.constructor = Log;
+
+Log.prototype.startInteraction = function () {
+    if (Interactable.prototype.startInteraction.call(this)) {
+        if (this.game.entities[0].inventory.hasItem("Ax", 1)) {
+            this.game.alertHero("You use your ax to break the log!");
+            var loc_point = this.game.changeXYForQuad(new Point(this.x / 32, this.y / 32), 4);
+            var ax = this.game.entities[0].inventory.getItem("Ax");
+            ax.doAction();
+            this.game.environment.map[loc_point.y][loc_point.x] = 0;
+            this.game.environment.map[loc_point.y][loc_point.x - 1] = 0;
+        } else {
+            this.game.alertHero("This log requires an ax to break.");
+        }
+    }
+}
 
 Door = function (x, y, quad, game) {
     this.is_closed = true;
@@ -1661,25 +1758,27 @@ Door.prototype = new Interactable();
 Door.prototype.constructor = Door;
 
 Door.prototype.startInteraction = function () {
-    var y = this.y / 32;
-    var x = this.x / 32;
-    var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad); 
+    if (Interactable.prototype.startInteraction.call(this)) {
+        var y = this.y / 32;
+        var x = this.x / 32;
+        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
 
-    if (this.locked) {
-        this.game.alertHero("This door is locked. Try coming back after the village isn't burning down."); 
-    } else {
-        if (this.is_closed) {
-            // close door
-            this.game.environment.map[loc_point.y][loc_point.x] = 105;
-            this.game.environment.map[loc_point.y - 1][loc_point.x] = 102;
-            this.game.environment.map[loc_point.y - 2][loc_point.x] = 101;
+        if (this.locked) {
+            this.game.alertHero("This door is locked. Try coming back after the village isn't burning down.");
         } else {
-            // open door
-            this.game.environment.map[loc_point.y][loc_point.x] = 80;
-            this.game.environment.map[loc_point.y - 1][loc_point.x] = 79;
-            this.game.environment.map[loc_point.y - 2][loc_point.x] = 78;
+            if (this.is_closed) {
+                // close door
+                this.game.environment.map[loc_point.y][loc_point.x] = 105;
+                this.game.environment.map[loc_point.y - 1][loc_point.x] = 102;
+                this.game.environment.map[loc_point.y - 2][loc_point.x] = 101;
+            } else {
+                // open door
+                this.game.environment.map[loc_point.y][loc_point.x] = 80;
+                this.game.environment.map[loc_point.y - 1][loc_point.x] = 79;
+                this.game.environment.map[loc_point.y - 2][loc_point.x] = 78;
+            }
+            this.is_closed = !this.is_closed;
         }
-        this.is_closed = !this.is_closed;
     }
 }
 
@@ -1694,27 +1793,29 @@ Chest.prototype = new Interactable();
 Chest.prototype.constructor = Chest; 
 
 Chest.prototype.startInteraction = function () {
-    var y = this.y / 32;
-    var x = this.x / 32;
+    if (Interactable.prototype.startInteraction.call(this)) {
+        var y = this.y / 32;
+        var x = this.x / 32;
 
-    var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad); 
+        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
 
-    if (this.closed) {
-        if (!this.locked) {
-            this.lootChest(); 
-        } else if (this.locked && this.game.entities[0].removeItem("chest_key", 1)) {
-            var key = this.game.entities[0].removeItem("chest_key", 1);
-            // open chest
-            // give loot
-            this.lootChest()
+        if (this.closed) {
+            if (!this.locked) {
+                this.lootChest();
+            } else if (this.locked && this.game.entities[0].inventory.hasItem("chest_key", 1)) {
+                var key = this.game.entities[0].inventory.removeItem("chest_key", 1);
+                // open chest
+                // give loot
+                this.lootChest()
+            } else {
+                this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
+            }
         } else {
-            this.game.alertHero("This chest is locked and requires a key to open. Perhaps there are some around.");
+            this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
         }
-    } else {
-        this.game.alertHero("You've already taken the contents of this chest. You greedy bastard.");
-    }
-    if (!this.closed) {
-        this.game.environment.map[loc_point.y][loc_point.x] = 100;
+        if (!this.closed) {
+            this.game.environment.map[loc_point.y][loc_point.x] = 100;
+        }
     }
 }
 
@@ -1724,12 +1825,15 @@ Chest.prototype.lootChest = function () {
         this.game.entities[0].inventory.addItem(this.loot[i]);
         var loot = (this.loot[i].name || this.loot[i] + " gold");
         if (this.loot[i].qty > 1) {
-            loot += " x2";
+            loot += " x" + this.loot[i].qty;
         }
         if (i === this.loot.length - 1) {
-            loot_items += "and " + loot; 
+            loot_items += "and " + loot;
         } else {
             loot_items += loot + ", ";
+        }
+        if (this.loot.length === 1) {
+            loot_items = loot; 
         }
     }
     this.game.alertHero("You recieved " + loot_items + ".");
@@ -1747,11 +1851,13 @@ HealBerry.prototype = new Interactable();
 HealBerry.prototype.constructor = HealBerry;
 
 HealBerry.prototype.startInteraction = function () {
-    if (!this.picked) {
-        this.game.entities[0].addItem(this.berry);
-        this.picked = true;
-    } else {
-        this.game.alertHero("You've already picked the berries off of this plant.");
+    if (Interactable.prototype.startInteraction.call(this)) {
+        if (!this.picked) {
+            this.game.entities[0].addItem(this.berry);
+            this.picked = true;
+        } else {
+            this.game.alertHero("You've already picked the berries off of this plant.");
+        }
     }
 }
 
@@ -2083,13 +2189,98 @@ GeneralMenu.prototype.showMenu = function (flag) {
     }
 }
 
-Storekeeper = function (game, dialogue, anims, path, pause, name) {
-    this.name = name;
-    NPC.call(this, game, dialogue, anims, path, 0, pause);
+Storekeeper = function (game, name, dialog, anims, path, speed, pause, quest) {
+    this.part = 0; 
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quest);
+    this.curr_anim = this.animations.down;
+    this.lastX = this.x;
 }
 
-Storekeeper.prototype = new NPC();
+Storekeeper.prototype = new NPC_QUEST();
 Storekeeper.prototype.constructor = Storekeeper;
+
+Storekeeper.prototype.startInteraction = function () {
+    if (this.game.stage.part1 === false) {
+        // if before dragon is dead, have storekeeper give hero a quest. 
+        this.showDialog();
+    } else {
+        // after dragon is dead, show wares to the hero.
+        this.showWares(); 
+    }
+}
+
+Storekeeper.prototype.showDialog = function () {
+    this.reposition();
+    var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.game.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true;
+    this.game.canControl = false;
+}
+
+Storekeeper.prototype.update = function () {
+    if (!this.interacting) {
+        this.curr_anim = this.animations.down;
+        this.direction = Direction.DOWN;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+
+Storekeeper.prototype.updateDialogue = function () {
+    if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = document.createElement('p');
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                this.game.canControl = true;
+                this.interacting = false;
+                if (this.part === 0) {
+                    this.part++;
+                } else if (this.part === 1 && this.quest.complete) {
+                    this.part++;
+                }
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+Storekeeper.prototype.draw = function (context) {
+    if (this.game.environment.curr_quadrant === 3) {
+        this.x = 485; 
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    } else if (this.game.environment.curr_quadrant === 4) {
+        this.x = 133;
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    }
+}
+
+Storekeeper.prototype.showWares = function (flag) {
+    if (flag) {
+
+    } else {
+
+    }
+}
 
 //Storekeeper.prototype.requestSale = function (buyer, item_name, qty) {
 //    var item = null;
@@ -2153,6 +2344,34 @@ UsableItem = function (game, name, price, qty, img) {
 UsableItem.prototype = new Item();
 UsableItem.prototype.constructor = UsableItem;
 
+
+// Special items are not equipable, stackable, or usable in the normal sense, and they do not have a sale price.
+// special items have a number of uses and when they run out, the item will remove itself from the hero's inventory
+// actionFunction is the "doAction" function for special item, pass in whatever you need the item to do. 
+SpecialItem = function (game, name, img, uses, actionFunction) {
+    UsableItem.call(this, game, name, 0, 1, img);
+    this.isStackable = false;
+    this.isEquipped = false;
+    this.uses = uses;
+    this.actionFunction = actionFunction;
+    this.usable = false; 
+}
+
+SpecialItem.prototype = new UsableItem();
+SpecialItem.prototype.constructor = SpecialItem;
+
+SpecialItem.prototype.doAction = function () {
+    this.actionFunction();
+    this.uses--;
+    this.update();
+}
+
+SpecialItem.prototype.update = function () {
+    if (this.uses === 0) {
+        this.game.entities[0].inventory.removeItem(this.name, 1);
+    }
+}
+
 // potion will be mostly potions but a heal berry does the same thing so it's also a Potion. 
 // types are: mana, health, str, dex, int, stam - exactly as typed here so other code works. 
 
@@ -2190,7 +2409,8 @@ Potion.prototype.doAction = function () {
     this.game.entities[0].inventory.removeItem(this.name, 1);
 }
 
-HTML_Item = function (element) {
+HTML_Item = function (element, game) {
+    this.game = game;
     this.element = element;
     this.item = null;
     this.menu = document.getElementById("item_menu");
@@ -2204,7 +2424,8 @@ HTML_Item = function (element) {
     this.return.innerHTML = "Return";
 }
 
-HTML_Item.prototype.showItemMenu = function (flag, inventory) {
+HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
+    this.index = index; 
     if (flag && this.item) {
         inventory.interface.tabIndex = 0; 
         this.menu.style.visibility = "visible";
@@ -2333,8 +2554,17 @@ Inventory = function (game, coin, max_items) {
 Inventory.prototype.initHtmlItems = function () {
     var html_elements = document.getElementById("items").getElementsByTagName('DIV');
     for (var i = 0; i < html_elements.length; i++) {
-        var new_object = new HTML_Item(html_elements[i]); 
+        var new_object = new HTML_Item(html_elements[i], this.game); 
         this.html_items.push(new_object);
+    }
+}
+
+// used if you need to interact with an item in the inventory without removing it or increasing it's qty.
+Inventory.prototype.getItem = function (item_name) {
+    for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].name === item_name) {
+            return this.items[i];
+        }
     }
 }
 
@@ -2349,6 +2579,16 @@ Inventory.prototype.deductCoin = function (amount) {
 
 Inventory.prototype.addCoin = function (amount) {
     this.coin += amount;
+}
+
+Inventory.prototype.hasItem = function (item_name) {
+    var found = false;
+    for (var i = 0; i < this.items.length; i++) {
+        if (this.items[i].name === item_name) {
+            found = true; 
+        }
+    }
+    return found;
 }
 
 Inventory.prototype.showInventory = function (flag) {
@@ -2369,6 +2609,15 @@ Inventory.prototype.showInventory = function (flag) {
     }
 }
 
+HTML_Item.prototype.updateShowItemMenu = function () {
+    var that = this; 
+    this.element.addEventListener("keydown", function (e) {
+        if (String.fromCharCode(e.which) === ' ') {
+            that.showItemMenu(true, that.game.entities[0].inventory);
+        }
+    });
+}
+
 Inventory.prototype.draw = function (ctx) {
     for (var i = 0; i < this.html_items.length; i++) {
         // get img of each item
@@ -2384,15 +2633,17 @@ Inventory.prototype.draw = function (ctx) {
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
             this.html_items[i].actionInput();
-            
+            this.html_items[i].updateShowItemMenu(); 
         } else {
+            if (i === 5) {
+                console.log("fuck this");
+            }
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
         }
     }
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
-    this.selectInput();
     
 }
 
