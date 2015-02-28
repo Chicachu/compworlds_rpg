@@ -223,17 +223,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
         this.environment.draw(1);
     }
     this.queueActions();
-    for (var i = 1; i < this.entities.length; i++) {
-        if (this.entities[0].x - this.entities[i].x < 35) {
-            if (this.entities[i].y < this.entities[0].y) {
-                this.entities[i].draw(this.context);
-                this.entities[0].draw(this.context);
-            } else {
-                this.entities[0].draw(this.context);
-                this.entities[i].draw(this.context);
-                break;
-            }
-        }
+    for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.context);
     }
     if (drawCallBack) {
