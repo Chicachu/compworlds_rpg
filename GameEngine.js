@@ -122,17 +122,12 @@ GameEngine.prototype.startInput = function () {
                         || e.which === 38
                         || e.which === 39
                         || e.which === 40) {
-<<<<<<< HEAD
-                if (!that.is_battle) {
-                    that.key = e.which;
-                }
-=======
+
                 that.key = e.which;
             } else if (e.which === 27) {
                 that.esc_menu.showMenu(true); 
             } else if (e.which === 73) {
                 that.key_i = true; 
->>>>>>> origin/origin
             }
         } else {
             that.key = 0;
@@ -185,10 +180,7 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-<<<<<<< HEAD
-//test comment another
 
-=======
 GameEngine.prototype.clearEntities = function(save_entities)
 {
     //for(var i = 1; i < this.entities.length; i++)
@@ -213,7 +205,7 @@ GameEngine.prototype.addAuxillaryEntity = function(entity)
 {
     this.auxillary_sprites.push(entity);
 }
->>>>>>> origin/origin
+
 GameEngine.prototype.draw = function (drawCallBack) {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
     this.context.save();
@@ -335,11 +327,8 @@ Takes a game as a parameter
 GameEngine.prototype.fadeIn = function (game) {
     var that = game;
 
-<<<<<<< HEAD
-    that.timerId2 = setInterval(function () {
-=======
     that.timerId = setInterval(function () {
->>>>>>> origin/origin
+
         that.context.globalAlpha += .05;
         if (that.context.globalAlpha > .95) {
             that.context.globalAlpha = 1;
@@ -379,8 +368,8 @@ GameEngine.prototype.setBattle = function (game) {
     game.decideFighters();
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     window.setTimeout(game.menu.showMenu(true), 5000);
-    
-<<<<<<< HEAD
+}
+
 GameEngine.prototype.resetBattle = function (players)
 {
     players[0].game.is_battle = false;
@@ -390,8 +379,7 @@ GameEngine.prototype.resetBattle = function (players)
     players[0].game.menu.showMenu(false);
     players[0].x = players[0].save_x;
     players[0].y = players[0].save_y;
-=======
->>>>>>> origin/origin
+
 }
     
 /*
@@ -562,7 +550,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
 Entity.prototype.changeLocation = function () {
     if (this.game.key !== 0 && this.game.key !== null && !this.game.is_battle) {
         this.moving = true;
-        this.changeCoordinates(.5, .5, .5, .5);
+        this.changeCoordinates(.15, .15, .15, .15);
     }
     else{
         this.moving = false;
@@ -1190,29 +1178,11 @@ Enemy.prototype.init = function()
     this.curr_anim = this.stop_move_animation;
 }
 Enemy.prototype.draw = function (context) {
-<<<<<<< HEAD
-    //if (this.game.is_battle && this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
-    //    this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-    //} else 
-    if (this.game.is_battle) {
-        if (this.attack_anim) {
-            this.fight_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        } else if (this.game.is_battle && this.game.battleOver([this.game.entities[0], this.game.entities[1]]) && this.fight_animation.looped) {
-            this.death_animation = new Animation(this.spriteSheet, 5, 20, 64, 64, .05, 1, true, false);
-            this.death_animation.elapsedTime = .25;
-            this.death_animation.totalTime = .5;
-            this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        } else  {
-            this.stop_move_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        } //else if (this.game.battleOver(this.game, [this.game.entities[0], this.game.entities[1]])) {
-        //    this.death_animation.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
-        //}
-=======
     this.drawHealthBar(context);
     if (this.is_targeted)
     {
         this.drawSelector(context, 'yellow');
->>>>>>> origin/origin
+
     }
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
 }
