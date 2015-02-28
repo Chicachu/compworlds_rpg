@@ -26,6 +26,8 @@ ASSET_MANAGER.queueDownload("./imgs/items/shield1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/shield2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/ax.png");
 
+ASSET_MANAGER.queueDownload("./imgs/items/quest_potion.png");
+
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
     var context = canvas.getContext("2d");
@@ -84,6 +86,8 @@ ASSET_MANAGER.downloadAll(function () {
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
                                             ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
                                             [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest);
+
+    var quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });
 
 										//var mal = new Enemy(gameEngine, new Statistics(100, 20, 10), malboro_anims, true);
 

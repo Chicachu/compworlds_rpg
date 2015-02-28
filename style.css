@@ -226,4 +226,34 @@ body {
     background-image: url("./imgs/equipment/offhand.png");
 }
 
+#useitem_menu { 
+    height: auto;
+    width: auto; 
+    position: relative; 
+}
 
+#useitem_menu ul {
+    list-style-type: none;
+    background-image: url("./imgs/menu_background.png"); 
+    width: 125px;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+#useitem_menu li {
+    height: 30px;
+    width: auto;
+    top: -15px;
+}
+
+#useitem_menu img {
+    float: left; 
+}
+
+#useitem_menu p {
+    clear: right;
+    padding-top: 10px;
+    left: -10px;
+    color: #d8bca1;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+}
