@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -259,12 +259,8 @@ GameEngine.prototype.draw = function (drawCallBack) {
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
-            if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                var ent_y = this.entities[0].y;
-                if (this.environment[this.current_environment].curr_quadrant !== 0 && this.current_environment === "level1") {
-                    ent_y += 20;
-                }
-                if (this.entities[i].y < ent_y) {
+            if (Math.abs(this.entities[0].x - (this.entities[i].x - this.entities[i].x_offset)) < 35 && !hero_drawn) {
+                if (this.entities[i].y < (this.entities[0].y + this.entities[i].y_offset)) {
                     this.entities[i].draw(this.context);
                     this.entities[0].draw(this.context);
                 } else {
@@ -628,6 +624,8 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.y = y;
     this.save_x = x;
     this.save_y = y;
+    this.y_offset = 0;
+    this.x_offset = 0;
     this.center_x = this.x / 2;
     this.center_y = this.y / 2;
     this.direction = Direction.DOWN;
@@ -2650,6 +2648,7 @@ Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest, map
 	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
 	this.curr_anim = this.animations.down;
 	this.lastX = this.x;
+	this.y_offset = 15;
 	}
 	
 Ghost.prototype = new NPC_QUEST();
@@ -2754,6 +2753,7 @@ Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, que
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
+    this.y_offset = 25;
 }
 
 Storekeeper.prototype = new NPC_QUEST();
@@ -2862,6 +2862,8 @@ Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest, ma
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
+    this.y_offset = 25;
+    this.x_offset = 5;
 }
 
 Witch.prototype = new NPC_QUEST();
@@ -2885,9 +2887,8 @@ Witch.prototype.showDialog = function () {
     if (this.part === 0 && this.game.entities[0].hasQuest("Ghost")) {
         this.part++;
     }
-    if (this.part === 0) {
-        text.innerHTML = this.dialogue[this.part][this.dialogue_index];
-    }
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    
     text_box.innerHTML = text.outerHTML;
     text_box.style.visibility = "visible";
     text_box.style.display = "block";
