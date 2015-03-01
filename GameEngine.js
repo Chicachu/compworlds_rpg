@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "level1";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -919,9 +919,9 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-        this.preBattle();
-    }
+    //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+    //    this.preBattle();
+    //}
     this.checkBoundaries();
 
         if (this.game.space) {
