@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -249,7 +249,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     this.queueActions();
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
-            && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quad)) {
+            && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
             if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
                 if (this.entities[i].y < this.entities[0].y) {
                     this.entities[i].draw(this.context);
@@ -2798,6 +2798,10 @@ Storekeeper.prototype.updateDialogue = function () {
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++;
                 } else if (this.part === 3) {
+                    this.part++;
+                } else if (this.part === 4 && this.game.stage.part2) {
+                    this.part++; 
+                } else if (this.part === 5) {
                     this.part++;
                 }
             }
