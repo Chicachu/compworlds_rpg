@@ -795,7 +795,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     Entity.call(this, game, x, y, spriteSheet, animations, stats);
     this.width = 43;
     this.height = 64;
-    this.sight = 30; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
+    this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
     // pick up on any interaction. 
     this.fleeing = false;
 }
@@ -2647,7 +2647,6 @@ Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest, map
 	this.part = 0; 
 	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
 	this.curr_anim = this.animations.down;
-	this.lastX = this.x;
 	this.y_offset = 15;
 	}
 	
@@ -2752,7 +2751,6 @@ Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, que
 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
-    this.lastX = this.x;
     this.y_offset = 25;
 }
 
@@ -2861,7 +2859,6 @@ Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest, ma
     this.part = 0; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
-    this.lastX = this.x;
     this.y_offset = 25;
     this.x_offset = 5;
 }
