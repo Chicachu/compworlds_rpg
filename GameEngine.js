@@ -1803,6 +1803,7 @@ Log.prototype.startInteraction = function () {
     }
 }
 
+// PORTAL FUNCTIONS 
 EnterDragonCave = function () {
     if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
@@ -1827,6 +1828,7 @@ TalkToDragon = function () {
 
 }
 
+// used to change maps or to initiate special battles. 
 Portal = function (x, y, quad, game, func) {
     this.func = func; 
     Interactable.call(this, x, y, quad, game);
