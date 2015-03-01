@@ -219,6 +219,13 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
+GameEngine.prototype.removeEntity = function(entity){
+	var index =  this.entities.indexOf(entity);
+	
+	if (index > -1) {
+    this.entities.splice(index, 1);
+ }
+}
 
 GameEngine.prototype.clearEntities = function (save_entities) {
     if (save_entities) {
@@ -252,8 +259,8 @@ GameEngine.prototype.draw = function (drawCallBack) {
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
-            if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                if (this.entities[i].y < this.entities[0].y) {
+            if (Math.abs(this.entities[0].x - (this.entities[i].x - this.entities[i].x_offset)) < 35 && !hero_drawn) {
+                if (this.entities[i].y < (this.entities[0].y + this.entities[i].y_offset)) {
                     this.entities[i].draw(this.context);
                     this.entities[0].draw(this.context);
                 } else {
@@ -458,7 +465,7 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    game.fiends.push(new Dragon1(game, new Statistics(100, 20, 20, 5, 10, 3)));
+    game.fiends.push(new Dragon1(game, new Statistics(100, 20, 15, 5, 10, 3)));
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
     game.fiends[0].init();
@@ -631,6 +638,10 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.y = y;
     this.save_x = x;
     this.save_y = y;
+    this.y_offset = 0;
+    this.x_offset = 0;
+    this.center_x = this.x / 2;
+    this.center_y = this.y / 2;
     this.direction = Direction.DOWN;
     this.save_direction = this.direction;
     this.moving = false;
@@ -646,6 +657,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
         this.stop_move_animation = this.stopAnimation(this.animations.right);
     }
 }
+
 
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () {
@@ -945,9 +957,8 @@ Hero.prototype.flee = function (flee) {
 Hero.prototype.checkSurroundings = function () {
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
 
-    if (Math.abs(distance_traveled) > 100) {
-        var x = 8;
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3994;
+    if (Math.abs(distance_traveled) > 125) {
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3999;
     }
 }
 
@@ -958,7 +969,8 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+    if ((this.game.current_environment === "level1" && this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) ||
+        this.game.current_environment === "dragon_cave") {
         this.preBattle();
     }
     this.checkBoundaries();
@@ -2052,7 +2064,7 @@ HealBerry.prototype.startInteraction = function () {
     if (Interactable.prototype.startInteraction.call(this)) {
         var x = this.x / 32;
         var y = this.y / 32;
-        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
+        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.game.environment[this.game.current_environment].curr_quadrant);
 
         if (!this.picked) {
             this.game.entities[0].recieveItem(this.berry);
@@ -2712,7 +2724,7 @@ Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest, map
 	this.part = 0; 
 	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
 	this.curr_anim = this.animations.down;
-	this.lastX = this.x;
+	this.y_offset = 15;
 	}
 	
 Ghost.prototype = new NPC_QUEST();
@@ -2780,13 +2792,18 @@ Ghost.prototype.updateDialogue = function () {
 					console.log("quest added, part=0");
                     this.game.entities[0].addQuest(this.quest);
                 }
-                if (this.part===1&&this.game.entities[0].inventory.hasItem("Potion")) {
-
+                if (this.part===1 &&this.game.entities[0].inventory.hasItem("Potion")) {
+					 
                     this.game.entities[0].inventory.removeItem("Potion", 1);
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++; 
 					console.log("reward added"+ this.part);
                 }
+				
+				if(this.part ===2){
+				console.log("removing entity"+ this.part);
+					this.game.removeEntity(this);
+				}
             }
             this.game.next = false;
         }
@@ -2811,7 +2828,7 @@ Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, que
 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
-    this.lastX = this.x;
+    this.y_offset = 25;
 }
 
 Storekeeper.prototype = new NPC_QUEST();
@@ -2919,7 +2936,8 @@ Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest, ma
     this.part = 0; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
-    this.lastX = this.x;
+    this.y_offset = 25;
+    this.x_offset = 5;
 }
 
 Witch.prototype = new NPC_QUEST();
@@ -2943,9 +2961,8 @@ Witch.prototype.showDialog = function () {
     if (this.part === 0 && this.game.entities[0].hasQuest("Ghost")) {
         this.part++;
     }
-    if (this.part === 0) {
-        text.innerHTML = this.dialogue[this.part][this.dialogue_index];
-    }
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    
     text_box.innerHTML = text.outerHTML;
     text_box.style.visibility = "visible";
     text_box.style.display = "block";
