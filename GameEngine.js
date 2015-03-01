@@ -1769,7 +1769,7 @@ Interactable = function (x, y, quad, game) {
 
 Interactable.prototype.startInteraction = function () {
     var found = false;
-    if (this.quad.length) {
+    if (this.quad.length > 1) {
         for (var i = 0; i < this.quad.length; i++) {
             if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
                 found = true;
@@ -2861,7 +2861,7 @@ Witch.prototype.showDialog = function () {
     if (this.part === 0 && this.game.entities[0].hasQuest("Ghost")) {
         this.part++;
     }
-    if (this.part) {
+    if (this.part === 0) {
         text.innerHTML = this.dialogue[this.part][this.dialogue_index];
     }
     text_box.innerHTML = text.outerHTML;
