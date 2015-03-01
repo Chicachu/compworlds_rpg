@@ -391,7 +391,7 @@ GameEngine.prototype.setBattle = function (game) {
     player.changeMoveAnimation();
     player.changeLocation();
     game.animation_queue.push(new Event(player, player.stop_move_animation, 0));
-    game.fiends = game.environment[this.current_environment].generateFiend(game, game.fiends).splice(0);
+    game.fiends = game.environment[game.current_environment].generateFiend(game, game.fiends).splice(0);
     game.clearEntities(true);
     var space_out = ((game.height / 2) / game.fiends.length) * 1.2;
     var next_y = space_out;
@@ -903,13 +903,13 @@ Hero.prototype.reposition = function (other) {
 }
 
 Hero.prototype.preBattle = function () {
-    //if (this.moving && this.checkSurroundings()) {
-    //    this.game.canControl = false;
-    //    this.game.key = 0;
-    //    this.game.space = 0; 
-    //    // lock user input controls here.
-    //    this.game.fadeOut(this.game, this.game, this.game.setBattle);
-    //}
+    if (this.moving && this.checkSurroundings()) {
+        this.game.canControl = false;
+        this.game.key = 0;
+        this.game.space = 0; 
+        // lock user input controls here.
+        this.game.fadeOut(this.game, this.game, this.game.setBattle);
+    }
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
