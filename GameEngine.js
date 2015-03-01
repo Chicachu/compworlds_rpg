@@ -2703,7 +2703,8 @@ Ghost.prototype.updateDialogue = function () {
                     this.game.entities[0].addQuest(this.quest);
                 }
                 if (this.part===1&&this.game.entities[0].inventory.hasItem("Potion")) {
-					
+
+                    this.game.entities[0].inventory.removeItem("Potion", 1);
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++; 
 					console.log("reward added"+ this.part);
@@ -2846,10 +2847,7 @@ Witch.prototype.startInteraction = function () {
     if (this.game.stage.part1 === false) {
         // if before dragon is dead, have Witch give hero a quest. 
         this.showDialog();
-    } else {
-        // after dragon is dead, show wares to the hero.
-        this.showWares();
-    }
+    } 
 }
 
 Witch.prototype.showDialog = function () {
@@ -2910,12 +2908,12 @@ Witch.prototype.updateDialogue = function () {
                     this.game.entities[0].addQuest(this.quest);
                 }
                 if (this.part === 2 && this.game.entities[0].inventory.hasItem("Book of Spells")) {
-
+                    this.game.entities[0].inventory.removeItem("Book of Spells", 1); 
                      this.game.entities[0].inventory.addItem(this.quest.reward);
                      this.part++; 
                      this.showDialog();
                  } else if (this.part === 3) {
-                    this.part++; 
+                    this.part++;    
                 }
             }
             this.game.next = false;
