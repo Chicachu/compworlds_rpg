@@ -190,7 +190,9 @@ GameEngine.prototype.startInput = function () {
     this.context.canvas.addEventListener('keyup', function (e) {
         if (e.which === 80) {
             that.sound_manager.toggleSound();
+            e.stopImmediatePropagation();
         }
+        e.preventDefault();
     });
 }
 
@@ -1390,7 +1392,7 @@ pause : whether the NPC will rest for 1 second once it reaches one of its points
 NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
     if (game && dialogue && anims && path) {
         this.game = game;
-
+        this.scale = 1;
         this.map_name = map_name; 
         this.animations = anims;
         this.spriteSheet = this.animations.right.spriteSheet;
@@ -1416,6 +1418,7 @@ NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
     }
 }
 
+
 NPC.prototype = new Entity();
 NPC.prototype.constructor = NPC;
 
@@ -1432,10 +1435,14 @@ NPC.prototype.draw = function (context) {
         }
     }
     if (found) {
-        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
     }
 }
 
+NPC.prototype.setScale = function(scale)
+{
+    this.scale = scale;
+}
 NPC.prototype.update = function () {
     // only update if NPC is in the current quadrant on the map
     var found = false;
@@ -1704,7 +1711,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
 }
 
-Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background) {
+Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends) {
     this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = map;
@@ -1713,7 +1720,7 @@ Environment = function (game, map, animations, tilesheet, quads, interactables, 
     this.quads = quads;
     this.name = name;
     this.curr_quadrant = 0;
-
+    this.fiends = fiends;
     this.battle_background = battle_background;
     this.interactables = interactables;
     //Environment.initInteractables.call(this, this.interactables);
@@ -1731,9 +1738,8 @@ EnvironmentAnimation = function (animation, coords, quads) {
 
 OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background) {
     this.indoor_maps = indoor_maps;
-
-    this.fiends = fiends; 
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background);
+    this.fiends = fiends;
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends);
     this.addIndoorEnvironments();
 }
 
@@ -1746,9 +1752,9 @@ OutdoorEnvironment.prototype.addIndoorEnvironments = function () {
     }
 }
 
-IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, fiends) {
+IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends) {
     this.fiends = fiends;
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name);
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends);
 }
 
 

@@ -16,6 +16,7 @@ ASSET_MANAGER.queueDownload("./imgs/witch.png");
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
 ASSET_MANAGER.queueDownload("./imgs/roomInteriorSpritesSheet.png")
 ASSET_MANAGER.queueDownload("./imgs/dragoncave.png");
+ASSET_MANAGER.queueDownload("./imgs/ice_cave.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -120,9 +121,10 @@ ASSET_MANAGER.downloadAll(function () {
 
 												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest, "level1");
 	
-    var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 3, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 3, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 3, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 3, 55, 107, .1, 1, true, false), null, null, null);
+    var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), null, null, null);
 
-	var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."], ["Nigga."]], dragon1_NPC_sprites, [new Point(512, 160)], .1, false, [1], "dragon_cave");
+    var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."], ["Nigga."]], dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
+    dragon1_NPC.setScale(1.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
