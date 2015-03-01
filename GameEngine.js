@@ -217,6 +217,13 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
+GameEngine.prototype.removeEntity = function(entity){
+	var index =  this.entities.indexOf(entity);
+	
+	if (index > -1) {
+    this.entities.splice(index, 1);
+ }
+}
 
 GameEngine.prototype.clearEntities = function (save_entities) {
     if (save_entities) {
@@ -908,7 +915,7 @@ Hero.prototype.checkSurroundings = function () {
 
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3994;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 80000;
     }
 }
 
@@ -2702,13 +2709,18 @@ Ghost.prototype.updateDialogue = function () {
 					console.log("quest added, part=0");
                     this.game.entities[0].addQuest(this.quest);
                 }
-                if (this.part===1&&this.game.entities[0].inventory.hasItem("Potion")) {
-
+                if (this.part===1 &&this.game.entities[0].inventory.hasItem("Potion")) {
+					 
                     this.game.entities[0].inventory.removeItem("Potion", 1);
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++; 
 					console.log("reward added"+ this.part);
                 }
+				
+				if(this.part ===2){
+				console.log("removing entity"+ this.part);
+					this.game.removeEntity(this);
+				}
             }
             this.game.next = false;
         }
