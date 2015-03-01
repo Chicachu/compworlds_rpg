@@ -228,11 +228,12 @@ ASSET_MANAGER.downloadAll(function () {
                 [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]],
         [house1, dragonCave], [level1_animation1, level1_animation2],
-        new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
+       
+	   new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
                 new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100], false),
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55], true),
-                new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", 0, 1, ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
+                new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(7, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
                 new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new DragonCave(16, 6, 5, gameEngine)], ["Skeleton", "Malboro", "Dragon1"], "level1");
 

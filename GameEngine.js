@@ -3087,6 +3087,8 @@ Book.prototype = new Item();
 Book.prototype.constructor = Book;
 
 
+
+
 Armor = function (game, name, price, img, type, stats) {
     this.isEquipped = false; 
     this.type = type;
