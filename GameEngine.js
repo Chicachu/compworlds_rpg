@@ -2861,7 +2861,7 @@ Witch.prototype.showDialog = function () {
     if (this.part === 0 && this.game.entities[0].hasQuest("Ghost")) {
         this.part++;
     }
-    if (this.part) {
+    if (this.part === 0) {
         text.innerHTML = this.dialogue[this.part][this.dialogue_index];
     }
     text_box.innerHTML = text.outerHTML;
