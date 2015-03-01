@@ -250,27 +250,19 @@ GameEngine.prototype.draw = function (drawCallBack) {
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quad)) {
-            if (!this.is_battle) {
-                if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                    if (this.entities[i].y < this.entities[0].y) {
-                        this.entities[i].draw(this.context);
-                        this.entities[0].draw(this.context);
-                    } else {
-                        this.entities[0].draw(this.context);
-                        this.entities[i].draw(this.context);
-                    }
-                    var hero_drawn = true;
+            if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
+                if (this.entities[i].y < this.entities[0].y) {
+                    this.entities[i].draw(this.context);
+                    this.entities[0].draw(this.context);
                 } else {
+                    this.entities[0].draw(this.context);
                     this.entities[i].draw(this.context);
                 }
-
+                var hero_drawn = true;
+            } else {
+                    this.entities[i].draw(this.context);                    
             }
-
-
-
-        }
-        else if (this.is_battle) {
-
+        } else if (this.is_battle && !this.entities[i].quad) {
             this.entities[i].draw(this.context);
         }
     }
