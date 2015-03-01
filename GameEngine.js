@@ -230,21 +230,23 @@ GameEngine.prototype.draw = function (drawCallBack) {
     var hero_drawn = false; 
     this.queueActions();
     for (var i = 1; i < this.entities.length; i++) {
-        if (!this.is_battle) {
-            if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                if (this.entities[i].y < this.entities[0].y) {
-                    this.entities[i].draw(this.context);
-                    this.entities[0].draw(this.context);         
+        if (this.entities[i].map_name === this.current_environment) {
+            if (!this.is_battle) {
+                if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
+                    if (this.entities[i].y < this.entities[0].y) {
+                        this.entities[i].draw(this.context);
+                        this.entities[0].draw(this.context);
+                    } else {
+                        this.entities[0].draw(this.context);
+                        this.entities[i].draw(this.context);
+                    }
+                    var hero_drawn = true;
                 } else {
-                    this.entities[0].draw(this.context);
                     this.entities[i].draw(this.context);
                 }
-                var hero_drawn = true; 
             } else {
                 this.entities[i].draw(this.context);
             }
-        } else {
-            this.entities[i].draw(this.context);
         }
     }
     if (!hero_drawn) {
@@ -1311,10 +1313,10 @@ dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, speed, pause, quad) {
+NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
     if (game && dialogue && anims && path) {
         this.game = game;
-
+        this.map_name = map_name; 
         this.animations = anims;
         this.spriteSheet = this.animations.right.spriteSheet;
 
@@ -1531,10 +1533,10 @@ quest: what kind of quest it has
 pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest) {
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.name = name;
     this.quest = quest; 
-    NPC.call(this, game, dialog, anims, path, speed, pause, quad);
+    NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name);
 }
 
 NPC_QUEST.prototype = new NPC();
@@ -2530,9 +2532,9 @@ GeneralMenu.prototype.showMenu = function (flag) {
 /*
 GHOST NPC_QUEST
 */
-Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest){
+Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name){
 	this.part = 0; 
-	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
 	this.curr_anim = this.animations.down;
 	this.lastX = this.x;
 	}
@@ -2624,9 +2626,9 @@ Ghost.prototype.draw = function (context) {
 
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
-Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.part = 0; 
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
 }
@@ -2727,9 +2729,9 @@ Storekeeper.prototype.showWares = function (flag) {
 
 /*WITCH NPC_QUEST with KILL_QUEST
 */
-Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.part = 0; 
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
 }
