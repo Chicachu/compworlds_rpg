@@ -253,7 +253,11 @@ GameEngine.prototype.draw = function (drawCallBack) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
             if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                if (this.entities[i].y < this.entities[0].y) {
+                var ent_y = this.entities[0].y;
+                if (this.environment[this.current_environment].curr_quadrant !== 0 && this.current_environment === "level1") {
+                    ent_y += 20;
+                }
+                if (this.entities[i].y < ent_y) {
                     this.entities[i].draw(this.context);
                     this.entities[0].draw(this.context);
                 } else {
@@ -617,6 +621,8 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.y = y;
     this.save_x = x;
     this.save_y = y;
+    this.center_x = this.x / 2;
+    this.center_y = this.y / 2;
     this.direction = Direction.DOWN;
     this.save_direction = this.direction;
     this.moving = false;
@@ -632,6 +638,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
         this.stop_move_animation = this.stopAnimation(this.animations.right);
     }
 }
+
 
 /* Changes the x and y coordinates of the entity depending on which direction they are travelling */
 Entity.prototype.changeLocation = function () {
@@ -1972,7 +1979,7 @@ HealBerry.prototype.startInteraction = function () {
     if (Interactable.prototype.startInteraction.call(this)) {
         var x = this.x / 32;
         var y = this.y / 32;
-        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
+        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.game.environment[this.game.current_environment].curr_quadrant);
 
         if (!this.picked) {
             this.game.entities[0].recieveItem(this.berry);
