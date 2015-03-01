@@ -225,9 +225,6 @@ GameEngine.prototype.draw = function (drawCallBack) {
     if (this.curr_background && this.is_battle) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
-        if (this.current_environment === "dragon_cave") {
-            this.environment[this.current_environment].draw();
-        }
         this.environment[this.current_environment].draw();
     }
     var hero_drawn = false; 
@@ -903,13 +900,13 @@ Hero.prototype.reposition = function (other) {
 }
 
 Hero.prototype.preBattle = function () {
-    if (this.moving && this.checkSurroundings()) {
-        this.game.canControl = false;
-        this.game.key = 0;
-        this.game.space = 0; 
-        // lock user input controls here.
-        this.game.fadeOut(this.game, this.game, this.game.setBattle);
-    }
+    //if (this.moving && this.checkSurroundings()) {
+    //    this.game.canControl = false;
+    //    this.game.key = 0;
+    //    this.game.space = 0; 
+    //    // lock user input controls here.
+    //    this.game.fadeOut(this.game, this.game, this.game.setBattle);
+    //}
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
@@ -1041,6 +1038,9 @@ Hero.prototype.boundaryDown = function () {
 
 Hero.prototype.checkBoundaries = function () {
     var quadrant = this.game.environment[this.game.current_environment].curr_quadrant;
+    if (this.game.current_environment === "level1") {
+        console.log("test");
+    }
     if (this.boundaryRight()) {
         if (quadrant !== 2 && quadrant !== 5) {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 1);
@@ -1064,7 +1064,7 @@ Hero.prototype.checkBoundaries = function () {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant -= 3);
             this.y += 11 * 32; 
         }
-    } else if (this.boundaryDown()) {
+    } else if (this.boundaryDown() && this.game.current_environment !== "dragon_cave") {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 3);
             this.y -= 11 * 32; 
@@ -1074,7 +1074,7 @@ Hero.prototype.checkBoundaries = function () {
 
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
 Hero.prototype.getTile = function (x, y) {
-    if (y < 24) {
+    if (y < this.game.environment[this.game.current_environment].map.length) {
         return this.game.environment[this.game.current_environment].map[y][x];
     } else {
         console.log(y);
@@ -1083,7 +1083,7 @@ Hero.prototype.getTile = function (x, y) {
 }
 
 Hero.prototype.isPassable = function (tile, index) {
-    if (this.game.current_environment = "level1" ) {
+    if (this.game.current_environment === "level1" ) {
         if (tile === 0 || (tile >= 7 && tile <= 14) || tile === 80) {
             return true;
         } else if (tile === 66 || tile === 105) {
@@ -1091,6 +1091,8 @@ Hero.prototype.isPassable = function (tile, index) {
                 return true;
             }
         }
+    } else {
+        return true; 
     }
 }
 
@@ -1730,8 +1732,16 @@ DragonCave.prototype.constructor = DragonCave;
 DragonCave.prototype.startInteraction = function () {
     if (this.game.entities[0].inventory.hasItem("Book of Spells")) {
         this.game.current_environment = "dragon_cave";
+        this.game.environment[this.game.current_environment].setQuadrant(0);
+        this.game.entities[0].x = 32;
+        this.game.entities[0].y = 200; 
     } else {
-        this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
+        //this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
+
+        this.game.current_environment = "dragon_cave";
+        this.game.environment[this.game.current_environment].setQuadrant(0);
+        this.game.entities[0].x = 32;
+        this.game.entities[0].y = 200;
     }
 }
 

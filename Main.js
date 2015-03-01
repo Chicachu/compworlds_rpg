@@ -48,10 +48,10 @@ ASSET_MANAGER.downloadAll(function () {
 	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
     var warrior = new Warrior(gameEngine, new Statistics(50, 200, 200, 4, 3, 1));
 
-    var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.05, 9, true, false),
-                                            new Animation(npc_sprites, 0, 8, 64, 64, 0.05, 9, true, false),
-                                            new Animation(npc_sprites, 0, 9, 64, 64, 0.05, 9, true, false),
-                                            new Animation(npc_sprites, 0, 11, 64, 64, 0.05, 9, true, false),
+    var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
+                                            new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
+                                            new Animation(npc_sprites, 0, 9, 64, 64, 0.25, 9, true, false),
+                                            new Animation(npc_sprites, 0, 11, 64, 64, 0.25, 9, true, false),
                                             null, null, null);
 											
     var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
