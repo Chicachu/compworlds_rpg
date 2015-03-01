@@ -1152,7 +1152,7 @@ Hero.prototype.isPassable = function (tile, index) {
             }
         }
     } else if (this.game.current_environment === "dragon_cave") {
-        if (tile === 33 || tile === 34) {
+        if (tile === 33 || tile === 34 || (tile >= 1 && tile <= 9)) {
             return true;
         }
     } else {
