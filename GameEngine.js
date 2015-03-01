@@ -676,7 +676,9 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         foes.stats.health = 0;
         foes.is_dead = true;
         // check to see if foe is one for a kill quest
-        this.game.entities[0].checkKillQuest(foes); 
+        var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
+        // TODO: alert hero if kill_quest_complete AFTER battle fades out
+        // use gameengine.alertHero(<dialog>); when world view is back in
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -1140,14 +1142,17 @@ Warrior.prototype.addQuest = function (quest) {
 }
 
 Warrior.prototype.checkKillQuest = function (enemy) {
+    var complete = false; 
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
             if (this.quests[i].number_enemies === this.quests[i].enemies_killed) {
                 this.quests[i].complete = true;
+                complete = true; 
             }
         }
     }
+    return complete; 
 }
 
 Warrior.prototype.checkItemQuest = function(item){
