@@ -45,8 +45,9 @@ ASSET_MANAGER.downloadAll(function () {
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
-    var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
-    var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
+	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
+	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
+	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
     var warrior = new Warrior(gameEngine, new Statistics(50, 200, 200, 4, 3, 1));
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
@@ -119,8 +120,9 @@ ASSET_MANAGER.downloadAll(function () {
 
 												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest, "level1");
 	
-	
+	var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), null, null, null);
 
+	var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."]], dragon1_NPC_sprites, [new Point(100, 100)], .1, false, [0], "level1");
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
@@ -268,9 +270,9 @@ ASSET_MANAGER.downloadAll(function () {
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
     gameEngine.addEntity(storekeeper);
-    gameEngine.addEntity(ghost);
-    gameEngine.addEntity(witch);
-
+	gameEngine.addEntity(ghost);
+	gameEngine.addEntity(witch);
+	gameEngine.addEntity(dragon1_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
     gameEngine.start();
