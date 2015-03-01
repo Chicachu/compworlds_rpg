@@ -1823,6 +1823,10 @@ ExitDragonCave = function () {
     this.game.entities[0].y = 192;
 }
 
+TalkToDragon = function () {
+
+}
+
 Portal = function (x, y, quad, game, func) {
     this.func = func; 
     Interactable.call(this, x, y, quad, game);
