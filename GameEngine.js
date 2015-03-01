@@ -121,6 +121,19 @@ GameEngine.prototype.addEnvironment = function (name, environment_object) {
 GameEngine.prototype.startInput = function () {
     var that = this;
     //Temporary, space bar invokes attack
+
+    this.context.canvas.addEventListener("keyup", function (e) {
+        if (e.which === 16 && !that.is_battle) {
+            that.canControl = false;
+            that.key = 0;
+            that.space = 0;
+            // lock user input controls here.
+            that.entities[0].game.fadeOut(that.entities[0].game, that.entities[0].game, that.entities[0].game.setBattle);
+
+        };
+        //e.stopImmediatePropagation();
+        e.preventDefault();
+    });
     this.context.canvas.addEventListener('keydown', function (e) {
         if (that.canControl) {
             if (String.fromCharCode(e.which) === ' ') {
@@ -170,6 +183,12 @@ GameEngine.prototype.startInput = function () {
             that.next = false;
         }
     }, false);
+
+    this.context.canvas.addEventListener('keyup', function (e) {
+        if (e.which === 80) {
+            that.sound_manager.toggleSound();
+        }
+    });
 }
 
 GameEngine.prototype.setWindowEvent = function (game) {
@@ -221,28 +240,29 @@ GameEngine.prototype.draw = function (drawCallBack) {
     if (this.curr_background && this.is_battle) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
-        if (this.current_environment === "dragon_cave") {
-            this.environment[this.current_environment].draw();
-        }
         this.environment[this.current_environment].draw();
     }
     var hero_drawn = false;
     this.queueActions();
     for (var i = 1; i < this.entities.length; i++) {
-        if (!this.is_battle) {
-            if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                if (this.entities[i].y < this.entities[0].y) {
-                    this.entities[i].draw(this.context);
-                    this.entities[0].draw(this.context);
+        if (this.entities[i].map_name === this.current_environment && !this.is_battle) {
+            if (!this.is_battle) {
+                if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
+                    if (this.entities[i].y < this.entities[0].y) {
+                        this.entities[i].draw(this.context);
+                        this.entities[0].draw(this.context);
+                    } else {
+                        this.entities[0].draw(this.context);
+                        this.entities[i].draw(this.context);
+                    }
+                    var hero_drawn = true;
                 } else {
-                    this.entities[0].draw(this.context);
                     this.entities[i].draw(this.context);
                 }
-                var hero_drawn = true;
-            } else {
-                this.entities[i].draw(this.context);
             }
-        } else {
+        }
+        else if (this.is_battle) {
+
             this.entities[i].draw(this.context);
         }
     }
@@ -381,7 +401,7 @@ GameEngine.prototype.setBattle = function (game) {
     player.save_x = game.entities[0].x;
     player.save_y = game.entities[0].y;
     player.save_direction = game.entities[0].direction;
-    player.x = 300;
+    player.x = 350;
     player.y = 200;
     player.direction = Direction.LEFT;
     player.changeMoveAnimation();
@@ -389,27 +409,41 @@ GameEngine.prototype.setBattle = function (game) {
     game.animation_queue.push(new Event(player, player.stop_move_animation, 0));
     game.fiends = game.environment[game.current_environment].generateFiend(game, game.fiends).splice(0);
     game.clearEntities(true);
-    var space_out = ((game.height / 2) / game.fiends.length) * 1.2;
-    var next_y = space_out;
+
+    if (game.fiends.length === 1) {
+        game.fiends[0].y = game.height / 2;
+    }
+    else if (game.fiends.length === 2) {
+        game.fiends[0].y = (game.height / 2) - 40;
+        game.fiends[0].x = game.fiends[0].x + 10;
+        game.fiends[1].y = (game.height / 2) + 40;
+        game.fiends[1].x = game.fiends[0].x - 20;
+    }
+    else if (game.fiends.length === 3) {
+        game.fiends[0].y = (game.height / 2) - 60;
+        game.fiends[0].x = game.fiends[0].x + 30;
+        game.fiends[1].y = (game.height / 2);
+        game.fiends[1].x = game.fiends[0].x - 20;
+        game.fiends[2].y = (game.height / 2) + 60;
+        game.fiends[2].x = game.fiends[1].x - 20;
+    }
     for (var i = 0; i < game.fiends.length; i++) {
-        game.fiends[i].y = next_y;
-        next_y += space_out;
         game.addEntity(game.fiends[i]);
     }
+    //var space_out = ((game.height / 2) / (game.fiends.length - ((game.fiends.length - 1) * .2)) * .95);
+    //var start_y = ((game.height / 2) / game.fiends.length) * .95;
+    //var next_y = start_y;
+    //var next_x = game.fiends[0].x;
+    //for (var i = 0; i < game.fiends.length; i++) {
+    //    game.fiends[i].y = next_y;
+    //    next_y += space_out;
+    //    game.fiends[i].x = next_x;
+    //    next_x -= 25;
+    //    game.addEntity(game.fiends[i]);
+    //}
     game.decideFighters();
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     window.setTimeout(game.menu.showMenu(true), 5000);
-}
-
-GameEngine.prototype.resetBattle = function (players) {
-    players[0].game.is_battle = false;
-    // game.drawBackground("./imgs/desert.png");
-    players[0].stats.health = 100;
-    players[1].stats.health = 75;
-    players[0].game.menu.showMenu(false);
-    players[0].x = players[0].save_x;
-    players[0].y = players[0].save_y;
-
 }
 
 /*
@@ -418,6 +452,9 @@ GameEngine.prototype.resetBattle = function (players) {
     and for now resets the players health.
 */
 GameEngine.prototype.endBattle = function (game) {
+    if (game.entities[0].checkKillQuest(game.entities[0])) {
+        game.alertHero("You've completed the quest");
+    }
     game.is_battle = false;
     game.menu.showMenu(false);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
@@ -659,7 +696,10 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         foes.stats.health = 0;
         foes.is_dead = true;
         // check to see if foe is one for a kill quest
-        this.game.entities[0].checkKillQuest(foes);
+        var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
+        // TODO: alert hero if kill_quest_complete AFTER battle fades out
+        // use gameengine.alertHero(<dialog>); when world view is back in
+
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -834,7 +874,13 @@ Hero.prototype.draw = function (context) {
                 }
             }
         }
-        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+        if (this.game.fiends.length > 0 && this.game.fiends[0].name === "dragon1") {
+
+            this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+        }
+        else {
+            this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.5);
+        }
     }
 }
 
@@ -846,7 +892,7 @@ Hero.prototype.checkSurroundings = function () {
 
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2997;
+        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2000;
     }
 }
 
@@ -856,9 +902,9 @@ Hero.prototype.update = function () {
         this.changeDirection();
         this.changeMoveAnimation();
         this.changeLocation();
-        if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-            this.preBattle();
-        }
+        //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+        //    this.preBattle();
+        //}
         this.checkBoundaries();
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
@@ -960,7 +1006,12 @@ Hero.prototype.canMove = function (direction) {
         return true;
     }
     else {
-        return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
+        if (this.game.environment[this.game.current_environment].map.length === 2) {
+            return this.isPassable(this.getTile(x1, y1, 0), index_low) && this.isPassable(this.getTile(x2, y2, 0), index_high)
+            && this.isPassable(this.getTile(x1, y1, 1), index_low) && this.isPassable(this.getTile(x2, y2, 1), index_high);
+        } else {
+            return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
+        }
     }
 }
 
@@ -1044,7 +1095,7 @@ Hero.prototype.checkBoundaries = function () {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant -= 3);
             this.y += 11 * 32;
         }
-    } else if (this.boundaryDown()) {
+    } else if (this.boundaryDown() && this.game.current_environment !== "dragon_cave") {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 3);
             this.y -= 11 * 32;
@@ -1053,17 +1104,21 @@ Hero.prototype.checkBoundaries = function () {
 }
 
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
-Hero.prototype.getTile = function (x, y) {
-    if (y < 24) {
-        return this.game.environment[this.game.current_environment].map[y][x];
+Hero.prototype.getTile = function (x, y, num) {
+    if (this.game.environment[this.game.current_environment].map.length === 2) {
+        return this.game.environment[this.game.current_environment].map[num][y][x];
     } else {
-        console.log(y);
-        return this.game.environment[this.game.current_environment].map[y - 1][x];
+        if (y < this.game.environment[this.game.current_environment].map.length) {
+            return this.game.environment[this.game.current_environment].map[y][x];
+        } else {
+            console.log(y);
+            return this.game.environment[this.game.current_environment].map[y - 1][x];
+        }
     }
 }
 
 Hero.prototype.isPassable = function (tile, index) {
-    if (this.game.current_environment = "level1") {
+    if (this.game.current_environment === "level1") {
         if (tile === 0 || (tile >= 7 && tile <= 14) || tile === 80) {
             return true;
         } else if (tile === 66 || tile === 105) {
@@ -1071,6 +1126,12 @@ Hero.prototype.isPassable = function (tile, index) {
                 return true;
             }
         }
+    } else if (this.game.current_environment === "dragon_cave") {
+        if (tile === 33 || tile === 34 || (tile >= 1 && tile <= 9)) {
+            return true;
+        }
+    } else {
+        return true;
     }
 }
 
@@ -1116,14 +1177,17 @@ Warrior.prototype.addQuest = function (quest) {
 }
 
 Warrior.prototype.checkKillQuest = function (enemy) {
+    var complete = false;
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
             if (this.quests[i].number_enemies === this.quests[i].enemies_killed) {
                 this.quests[i].complete = true;
+                complete = true;
             }
         }
     }
+    return complete;
 }
 
 Warrior.prototype.checkItemQuest = function (item) {
@@ -1175,27 +1239,11 @@ Warrior.prototype.setAction = function (action, target) {
 
 /* ENEMY and subclasses */
 Enemy = function (game, stats, anims, spriteSheet, name) {
-    this.x = 50;
+    this.x = 40;
     this.y = 150;
     Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
     this.game = game;
     this.name = name;
-    //this.loop_while_standing = loop_while_standing;
-    //this.animations = anims;
-    //this.animations = {
-    //    down: anims.down,
-    //    up: anims.up,
-    //    left: anims.left,
-    //    right: anims.right,
-    //    destroy: anims.destroy,
-    //    hit: anims.hit,
-    //    death: anims.death
-    //    // TODO: Move stop_move_animation and death_animation to here and fight animations
-    //};
-
-    //this.animations.death.elapsedTime = .25;
-    //this.animations.death.totalTime = .5;
-
 }
 
 Enemy.prototype = new Entity();
@@ -1217,7 +1265,12 @@ Enemy.prototype.draw = function (context) {
         this.drawSelector(context, 'yellow');
 
     }
-    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2);
+    if (this.name === "dragon1") {
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2.0);
+    }
+    else {
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.5);
+    }
 }
 
 Enemy.prototype.update = function () {
@@ -1255,14 +1308,14 @@ Skeleton = function (game, stats, loop_while_standing) {
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Skeleton");
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton");
 }
 
 Skeleton.prototype = new Enemy();
 Skeleton.prototype.constructor = Enemy;
 
 
-Malboro = function (game, stats, anims, loop_while_standing) {
+Malboro = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
     this.animations = {
@@ -1279,16 +1332,35 @@ Malboro = function (game, stats, anims, loop_while_standing) {
 
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Enemy;
+
+Dragon1 = function (game, stats, loop_while_standing) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
+    this.loop_while_standing = loop_while_standing;
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 104.5, 107, .1, 8, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 1, 210, 107, .13, 12, true, false),
+        hit: new Animation(this.spriteSheet, 0, 2, 90.16, 107, .1, 18, true, false),
+        death: new Animation(this.spriteSheet, 0, 3, 40, 4107, .1, 7, true, false)
+    };
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1");
+}
+
+Dragon1.prototype = new Enemy();
+Dragon1.prototype.constructor = Enemy;
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, speed, pause, quad) {
+NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
     if (game && dialogue && anims && path) {
         this.game = game;
-
+        this.map_name = map_name;
         this.animations = anims;
         this.spriteSheet = this.animations.right.spriteSheet;
 
@@ -1504,10 +1576,10 @@ quest: what kind of quest it has
 pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
-NPC_QUEST = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+NPC_QUEST = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.name = name;
     this.quest = quest;
-    NPC.call(this, game, dialog, anims, path, speed, pause, quad);
+    NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name);
 }
 
 NPC_QUEST.prototype = new NPC();
@@ -1705,6 +1777,9 @@ DragonCave.prototype.constructor = DragonCave;
 DragonCave.prototype.startInteraction = function () {
     if (this.game.entities[0].inventory.hasItem("Book of Spells")) {
         this.game.current_environment = "dragon_cave";
+        this.game.environment[this.game.current_environment].setQuadrant(0);
+        this.game.entities[0].x = 32;
+        this.game.entities[0].y = 200;
     } else {
         this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
@@ -1874,6 +1949,8 @@ Environment.prototype.initNewFiend = function (fiend) {
         case "Malboro":
             return (new Malboro(this.game, new Statistics(75, 15, 10), false));
             break;
+        case "Dragon1":
+            return (new Dragon1(this.game, new Statistics(250, 30, 40), true));
         default:
             return null;
     }
@@ -1894,7 +1971,7 @@ Environment.prototype.draw = function (scaleBy) {
     this.context = this.game.context;
     var scaleBy = (scaleBy || 1);
 
-    this.drawTiles(scaleBy);
+    this.drawTiles.call(this, scaleBy);
     if (this.animations) {
         this.drawEnvironmentAnimations();
     }
@@ -1947,29 +2024,29 @@ Environment.prototype.drawTiles = function (scaleBy) {
     }
 }
 
-///* TODO: FIX THIS */
-//IndoorEnvironment.prototype.drawTiles = function () {
-//    for (var k = 0; k < this.map.length; k++) {
-//        for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
-//            for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
-//                var tile_index = this.map[i][j];
+/* TODO: FIX THIS */
+IndoorEnvironment.prototype.drawTiles = function (scaleBy) {
+    for (var k = 0; k < this.map.length; k++) {
+        for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
+            for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
+                var tile_index = this.map[k][i][j];
 
-//                var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
-//                var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
-//                var amount_clip = this.tileSheet.tileSize;
-//                var x_coord = (this.tileSheet.tileSize * j) - (this.game.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
-//                var y_coord = (this.tileSheet.tileSize * i) - (this.game.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
-//                var draw_size = this.tileSheet.tileSize * scaleBy;
+                var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
+                var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
+                var amount_clip = this.tileSheet.tileSize;
+                var x_coord = (this.tileSheet.tileSize * j) - (this.game.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
+                var y_coord = (this.tileSheet.tileSize * i) - (this.game.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
+                var draw_size = this.tileSheet.tileSize * scaleBy;
 
-//                this.context.drawImage(this.tileSheet.sheet,
-//                                  x_start_clip, y_start_clip, // where to start clipping
-//                                  amount_clip, amount_clip,  // how much to clip
-//                                  x_coord, y_coord, // coordinates to start drawing to 
-//                                  draw_size, draw_size); // how big to draw. 
-//            }
-//        }
-//    }
-//}
+                this.context.drawImage(this.tileSheet.sheet,
+                                  x_start_clip, y_start_clip, // where to start clipping
+                                  amount_clip, amount_clip,  // how much to clip
+                                  x_coord, y_coord, // coordinates to start drawing to 
+                                  draw_size, draw_size); // how big to draw. 
+            }
+        }
+    }
+}
 
 Environment.prototype.drawEnvironmentAnimations = function () {
     var loc_point = null;
@@ -2494,9 +2571,9 @@ GeneralMenu.prototype.showMenu = function (flag) {
 /*
 GHOST NPC_QUEST
 */
-Ghost = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+Ghost = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.part = 0;
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
 }
@@ -2562,13 +2639,14 @@ Ghost.prototype.updateDialogue = function () {
                 this.interacting = false;
                 if (this.part === 0) {
                     this.part++;
+                    console.log("quest added, part=0");
                     this.game.entities[0].addQuest(this.quest);
                 }
-                if (this.part === 2) {
+                if (this.part === 1 && this.game.entities[0].inventory.hasItem("Potion")) {
+
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++;
-                } else if (this.part === 3) {
-                    this.part++;
+                    console.log("reward added" + this.part);
                 }
             }
             this.game.next = false;
@@ -2588,9 +2666,9 @@ Ghost.prototype.draw = function (context) {
 
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
-Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.part = 0;
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
 }
@@ -2691,9 +2769,9 @@ Storekeeper.prototype.showWares = function (flag) {
 
 /*WITCH NPC_QUEST with KILL_QUEST
 */
-Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest) {
+Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.part = 0;
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
 }
@@ -2765,17 +2843,14 @@ Witch.prototype.updateDialogue = function () {
                 this.game.canControl = true;
                 this.interacting = false;
                 if (this.part === 1) {
-                    console.log(this.part);
                     this.part++;
                     this.game.entities[0].addQuest(this.quest);
                 }
                 if (this.part === 2 && this.game.entities[0].inventory.hasItem("Book of Spells")) {
-                    console.log(this.part);
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++;
                     this.showDialog();
                 } else if (this.part === 3) {
-                    console.log(this.part);
                     this.part++;
                 }
             }
@@ -3016,6 +3091,8 @@ Book = function (game, name, img) {
 }
 Book.prototype = new Item();
 Book.prototype.constructor = Book;
+
+
 
 
 Armor = function (game, name, price, img, type, stats) {
@@ -3404,6 +3481,7 @@ SoundManager = function (game) {
     this.game = game;
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
+    this.paused = false;
     this.background = this.world1;
     //this.background.play();
 }
@@ -3418,6 +3496,14 @@ SoundManager.prototype.playSound = function (sound) {
     }
 }
 
+SoundManager.prototype.toggleSound = function () {
+    if (this.background.paused) {
+        this.background.play();
+    }
+    else {
+        this.background.pause();
+    }
+}
 SoundManager.prototype.playSong = function (sound) {
     this.background.pause();
     switch (sound) {
