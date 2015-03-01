@@ -987,7 +987,12 @@ Hero.prototype.canMove = function (direction) {
         return true;
     }
     else {
-        return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
+        if (this.game.environment[this.game.current_environment].map.length === 2) {
+            return this.isPassable(this.getTile(x1, y1, 0), index_low) && this.isPassable(this.getTile(x2, y2, 0), index_high)
+            && this.isPassable(this.getTile(x1, y1, 1), index_low) && this.isPassable(this.getTile(x2, y2, 1), index_high); 
+        } else {
+            return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
+        }
     }
 }
 
@@ -1080,12 +1085,16 @@ Hero.prototype.checkBoundaries = function () {
 }
 
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
-Hero.prototype.getTile = function (x, y) {
-    if (y < this.game.environment[this.game.current_environment].map.length) {
-        return this.game.environment[this.game.current_environment].map[y][x];
+Hero.prototype.getTile = function (x, y, num) {
+    if (this.game.environment[this.game.current_environment].map.length === 2) {
+       return this.game.environment[this.game.current_environment].map[num][y][x];
     } else {
-        console.log(y);
-        return this.game.environment[this.game.current_environment].map[y - 1][x];
+        if (y < this.game.environment[this.game.current_environment].map.length) {
+            return this.game.environment[this.game.current_environment].map[y][x];
+        } else {
+            console.log(y);
+            return this.game.environment[this.game.current_environment].map[y - 1][x];
+        }
     }
 }
 
@@ -1098,8 +1107,12 @@ Hero.prototype.isPassable = function (tile, index) {
                 return true;
             }
         }
+    } else if (this.game.current_environment === "dragon_cave") {
+        if (tile === 33 || tile === 34) {
+            return true;
+        }
     } else {
-        return true; 
+        return true;
     }
 }
 
@@ -1766,12 +1779,7 @@ DragonCave.prototype.startInteraction = function () {
         this.game.entities[0].x = 32;
         this.game.entities[0].y = 200; 
     } else {
-        //this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
-
-        this.game.current_environment = "dragon_cave";
-        this.game.environment[this.game.current_environment].setQuadrant(0);
-        this.game.entities[0].x = 32;
-        this.game.entities[0].y = 200;
+        this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
 }
 
@@ -1962,7 +1970,7 @@ Environment.prototype.draw = function (scaleBy) {
     this.context = this.game.context;
     var scaleBy = (scaleBy || 1);
 
-    this.drawTiles(scaleBy);
+   this.drawTiles.call(this, scaleBy);
     if (this.animations) {
         this.drawEnvironmentAnimations();
     }
@@ -2015,29 +2023,29 @@ Environment.prototype.drawTiles = function (scaleBy) {
     }
 }
 
-///* TODO: FIX THIS */
-//IndoorEnvironment.prototype.drawTiles = function () {
-//    for (var k = 0; k < this.map.length; k++) {
-//        for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
-//            for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
-//                var tile_index = this.map[i][j];
+/* TODO: FIX THIS */
+IndoorEnvironment.prototype.drawTiles = function (scaleBy) {
+    for (var k = 0; k < this.map.length; k++) {
+        for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
+            for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
+                var tile_index = this.map[k][i][j];
 
-//                var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
-//                var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
-//                var amount_clip = this.tileSheet.tileSize;
-//                var x_coord = (this.tileSheet.tileSize * j) - (this.game.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
-//                var y_coord = (this.tileSheet.tileSize * i) - (this.game.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
-//                var draw_size = this.tileSheet.tileSize * scaleBy;
+                var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
+                var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
+                var amount_clip = this.tileSheet.tileSize;
+                var x_coord = (this.tileSheet.tileSize * j) - (this.game.quadrants[this.curr_quadrant][0] * this.tileSheet.tileSize);
+                var y_coord = (this.tileSheet.tileSize * i) - (this.game.quadrants[this.curr_quadrant][1] * this.tileSheet.tileSize);
+                var draw_size = this.tileSheet.tileSize * scaleBy;
 
-//                this.context.drawImage(this.tileSheet.sheet,
-//                                  x_start_clip, y_start_clip, // where to start clipping
-//                                  amount_clip, amount_clip,  // how much to clip
-//                                  x_coord, y_coord, // coordinates to start drawing to 
-//                                  draw_size, draw_size); // how big to draw. 
-//            }
-//        }
-//    }
-//}
+                this.context.drawImage(this.tileSheet.sheet,
+                                  x_start_clip, y_start_clip, // where to start clipping
+                                  amount_clip, amount_clip,  // how much to clip
+                                  x_coord, y_coord, // coordinates to start drawing to 
+                                  draw_size, draw_size); // how big to draw. 
+            }
+        }
+    }
+}
 
 Environment.prototype.drawEnvironmentAnimations = function () {
     var loc_point = null;
