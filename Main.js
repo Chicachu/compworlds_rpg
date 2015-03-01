@@ -84,7 +84,9 @@ ASSET_MANAGER.downloadAll(function () {
                                            ["Hello again, kid. You've been a great help to the town so far.",
                                             "Not to brag or anything, but this town's economy relies solely on the health of this store.",
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
-                                            ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
+                                            ["Seriously, kid, go kill that dragon."],
+                                            ["Wow! I didn't actually think you'd do it! Congratulations! Oh, sorry, but the store wont be open for a while yet.",
+                                            "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], storekeeper_sprites,
                                             [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1");
 										
 	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 

@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -250,28 +250,21 @@ GameEngine.prototype.draw = function (drawCallBack) {
     var hero_drawn = false;
     this.queueActions();
     for (var i = 1; i < this.entities.length; i++) {
-        if (this.entities[i].map_name === this.current_environment && !this.is_battle) {
-            if (!this.is_battle) {
-                if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
-                    if (this.entities[i].y < this.entities[0].y) {
-                        this.entities[i].draw(this.context);
-                        this.entities[0].draw(this.context);
-                    } else {
-                        this.entities[0].draw(this.context);
-                        this.entities[i].draw(this.context);
-                    }
-                    var hero_drawn = true;
+        if (this.entities[i].map_name === this.current_environment && !this.is_battle
+            && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
+            if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
+                if (this.entities[i].y < this.entities[0].y) {
+                    this.entities[i].draw(this.context);
+                    this.entities[0].draw(this.context);
                 } else {
+                    this.entities[0].draw(this.context);
                     this.entities[i].draw(this.context);
                 }
-
+                var hero_drawn = true;
+            } else {
+                    this.entities[i].draw(this.context);                    
             }
-
-
-
-        }
-        else if (this.is_battle) {
-
+        } else if (this.is_battle && !this.entities[i].quad) {
             this.entities[i].draw(this.context);
         }
     }
@@ -807,7 +800,7 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs(this.game.entities[i].x - this.x);
         var ent_y_difference = Math.abs(this.game.entities[i].y - this.y);
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
+        if (ent_distance < min_distance && includes(this.game.entities[i].quad, this.game.environment[this.game.current_environment].curr_quadrant)) {
             min_distance = ent_distance;
             min_index = i;
         }
@@ -2811,6 +2804,10 @@ Storekeeper.prototype.updateDialogue = function () {
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++;
                 } else if (this.part === 3) {
+                    this.part++;
+                } else if (this.part === 4 && this.game.stage.part2) {
+                    this.part++; 
+                } else if (this.part === 5) {
                     this.part++;
                 }
             }
