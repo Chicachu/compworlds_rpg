@@ -55,7 +55,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 11, 64, 64, 0.25, 9, true, false),
                                             null, null, null);
-											
+
     var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "... except the store keeper. I'm not sure how he made it out alive.",
@@ -65,7 +65,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         "Oh, before you go! The healing berry bushes along the road have finally grown their berries for the season!",
                                         "You should pick a few for your journey!"], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
 
-    var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 
+    var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
@@ -102,27 +102,29 @@ ASSET_MANAGER.downloadAll(function () {
 												ghost_sprites, [new Point(928, 30)], .1, false, [2, 2], ghost_quest, "level1");
 	
 	var witch_sprites = new SpriteSet(new Animation(witch_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 
+
                                         new Animation(witch_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
                                         new Animation(witch_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                         new Animation(witch_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
-											
-	var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { });	
-	var witch_quest_reward = ghost_quest_potion;
-	var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Witch", witch_quest_reward, witch_quest_book);
-	var witch = new Witch(gameEngine, "Witch", [["The witch simply glares at you as you approach her and her home."],
+
+    var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { });
+    var witch_quest_reward = ghost_quest_potion;
+    var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Witch", witch_quest_reward, witch_quest_book);
+    var witch = new Witch(gameEngine, "Witch", [["The witch simply glares at you as you approach her and her home."],
                                                  ["Long Time, since I have seen Living Human Being!",
 												"I know why you are here and I will give you what you want, only",
 												"if you bring me the Holy Book of Spells hidden somewhere in the forest"],
 												["Bring me the Holy Book of Spells, young man!"],
 	                                              ["Ah yes, thank you! *cackle* If you come back to me another time, I may have a better reward for you than this."],
 	                                              ["The witch seems to be back at her silent staring."]],
+
 												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest, "level1");
 	
 	var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), null, null, null);
 
 	var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."]], dragon1_NPC_sprites, [new Point(100, 100)], .1, false, [0], "level1");
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
-        // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
+    // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
     //test items
     var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
@@ -132,7 +134,7 @@ ASSET_MANAGER.downloadAll(function () {
 
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
-    var house1 = new IndoorEnvironment (gameEngine,[ [[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
+    var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
                         [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
                         [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
                         [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1],
@@ -143,7 +145,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2],
                         [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
                         [3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-                        [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1]],                            
+                        [4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1]],
                         [[28, 29, 30, 31, 32, 33, 34, 0, 0, 58, 59, 0, 0, 52, 52, 52, 52, 52],
                         [35, 36, 37, 38, 39, 40, 41, 0, 0, 60, 61, 0, 0, 23, 21, 21, 42, 0],
                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 22, 22, 43, 0],
@@ -155,10 +157,10 @@ ASSET_MANAGER.downloadAll(function () {
                         [11, 13, 0, 0, 0, 0, 0, 0, 0, 0, 66, 62, 63, 62, 63, 66, 0, 0],
                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 64, 65, 64, 65, 66, 0, 49],
                         [45, 0, 0, 53, 0, 0, 53, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 0, 50],
-                        [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51]] ], 
+                        [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51]]],
                         null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], null, "house1");
 
-    var house2 = new IndoorEnvironment([ [[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
+    var house2 = new IndoorEnvironment([[[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 68, 67],
@@ -169,7 +171,7 @@ ASSET_MANAGER.downloadAll(function () {
                          [67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67],
                          [68, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
-                         [67, 67, 68, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 68, 68]], 
+                         [67, 67, 68, 67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67, 68, 68]],
                           [[88, 85, 70, 71, 70, 71, 70, 72, 88, 85, 73, 70, 71, 70, 71, 70, 88, 88],
                             [84, 87, 77, 78, 77, 78, 77, 79, 84, 83, 80, 77, 78, 77, 78, 77, 84, 84],
                             [87, 0, 0, 0, 0, 0, 0, 0, 87, 86, 0, 0, 0, 0, 86, 0, 87, 87],
@@ -181,12 +183,14 @@ ASSET_MANAGER.downloadAll(function () {
                             [0, 0, 0, 0, 0, 74, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 0],
                             [0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0]] ], 
+                            [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0]]],
                             null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], null, "house2");
+
 
     var dragonCave = new IndoorEnvironment(gameEngine,  
 					  [[[0,   0,  0,  0, 0,  0,   0,  0,  0, 28, 28, 28, 33, 33, 33, 28, 28, 33, 28, 28,  0, 28, 28,  28,  28,  28, 33, 33, 28, 28],
                         [0,   0,  0,  0, 28, 28,  0,  0, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 33, 28, 28, 28, 33, 33, 33, 33],
+
                         [28, 28, 28, 28, 28, 28, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33],
                         [28, 28, 28, 28, 33, 33, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33],
                         [33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33],
@@ -194,10 +198,12 @@ ASSET_MANAGER.downloadAll(function () {
                         [33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33],
                         [33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 35, 35, 35, 35, 35, 35, 35, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33],
                         [33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 35, 0, 0, 0, 0, 0, 0, 0, 35, 35, 33, 33, 33, 33, 33, 33, 33, 33, 33],
+
                         [33, 33, 33, 33, 33, 33, 33, 33, 33, 33,35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 33, 33, 33, 33, 33, 33, 33, 33],
                         [35, 35, 35, 35, 35, 35, 33, 33, 33, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 33, 33, 33, 0, 0, 33, 33],
                         [0, 0, 0, 0, 0, 0, 33, 33, 35,35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 35, 35, 0, 0, 35, 33],
 						[0, 0, 0, 0, 0, 0, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 35]],
+
 
                         [[34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 11, 34, 34, 13, 17, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 16],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 31, 12, 34, 34, 23, 34, 34, 34, 11, 34, 34, 34, 15, 34, 34, 22],
@@ -208,16 +214,18 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 11, 30, 10, 12, 34, 34, 34, 34, 34, 34, 34, 34, 8, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 31, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 12, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 16, 34, 34, 34, 34, 34, 34, 34],
+
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 1, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 22, 10, 34,14, 34, 13, 14, 34],
                         [34, 34, 34, 34, 34, 34, 34, 30, 2, 5, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 20, 34, 34, 20,15],
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
-                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], null, "dragon_cave", "./imgs/ice_cave.png");
+                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave)], "dragon_cave", "./imgs/ice_cave.png");
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
+
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4]);
 
-    var level1_animation2 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire2.png"), 0, 0, 32, 32, 0.5, 4, true, false), 
+    var level1_animation2 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire2.png"), 0, 0, 32, 32, 0.5, 4, true, false),
                               [[2, 1], [14, 1], [1, 2], [16, 2], [0, 11], [10, 12]], [0, 1, 3, 4]);
 
     var level1 = new OutdoorEnvironment(gameEngine, [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 90, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 62, 15, 17, 15, 0, 17, 3, 4, 62],
@@ -245,16 +253,18 @@ ASSET_MANAGER.downloadAll(function () {
                 [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]],
         [house1, dragonCave], [level1_animation1, level1_animation2],
+
        
 	   new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
+
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
                 new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100], false),
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(7, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
-                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new DragonCave(16, 6, 5, gameEngine)], ["Skeleton", "Malboro"], "level1", "./imgs/woods.png");
+                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro"], "level1", "./imgs/woods.png");
 
-    gameEngine.addEnvironment(level1.name, level1); 
+    gameEngine.addEnvironment(level1.name, level1);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
