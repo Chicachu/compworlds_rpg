@@ -902,9 +902,9 @@ Hero.prototype.update = function () {
         this.changeDirection();
         this.changeMoveAnimation();
         this.changeLocation();
-        //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-        //    this.preBattle();
-        //}
+        if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+            this.preBattle();
+        }
         this.checkBoundaries();
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
@@ -1767,15 +1767,21 @@ Log.prototype.startInteraction = function () {
     }
 }
 
-DragonCave = function (x, y, quad, game) {
+Portal = function (x, y, quad, game, func) {
+    this.func = func; 
     Interactable.call(this, x, y, quad, game);
 }
 
-DragonCave.prototype = new Interactable();
-DragonCave.prototype.constructor = DragonCave;
+Portal.prototype = new Interactable();
+Portal.prototype.constructor = Portal;
 
-DragonCave.prototype.startInteraction = function () {
-    if (this.game.entities[0].inventory.hasItem("Book of Spells")) {
+Portal.prototype.startInteraction = function () {
+    this.func();
+}
+
+// portal functions, reference them in the portal object
+EnterDragonCave = function () {
+    if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
         this.game.environment[this.game.current_environment].setQuadrant(0);
         this.game.entities[0].x = 32;
@@ -1783,6 +1789,14 @@ DragonCave.prototype.startInteraction = function () {
     } else {
         this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
+}
+
+
+ExitDragonCave = function () {
+    this.game.current_environment = "level1";
+    this.game.environment[this.game.current_environment].setQuadrant(5);
+    this.game.entities[0].x = 512;
+    this.game.entities[0].y = 192;
 }
 
 Door = function (x, y, quad, game) {
