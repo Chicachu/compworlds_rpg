@@ -391,7 +391,7 @@ GameEngine.prototype.setBattle = function (game) {
     player.changeMoveAnimation();
     player.changeLocation();
     game.animation_queue.push(new Event(player, player.stop_move_animation, 0));
-    game.fiends = game.environment[this.current_environment].generateFiend(game, game.fiends).splice(0);
+    game.fiends = game.environment[game.current_environment].generateFiend(game, game.fiends).splice(0);
     game.clearEntities(true);
     var space_out = ((game.height / 2) / game.fiends.length) * 1.2;
     var next_y = space_out;
@@ -1733,7 +1733,6 @@ DragonCave.prototype.startInteraction = function () {
     } else {
         this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
-    this.game.current_environment = "dragon_cave";
 }
 
 Door = function (x, y, quad, game) {
