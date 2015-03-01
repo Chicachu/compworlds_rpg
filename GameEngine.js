@@ -121,6 +121,18 @@ GameEngine.prototype.addEnvironment = function (name, environment_object) {
 GameEngine.prototype.startInput = function () {
     var that = this;
     //Temporary, space bar invokes attack
+
+    this.context.canvas.addEventListener("keyup", function(e)
+    {
+        if(e.which === 16)
+        {
+            that.canControl = false;
+            that.key = 0;
+            that.space = 0; 
+            // lock user input controls here.
+            that.entities[0].game.fadeOut(that.entities[0].game, that.entities[0].game, that.entities[0].game.setBattle);
+        };
+    });
     this.context.canvas.addEventListener('keydown', function (e) {
         if (that.canControl) {
             if (String.fromCharCode(e.which) === ' ') {
@@ -429,6 +441,10 @@ GameEngine.prototype.resetBattle = function (players)
 */
 GameEngine.prototype.endBattle = function (game)
 {
+    if (game.entities[0].checkKillQuest(foes))
+    {
+        game.alertHero("You've completed the quest");
+    }
     game.is_battle = false;
     game.menu.showMenu(false);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
@@ -685,6 +701,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
+        
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -1212,22 +1229,6 @@ Enemy = function (game, stats, anims, spriteSheet, name) {
     Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
     this.game = game;
     this.name = name;
-    //this.loop_while_standing = loop_while_standing;
-    //this.animations = anims;
-    //this.animations = {
-    //    down: anims.down,
-    //    up: anims.up,
-    //    left: anims.left,
-    //    right: anims.right,
-    //    destroy: anims.destroy,
-    //    hit: anims.hit,
-    //    death: anims.death
-    //    // TODO: Move stop_move_animation and death_animation to here and fight animations
-    //};
-
-    //this.animations.death.elapsedTime = .25;
-    //this.animations.death.totalTime = .5;
-
 }
 
 Enemy.prototype = new Entity();
