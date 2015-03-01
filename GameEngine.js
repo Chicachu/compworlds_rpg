@@ -225,12 +225,9 @@ GameEngine.prototype.draw = function (drawCallBack) {
     if (this.curr_background && this.is_battle) {
         this.context.drawImage(this.curr_background, 0, 0);
     } else {
-<<<<<<< HEAD
-=======
         if (this.current_environment === "dragon_cave") {
             this.environment[this.current_environment].draw();
         }
->>>>>>> origin/origin
         this.environment[this.current_environment].draw();
     }
     var hero_drawn = false; 
@@ -394,11 +391,7 @@ GameEngine.prototype.setBattle = function (game) {
     player.changeMoveAnimation();
     player.changeLocation();
     game.animation_queue.push(new Event(player, player.stop_move_animation, 0));
-<<<<<<< HEAD
-    game.fiends = game.environment[this.current_environment].generateFiend(game, game.fiends).splice(0);
-=======
     game.fiends = game.environment[game.current_environment].generateFiend(game, game.fiends).splice(0);
->>>>>>> origin/origin
     game.clearEntities(true);
     var space_out = ((game.height / 2) / game.fiends.length) * 1.2;
     var next_y = space_out;
@@ -1632,37 +1625,20 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
 }
 
-<<<<<<< HEAD
-Quadrants = {
-    first: [0, 0, 18, 12],
-    second: [11, 0, 29, 12],
-    third: [23, 0, 41, 12],
-    fourth: [0, 11, 18, 23],
-    fifth: [11, 11, 29, 23],
-    sixth: [23, 11, 41, 23]
-}
-
-Environment = function (game, map, animations, tilesheet, quads, interactables) {
-=======
 Environment = function (game, map, animations, tilesheet, quads, interactables, name) {
->>>>>>> origin/origin
+
     this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = map;
     this.animations = animations;
     this.tileSheet = tilesheet;
     this.quads = quads; 
-<<<<<<< HEAD
-
-=======
     this.name = name;
->>>>>>> origin/origin
     this.curr_quadrant = 0;
     
     this.interactables = interactables;
     //Environment.initInteractables.call(this, this.interactables);
 }
-<<<<<<< HEAD
 
 EnvironmentAnimation = function (animation, coords, quads) {
     this.animation = animation;
@@ -1683,7 +1659,7 @@ IndoorEnvironment = function (game, map, animations, tilesheet, quads, interacta
     Environment.call(this, game, map, animations, tilesheet, quads, interactables);
 }
 
-=======
+
 
 EnvironmentAnimation = function (animation, coords, quads) {
     this.animation = animation;
@@ -1712,7 +1688,7 @@ IndoorEnvironment = function (game, map, animations, tilesheet, quads, interacta
 }
 
 
->>>>>>> origin/origin
+
 IndoorEnvironment.prototype = new Environment();
 IndoorEnvironment.prototype.constructor = IndoorEnvironment; 
 
@@ -1955,11 +1931,8 @@ Environment.prototype.initNewFiend = function (fiend) {
 // used to check if the curr_quad exists in an objects quad array. 
 includes = function (array, index) {
     for (var i = 0; i < array.length; i++) {
-<<<<<<< HEAD
-        if (i === index) {
-=======
+
         if (array[i] === index) {
->>>>>>> origin/origin
             return true; 
         }
     }
@@ -1972,9 +1945,8 @@ Environment.prototype.draw = function (scaleBy) {
     var scaleBy = (scaleBy || 1);
 
     this.drawTiles(scaleBy);
-<<<<<<< HEAD
     this.drawEnvironmentAnimations();
-=======
+
     if (this.animations) {
         this.drawEnvironmentAnimations();
     }
@@ -2001,29 +1973,9 @@ Environment.prototype.changeXY = function (point, quad) {
             break;
     }
     return point;
->>>>>>> origin/origin
 }
 
 Environment.prototype.drawTiles = function (scaleBy) {
-    //draw tiles
-<<<<<<< HEAD
-    for (var i = this.quads[this.curr_quadrant][1]; i <= this.quads[this.curr_quadrant][3]; i++) { // length of each column
-        for (var j = this.quads[this.curr_quadrant][0]; j <= this.quads[this.curr_quadrant][2]; j++) { // length of each row
-            var tile_index = this.map[i][j];
-
-            var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
-            var y_start_clip = Math.floor(tile_index / this.tileSheet.sheetWidth) * this.tileSheet.tileSize;
-            var amount_clip = this.tileSheet.tileSize;
-            var x_coord = (this.tileSheet.tileSize * j) - (this.quads[this.curr_quadrant][0] * this.tileSheet.tileSize);
-            var y_coord = (this.tileSheet.tileSize * i) - (this.quads[this.curr_quadrant][1] * this.tileSheet.tileSize);
-            var draw_size = this.tileSheet.tileSize * scaleBy;
-
-            this.context.drawImage(this.tileSheet.sheet,
-                              x_start_clip, y_start_clip, // where to start clipping
-                              amount_clip, amount_clip,  // how much to clip
-                              x_coord, y_coord, // coordinates to start drawing to 
-                              draw_size, draw_size); // how big to draw. 
-=======
     for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
         for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
             if (this.map[i]) {
@@ -2042,13 +1994,10 @@ Environment.prototype.drawTiles = function (scaleBy) {
                                   x_coord, y_coord, // coordinates to start drawing to 
                                   draw_size, draw_size); // how big to draw. 
             }
->>>>>>> origin/origin
         }
     }
 }
 
-<<<<<<< HEAD
-=======
 ///* TODO: FIX THIS */
 //IndoorEnvironment.prototype.drawTiles = function () {
 //    for (var k = 0; k < this.map.length; k++) {
@@ -2073,7 +2022,6 @@ Environment.prototype.drawTiles = function (scaleBy) {
 //    }
 //}
 
->>>>>>> origin/origin
 Environment.prototype.drawEnvironmentAnimations = function () {
     var loc_point = null;
     for (var i = 0; i < this.animations.length; i++) {
@@ -2084,11 +2032,7 @@ Environment.prototype.drawEnvironmentAnimations = function () {
                 var coord_point = new Point(coord[0], coord[1]); 
                 if (this.curr_quadrant !== 0) {
                     // if not in the 0 quad, change x and y to fit new quad. 
-<<<<<<< HEAD
-                    coord_point = this.game.changeXYForQuad(coord_point, this.curr_quadrant);
-=======
                     coord_point = this.changeXY(coord_point, this.curr_quadrant);
->>>>>>> origin/origin
                 }
                 this.animations[i].animation.drawFrame(this.game.clockTick, this.game.context, coord_point.x * 32, coord_point.y * 32, 1.3);
             }
