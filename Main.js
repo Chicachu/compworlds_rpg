@@ -61,7 +61,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
                                         "And by rebuild, I mean repopulate. *wink wink*",
                                         "Oh, before you go! The healing berry bushes along the road have finally grown their berries for the season!",
-                                        "You should pick a few for your journey!"], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
+                                        "You should pick a few for your journey!"], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0]);
 
     var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
@@ -82,7 +82,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             "Not to brag or anything, but this town's economy relies solely on the health of this store.",
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
                                             ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
-                                            [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1");
+                                            [new Point(485, 207)], .1, false, [3,4], storekeeper_quest);
 										
 	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 
                                         new Animation(ghost_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
@@ -96,7 +96,7 @@ ASSET_MANAGER.downloadAll(function () {
 												"Go to Witch and get me that Tasty Heaven Potion!",
 												"In reward, you will receive the King Arthur's Stone that opens any Dragon Cave!"],
 												["Go to Witch and get me that Tasty Heaven Potion!"]], 
-												ghost_sprites, [new Point(928, 30)], .1, false, [2, 2], ghost_quest, "level1");
+												ghost_sprites, [new Point(928, 30)], .1, false, [2,2], ghost_quest);
 	
 	var witch_sprites = new SpriteSet(new Animation(witch_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 
                                         new Animation(witch_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
@@ -113,7 +113,7 @@ ASSET_MANAGER.downloadAll(function () {
 												["Bring me the Holy Book of Spells, young man!"],
 	                                              ["Ah yes, thank you! *cackle* If you come back to me another time, I may have a better reward for you than this."],
 	                                              ["The witch seems to be back at her silent staring."]],
-												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest, "level1");
+												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest);
 	
 	
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
