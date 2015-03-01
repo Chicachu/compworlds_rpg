@@ -1746,7 +1746,8 @@ OutdoorEnvironment.prototype.addIndoorEnvironments = function () {
     }
 }
 
-IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name) {
+IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, fiends) {
+    this.fiends = fiends;
     Environment.call(this, game, map, animations, tilesheet, quads, interactables, name);
 }
 
