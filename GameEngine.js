@@ -248,7 +248,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     var hero_drawn = false; 
     this.queueActions();
     for (var i = 1; i < this.entities.length; i++) {
-        if (this.entities[i].map_name === this.current_environment) {
+        if (this.entities[i].map_name === this.current_environment && !this.is_battle) {
             if (!this.is_battle) {
                 if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
                     if (this.entities[i].y < this.entities[0].y) {
@@ -262,9 +262,11 @@ GameEngine.prototype.draw = function (drawCallBack) {
                 } else {
                     this.entities[i].draw(this.context);
                 }
-            } else {
-                this.entities[i].draw(this.context);
-            }
+            } 
+        }
+        else if (this.is_battle) {
+
+            this.entities[i].draw(this.context);
         }
     }
     if (!hero_drawn) {
@@ -441,7 +443,7 @@ GameEngine.prototype.resetBattle = function (players)
 */
 GameEngine.prototype.endBattle = function (game)
 {
-    if (game.entities[0].checkKillQuest(foes))
+    if (game.entities[0].checkKillQuest(game.entities[0]))
     {
         game.alertHero("You've completed the quest");
     }
@@ -900,9 +902,9 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    if (this.game.environment[this.game.current_environment].curr_quadrant != 2 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-        this.preBattle();
-    }
+    //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+    //    this.preBattle();
+    //}
     this.checkBoundaries();
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
@@ -927,13 +929,13 @@ Hero.prototype.reposition = function (other) {
 }
 
 Hero.prototype.preBattle = function () {
-    //if (this.moving && this.checkSurroundings()) {
-    //    this.game.canControl = false;
-    //    this.game.key = 0;
-    //    this.game.space = 0; 
-    //    // lock user input controls here.
-    //    this.game.fadeOut(this.game, this.game, this.game.setBattle);
-    //}
+    if (this.moving && this.checkSurroundings()) {
+        this.game.canControl = false;
+        this.game.key = 0;
+        this.game.space = 0; 
+        // lock user input controls here.
+        this.game.fadeOut(this.game, this.game, this.game.setBattle);
+    }
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
