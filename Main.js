@@ -90,13 +90,14 @@ ASSET_MANAGER.downloadAll(function () {
                                         new Animation(ghost_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
                                         new Animation(ghost_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 											
-	var ghost_quest_potion = new SpecialItem(gameEngine, "Mysterious Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
+	var ghost_quest_potion = new SpecialItem(gameEngine, "Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
 	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { });	
 	var ghost_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", ghost_quest_reward, ghost_quest_potion);
 	var ghost = new Ghost(gameEngine, "Ghost", [["Set my soul free, Brave Warrior!", 
 												"Go to Witch and get me that Tasty Heaven Potion!",
 												"In reward, you will receive the King Arthur's Stone that opens any Dragon Cave!"],
-												["Go to Witch and get me that Tasty Heaven Potion!"]], 
+												["Did you bring the Potion, young man?"],
+												["Bless your soul, Brave Warrior!"]], 
 												ghost_sprites, [new Point(928, 30)], .1, false, [2, 2], ghost_quest, "level1");
 	
 	var witch_sprites = new SpriteSet(new Animation(witch_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false), 

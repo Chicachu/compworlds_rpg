@@ -2633,13 +2633,14 @@ Ghost.prototype.updateDialogue = function () {
                 this.interacting = false;
                 if (this.part === 0) {
                     this.part++;
+					console.log("quest added, part=0");
                     this.game.entities[0].addQuest(this.quest);
                 }
-                if (this.part === 2) {
+                if (this.part===1&&this.game.entities[0].inventory.hasItem("Potion")) {
+					
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++; 
-                } else if (this.part === 3) {
-                    this.part++; 
+					console.log("reward added"+ this.part);
                 }
             }
             this.game.next = false;
@@ -2836,17 +2837,14 @@ Witch.prototype.updateDialogue = function () {
                 this.game.canControl = true;
                 this.interacting = false;
                 if (this.part === 1) {
-                    console.log(this.part);
                     this.part++;
                     this.game.entities[0].addQuest(this.quest);
                  }
                 if (this.part === 2 && this.game.entities[0].inventory.hasItem("Book of Spells")) {
-                     console.log(this.part);
                      this.game.entities[0].inventory.addItem(this.quest.reward);
                      this.part++; 
                      this.showDialog();
                  } else if (this.part === 3) {
-                     console.log(this.part);
                     this.part++; 
                 }
             }
