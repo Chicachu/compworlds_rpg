@@ -5,6 +5,7 @@ ASSET_MANAGER.queueDownload("./imgs/skeleton.png");
 ASSET_MANAGER.queueDownload("./imgs/Hero-Warrior.png");
 ASSET_MANAGER.queueDownload("./imgs/npc-female.png");
 ASSET_MANAGER.queueDownload("./imgs/dragon_1.png");
+ASSET_MANAGER.queueDownload("./imgs/dragon_1_npc.png");
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/tiles.png");
@@ -14,6 +15,7 @@ ASSET_MANAGER.queueDownload("./imgs/malboro.png");
 ASSET_MANAGER.queueDownload("./imgs/storekeeper.png");
 ASSET_MANAGER.queueDownload("./imgs/witch.png");
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
+ASSET_MANAGER.queueDownload("./imgs/game_over_win.png");
 ASSET_MANAGER.queueDownload("./imgs/roomInteriorSpritesSheet.png")
 ASSET_MANAGER.queueDownload("./imgs/dragoncave.png");
 ASSET_MANAGER.queueDownload("./imgs/ice_cave.png");
@@ -48,8 +50,8 @@ ASSET_MANAGER.downloadAll(function () {
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
 	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
-	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
-    var warrior = new Warrior(gameEngine, new Statistics(50, 200, 200, 4, 3, 1));
+	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
+    var warrior = new Warrior(gameEngine, new Statistics(100, 15, 15, 4, 3, 1));
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
@@ -123,9 +125,9 @@ ASSET_MANAGER.downloadAll(function () {
 
 												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest, "level1");
 	
-    var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), null, null, null);
+    var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), null, null, null);
 
-    var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."], ["Nigga."]], dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
+    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Your journey ends here."], ["And you'll never make it to my super secret treasure room."], ["That's secret."], ["The one that's behind me."], ["That no one knows about."], ["Did I mention that it's a secret?"], ["And also the secret passageway leading to the mountains."], ["Which is also behind me."], ["And is also secret."]], dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
     dragon1_NPC.setScale(1.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
@@ -224,7 +226,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
                         null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave),
-                            new Portal(15, 5, 1, gameEngine, TalkToDragon)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro"]);
+                            new Portal(16, 15, 1, gameEngine, TalkToDragon)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro"]);
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
 
