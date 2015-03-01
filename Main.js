@@ -195,7 +195,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [0, 1, 4, 5, 0, 1, 9, 8, 0, 1, 11, 8, 0, 1, 12, 9, 0, 1, 12, 11, 0, 1, 10, 11, 0, 1, 9, 11, 0, 1, 8, 12, 0, 1, 8, 11, 0, 1, 11, 9, 0, 1],
                         [2, 3, 6, 7, 2, 3, 11, 10, 2, 3, 9, 10, 2, 3, 11, 8, 2, 3, 8, 9, 2, 3, 8, 11, 2, 3, 10, 11, 2, 3, 11, 9, 2, 3, 10, 9, 2, 3, 10, 8, 2, 3],
 						[4, 5, 0, 1, 10, 8, 4, 5, 10, 12, 4, 5, 8, 11, 4, 5, 12, 10, 4, 5, 12, 12, 4, 5, 8, 10, 4, 5, 9, 11, 4, 5, 8, 12, 4, 5, 11, 9, 4, 5, 12, 8]], 
-                        null, new Tilesheet("./imgs/olddragoncavetiles.png", 32, 8), [0, 1, 2], null, "dragon_cave");
+                        null, new Tilesheet("./imgs/olddragoncavetiles.png", 32, 8), [0, 1, 2], null, "dragon_cave", "./imgs/ice_cave.png");
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4]);
@@ -235,7 +235,7 @@ ASSET_MANAGER.downloadAll(function () {
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(7, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
-                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new DragonCave(16, 6, 5, gameEngine)], ["Skeleton", "Malboro"], "level1");
+                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new DragonCave(16, 6, 5, gameEngine)], ["Skeleton", "Malboro"], "level1", "./imgs/woods.png");
 
     gameEngine.addEnvironment(level1.name, level1); 
     //gameEngine.addAuxillaryEntity(mal);

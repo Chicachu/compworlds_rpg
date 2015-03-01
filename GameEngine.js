@@ -403,7 +403,7 @@ GameEngine.prototype.setBattle = function (game) {
     var player = game.entities[0];
     game.sound_manager.playSong("battle");
     game.is_battle = true;
-    game.setBackground("./imgs/woods.png");
+    game.setBackground(game.environment[game.current_environment].getBattleBackground());
     player.save_x = game.entities[0].x;
     player.save_y = game.entities[0].y;
     player.save_direction = game.entities[0].direction;
@@ -1691,7 +1691,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
 }
 
-Environment = function (game, map, animations, tilesheet, quads, interactables, name) {
+Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background) {
     this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = map;
@@ -1700,21 +1700,25 @@ Environment = function (game, map, animations, tilesheet, quads, interactables, 
     this.quads = quads; 
     this.name = name;
     this.curr_quadrant = 0;
-    
+    this.battle_background = battle_background;
     this.interactables = interactables;
     //Environment.initInteractables.call(this, this.interactables);
 }
 
+Environment.prototype.getBattleBackground = function()
+{
+    return this.battle_background;
+}
 EnvironmentAnimation = function (animation, coords, quads) {
     this.animation = animation;
     this.coords = coords;
     this.quads = quads; 
 }
 
-OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name) {
+OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background) {
     this.indoor_maps = indoor_maps;
     this.fiends = fiends; 
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name);
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background);
     this.addIndoorEnvironments();
 }
 
