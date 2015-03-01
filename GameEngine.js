@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "level1";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1809,6 +1809,7 @@ Log.prototype.startInteraction = function () {
 EnterDragonCave = function () {
     if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
+        this.game.entities[0].sight = 60;
         this.game.environment[this.game.current_environment].setQuadrant(0);
         this.game.entities[0].x = 32;
 
