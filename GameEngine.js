@@ -892,7 +892,7 @@ Hero.prototype.checkSurroundings = function () {
 
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2000;
+        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2996;
     }
 }
 
