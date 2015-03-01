@@ -1373,7 +1373,7 @@ Dragon1 = function(game, stats, loop_while_standing)
         right: new Animation(this.spriteSheet, 0, 0, 104.5, 107, .1, 8, true, false),
         destroy: new Animation(this.spriteSheet, 0, 1, 210, 107, .13, 12, true, false),
         hit: new Animation(this.spriteSheet, 0, 2, 90.16, 107, .1, 18, true, false),
-        death: new Animation(this.spriteSheet, 0, 4, 64.3, 4107, .1, 1, true, false),
+        death: new Animation(this.spriteSheet, 0, 4, 64.3, 107, .1, 1, true, false),
         rest: new Animation(this.spriteSheet, 0, 3, 64.3, 107, .13, 7, true, false)
     };
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1");
