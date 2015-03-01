@@ -1750,9 +1750,14 @@ Door.prototype.startInteraction = function () {
         var y = this.y / 32;
         var x = this.x / 32;
         var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
+        if (this.game.stage.part2) {
+            this.locked = false; 
+        }
 
         if (this.locked) {
-            this.game.alertHero("This door is locked. Try coming back after the village isn't burning down.");
+            if (this.game.stage.part1) {
+                this.game.alertHero("This door is locked. Try coming back after the village isn't burning down.");
+            } 
         } else {
             if (this.is_closed) {
                 // close door
