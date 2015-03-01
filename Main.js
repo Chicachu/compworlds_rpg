@@ -4,6 +4,7 @@ var ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload("./imgs/skeleton.png");
 ASSET_MANAGER.queueDownload("./imgs/Hero-Warrior.png");
 ASSET_MANAGER.queueDownload("./imgs/npc-female.png");
+ASSET_MANAGER.queueDownload("./imgs/dragon_1.png");
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/tiles.png");
@@ -232,7 +233,7 @@ ASSET_MANAGER.downloadAll(function () {
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", 0, 1, ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(7, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
-                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new DragonCave(16, 6, 5, gameEngine)], ["Skeleton", "Malboro"], "level1");
+                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new DragonCave(16, 6, 5, gameEngine)], ["Skeleton", "Malboro", "Dragon1"], "level1");
 
     gameEngine.addEnvironment(level1.name, level1); 
     //gameEngine.addAuxillaryEntity(mal);

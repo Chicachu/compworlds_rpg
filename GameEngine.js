@@ -169,7 +169,13 @@ GameEngine.prototype.startInput = function () {
         if (String.fromCharCode(e.which) === ' ' && text_box.style.visibility === "visible") {
             that.next = false;
         }
-    }, false);   
+    }, false);
+
+    this.context.canvas.addEventListener('keyup', function (e) {
+        if (e.which === 80) {
+            that.sound_manager.toggleSound();
+        }
+    });
 }
 
 GameEngine.prototype.setWindowEvent = function (game) {
@@ -867,7 +873,7 @@ Hero.prototype.checkSurroundings = function () {
 
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2997;
+        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2000;
     }
 }
 
@@ -877,7 +883,7 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+    if (this.game.environment[this.game.current_environment].curr_quadrant != 2 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
         this.preBattle();
     }
     this.checkBoundaries();
@@ -1295,7 +1301,7 @@ Skeleton.prototype = new Enemy();
 Skeleton.prototype.constructor = Enemy;
 
 
-Malboro = function(game, stats, anims, loop_while_standing)
+Malboro = function(game, stats, loop_while_standing)
 {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
@@ -1312,6 +1318,26 @@ Malboro = function(game, stats, anims, loop_while_standing)
     
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Enemy;
+
+Dragon1 = function(game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
+    this.loop_while_standing = loop_while_standing;
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 104.5, 107, .1, 8, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 1, 70, 107, .1, 12, true, false),
+        hit: new Animation(this.spriteSheet, 0, 2, 75, 107, .1, 18, true, false),
+        death: new Animation(this.spriteSheet, 0, 3, 40, 4107, .1, 7, true, false)
+    };
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1");
+}
+
+Dragon1.prototype = new Enemy();
+Dragon1.prototype.constructor = Enemy;
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
@@ -1917,6 +1943,8 @@ Environment.prototype.initNewFiend = function (fiend) {
         case "Malboro":
             return (new Malboro(this.game, new Statistics(75, 15, 10), false));
             break;
+        case "Dragon1":
+            return (new Dragon1(this.game, new Statistics(250, 30, 40), true));
         default:
             return null;
     }
@@ -3448,6 +3476,7 @@ SoundManager = function(game)
     this.game = game;
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
+    this.paused = false;
     this.background = this.world1;
     //this.background.play();
 }
@@ -3463,6 +3492,17 @@ SoundManager.prototype.playSound = function(sound)
     }
 }
 
+SoundManager.prototype.toggleSound = function()
+{
+    if(this.background.paused)
+    {
+        this.background.play();
+    }
+    else
+    {
+        this.background.pause();
+    }
+}
 SoundManager.prototype.playSong = function(sound)
 {
     this.background.pause();
