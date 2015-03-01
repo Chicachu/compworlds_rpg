@@ -908,14 +908,14 @@ Hero.prototype.checkSurroundings = function () {
 
     if (Math.abs(distance_traveled) > 100) {
         var x = 8;
-        return Math.ceil(Math.random() * (3000 - 0) - 0) >= 2000;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3994;
     }
 }
 
 Hero.prototype.update = function () {
 
     if (!this.game.is_battle) {
-
+            
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
@@ -1803,23 +1803,36 @@ Log.prototype.startInteraction = function () {
     }
 }
 
-DragonCave = function (x, y, quad, game) {
-    Interactable.call(this, x, y, quad, game);
-}
-
-DragonCave.prototype = new Interactable();
-DragonCave.prototype.constructor = DragonCave;
-
-DragonCave.prototype.startInteraction = function () {
-    if (this.game.entities[0].inventory.hasItem("Book of Spells")) {
+EnterDragonCave = function () {
+    if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
         this.game.environment[this.game.current_environment].setQuadrant(0);
         this.game.entities[0].x = 32;
 
-        this.game.entities[0].y = 200; 
+        this.game.entities[0].y = 200;
     } else {
         this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
+}
+
+ExitDragonCave = function () {
+    this.game.current_environment = "level1";
+    this.game.environment[this.game.current_environment].setQuadrant(5);
+    this.game.entities[0].x = 512;
+
+    this.game.entities[0].y = 192;
+}
+
+Portal = function (x, y, quad, game, func) {
+    this.func = func; 
+    Interactable.call(this, x, y, quad, game);
+}
+
+Portal.prototype = new Interactable();
+Portal.prototype.constructor = Portal;
+
+Portal.prototype.startInteraction = function () {
+    this.func();
 }
 
 Door = function (x, y, quad, game) {
