@@ -805,7 +805,7 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs(this.game.entities[i].x - this.x);
         var ent_y_difference = Math.abs(this.game.entities[i].y - this.y);
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance) {
+        if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
             min_distance = ent_distance;
             min_index = i;
         }
@@ -919,9 +919,9 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-    //    this.preBattle();
-    //}
+    if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+        this.preBattle();
+    }
     this.checkBoundaries();
 
         if (this.game.space) {
