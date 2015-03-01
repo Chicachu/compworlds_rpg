@@ -1048,9 +1048,6 @@ Hero.prototype.boundaryDown = function () {
 
 Hero.prototype.checkBoundaries = function () {
     var quadrant = this.game.environment[this.game.current_environment].curr_quadrant;
-    if (this.game.current_environment === "level1") {
-        console.log("test");
-    }
     if (this.boundaryRight()) {
         if (quadrant !== 2 && quadrant !== 5) {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 1);
