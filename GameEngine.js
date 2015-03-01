@@ -1769,7 +1769,7 @@ Interactable = function (x, y, quad, game) {
 
 Interactable.prototype.startInteraction = function () {
     var found = false;
-    if (this.quad.length) {
+    if (this.quad.length > 1) {
         for (var i = 0; i < this.quad.length; i++) {
             if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
                 found = true;
