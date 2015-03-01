@@ -122,16 +122,6 @@ GameEngine.prototype.startInput = function () {
     var that = this;
     //Temporary, space bar invokes attack
 
-<<<<<<< HEAD
-    this.context.canvas.addEventListener("keyup", function (e) {
-        if (e.which === 16 && !that.is_battle) {
-            that.canControl = false;
-            that.key = 0;
-            that.space = 0;
-            // lock user input controls here.
-            that.entities[0].game.fadeOut(that.entities[0].game, that.entities[0].game, that.entities[0].game.setBattle);
-
-=======
     this.context.canvas.addEventListener("keyup", function(e)
     {
         if(e.which === 16 && !that.is_battle)
@@ -142,7 +132,7 @@ GameEngine.prototype.startInput = function () {
             // lock user input controls here.
             that.entities[0].game.fadeOut(that.entities[0].game, that.entities[0].game, that.entities[0].game.setBattle);
             
->>>>>>> origin/origin
+
         };
         //e.stopImmediatePropagation();
         e.preventDefault();
@@ -272,11 +262,11 @@ GameEngine.prototype.draw = function (drawCallBack) {
                 } else {
                     this.entities[i].draw(this.context);
                 }
-<<<<<<< HEAD
+
             }
-=======
-            } 
->>>>>>> origin/origin
+
+
+
         }
         else if (this.is_battle) {
 
@@ -427,30 +417,21 @@ GameEngine.prototype.setBattle = function (game) {
     game.fiends = game.environment[game.current_environment].generateFiend(game, game.fiends).splice(0);
     game.clearEntities(true);
 
-<<<<<<< HEAD
-    if (game.fiends.length === 1) {
-        game.fiends[0].y = game.height / 2;
-    }
-    else if (game.fiends.length === 2) {
-=======
+
     if (game.fiends.length === 1)
     {
         game.fiends[0].y = game.height / 2;
     }
     else if (game.fiends.length === 2)
     {
->>>>>>> origin/origin
         game.fiends[0].y = (game.height / 2) - 40;
         game.fiends[0].x = game.fiends[0].x + 10;
         game.fiends[1].y = (game.height / 2) + 40;
         game.fiends[1].x = game.fiends[0].x - 20;
     }
-<<<<<<< HEAD
-    else if (game.fiends.length === 3) {
-=======
+
     else if (game.fiends.length === 3)
     {
->>>>>>> origin/origin
         game.fiends[0].y = (game.height / 2) - 60;
         game.fiends[0].x = game.fiends[0].x + 30;
         game.fiends[1].y = (game.height / 2);
@@ -482,15 +463,11 @@ GameEngine.prototype.setBattle = function (game) {
     putting the player back to original position, 
     and for now resets the players health.
 */
-<<<<<<< HEAD
-GameEngine.prototype.endBattle = function (game) {
-    if (game.entities[0].checkKillQuest(game.entities[0])) {
-=======
+
 GameEngine.prototype.endBattle = function (game)
 {
     if (game.entities[0].checkKillQuest(game.entities[0]))
     {
->>>>>>> origin/origin
         game.alertHero("You've completed the quest");
     }
     game.is_battle = false;
@@ -737,11 +714,8 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> origin/origin
+
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -941,23 +915,15 @@ Hero.prototype.checkSurroundings = function () {
 Hero.prototype.update = function () {
 
     if (!this.game.is_battle) {
-<<<<<<< HEAD
-        this.changeDirection();
-        this.changeMoveAnimation();
-        this.changeLocation();
-        //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-        //    this.preBattle();
-        //}
-        this.checkBoundaries();
-=======
+
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    //if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
-    //    this.preBattle();
-    //}
+    if (this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) {
+        this.preBattle();
+    }
     this.checkBoundaries();
->>>>>>> origin/origin
+
         if (this.game.space) {
             var interactable = this.checkForUserInteraction();
             if (interactable.ent) {
@@ -1060,11 +1026,8 @@ Hero.prototype.canMove = function (direction) {
     else {
         if (this.game.environment[this.game.current_environment].map.length === 2) {
             return this.isPassable(this.getTile(x1, y1, 0), index_low) && this.isPassable(this.getTile(x2, y2, 0), index_high)
-<<<<<<< HEAD
+
             && this.isPassable(this.getTile(x1, y1, 1), index_low) && this.isPassable(this.getTile(x2, y2, 1), index_high);
-=======
-            && this.isPassable(this.getTile(x1, y1, 1), index_low) && this.isPassable(this.getTile(x2, y2, 1), index_high); 
->>>>>>> origin/origin
         } else {
             return this.isPassable(this.getTile(x1, y1), index_low) && this.isPassable(this.getTile(x2, y2), index_high);
         }
@@ -1162,11 +1125,8 @@ Hero.prototype.checkBoundaries = function () {
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
 Hero.prototype.getTile = function (x, y, num) {
     if (this.game.environment[this.game.current_environment].map.length === 2) {
-<<<<<<< HEAD
-        return this.game.environment[this.game.current_environment].map[num][y][x];
-=======
        return this.game.environment[this.game.current_environment].map[num][y][x];
->>>>>>> origin/origin
+
     } else {
         if (y < this.game.environment[this.game.current_environment].map.length) {
             return this.game.environment[this.game.current_environment].map[y][x];
@@ -1178,11 +1138,7 @@ Hero.prototype.getTile = function (x, y, num) {
 }
 
 Hero.prototype.isPassable = function (tile, index) {
-<<<<<<< HEAD
-    if (this.game.current_environment === "level1") {
-=======
     if (this.game.current_environment === "level1" ) {
->>>>>>> origin/origin
         if (tile === 0 || (tile >= 7 && tile <= 14) || tile === 80) {
             return true;
         } else if (tile === 66 || tile === 105) {
@@ -1241,29 +1197,19 @@ Warrior.prototype.addQuest = function (quest) {
 }
 
 Warrior.prototype.checkKillQuest = function (enemy) {
-<<<<<<< HEAD
-    var complete = false;
-=======
     var complete = false; 
->>>>>>> origin/origin
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
             if (this.quests[i].number_enemies === this.quests[i].enemies_killed) {
                 this.quests[i].complete = true;
-<<<<<<< HEAD
-                complete = true;
-            }
-        }
-    }
-    return complete;
-=======
+
                 complete = true; 
             }
         }
     }
     return complete; 
->>>>>>> origin/origin
+
 }
 
 Warrior.prototype.checkItemQuest = function (item) {
@@ -1344,12 +1290,9 @@ Enemy.prototype.draw = function (context) {
     if (this.name === "dragon1") {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 2.0);
     }
-<<<<<<< HEAD
-    else {
-=======
+
     else
     {
->>>>>>> origin/origin
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.5);
     }
 }
@@ -1396,12 +1339,9 @@ Skeleton.prototype = new Enemy();
 Skeleton.prototype.constructor = Enemy;
 
 
-<<<<<<< HEAD
-Malboro = function (game, stats, loop_while_standing) {
-=======
+
 Malboro = function(game, stats, loop_while_standing)
 {
->>>>>>> origin/origin
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
     this.animations = {
@@ -1419,12 +1359,9 @@ Malboro = function(game, stats, loop_while_standing)
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Enemy;
 
-<<<<<<< HEAD
-Dragon1 = function (game, stats, loop_while_standing) {
-=======
+
 Dragon1 = function(game, stats, loop_while_standing)
 {
->>>>>>> origin/origin
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/dragon_1.png");
     this.loop_while_standing = loop_while_standing;
@@ -1451,11 +1388,8 @@ pause : whether the NPC will rest for 1 second once it reaches one of its points
 NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
     if (game && dialogue && anims && path) {
         this.game = game;
-<<<<<<< HEAD
-        this.map_name = map_name;
-=======
+
         this.map_name = map_name; 
->>>>>>> origin/origin
         this.animations = anims;
         this.spriteSheet = this.animations.right.spriteSheet;
 
@@ -1671,15 +1605,10 @@ quest: what kind of quest it has
 pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
-<<<<<<< HEAD
-NPC_QUEST = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
-    this.name = name;
-    this.quest = quest;
-=======
+
 NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
     this.name = name;
     this.quest = quest; 
->>>>>>> origin/origin
     NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name);
 }
 
@@ -1782,11 +1711,8 @@ Environment = function (game, map, animations, tilesheet, quads, interactables, 
     this.quads = quads;
     this.name = name;
     this.curr_quadrant = 0;
-<<<<<<< HEAD
 
-=======
     this.battle_background = battle_background;
->>>>>>> origin/origin
     this.interactables = interactables;
     //Environment.initInteractables.call(this, this.interactables);
 }
@@ -1803,13 +1729,9 @@ EnvironmentAnimation = function (animation, coords, quads) {
 
 OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background) {
     this.indoor_maps = indoor_maps;
-<<<<<<< HEAD
-    this.fiends = fiends;
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name);
-=======
+
     this.fiends = fiends; 
     Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background);
->>>>>>> origin/origin
     this.addIndoorEnvironments();
 }
 
@@ -1893,11 +1815,8 @@ DragonCave.prototype.startInteraction = function () {
         this.game.current_environment = "dragon_cave";
         this.game.environment[this.game.current_environment].setQuadrant(0);
         this.game.entities[0].x = 32;
-<<<<<<< HEAD
-        this.game.entities[0].y = 200;
-=======
+
         this.game.entities[0].y = 200; 
->>>>>>> origin/origin
     } else {
         this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
@@ -2089,11 +2008,7 @@ Environment.prototype.draw = function (scaleBy) {
     this.context = this.game.context;
     var scaleBy = (scaleBy || 1);
 
-<<<<<<< HEAD
-    this.drawTiles.call(this, scaleBy);
-=======
    this.drawTiles.call(this, scaleBy);
->>>>>>> origin/origin
     if (this.animations) {
         this.drawEnvironmentAnimations();
     }
@@ -2693,15 +2608,7 @@ GeneralMenu.prototype.showMenu = function (flag) {
 /*
 GHOST NPC_QUEST
 */
-<<<<<<< HEAD
-Ghost = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
-    this.part = 0;
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
-    this.curr_anim = this.animations.down;
-    this.lastX = this.x;
-}
 
-=======
 Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name){
 	this.part = 0; 
 	NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
@@ -2709,7 +2616,6 @@ Ghost = function(game, name, dialog, anims, path, speed, pause, quad, quest, map
 	this.lastX = this.x;
 	}
 	
->>>>>>> origin/origin
 Ghost.prototype = new NPC_QUEST();
 Ghost.prototype.constructor = Ghost;
 
@@ -2771,16 +2677,7 @@ Ghost.prototype.updateDialogue = function () {
                 this.interacting = false;
                 if (this.part === 0) {
                     this.part++;
-<<<<<<< HEAD
-                    console.log("quest added, part=0");
-                    this.game.entities[0].addQuest(this.quest);
-                }
-                if (this.part === 1 && this.game.entities[0].inventory.hasItem("Potion")) {
 
-                    this.game.entities[0].inventory.addItem(this.quest.reward);
-                    this.part++;
-                    console.log("reward added" + this.part);
-=======
 					console.log("quest added, part=0");
                     this.game.entities[0].addQuest(this.quest);
                 }
@@ -2789,7 +2686,6 @@ Ghost.prototype.updateDialogue = function () {
                     this.game.entities[0].inventory.addItem(this.quest.reward);
                     this.part++; 
 					console.log("reward added"+ this.part);
->>>>>>> origin/origin
                 }
             }
             this.game.next = false;
@@ -2810,11 +2706,9 @@ Ghost.prototype.draw = function (context) {
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
 Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
-<<<<<<< HEAD
-    this.part = 0;
-=======
+
     this.part = 0; 
->>>>>>> origin/origin
+
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
@@ -2917,11 +2811,8 @@ Storekeeper.prototype.showWares = function (flag) {
 /*WITCH NPC_QUEST with KILL_QUEST
 */
 Witch = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
-<<<<<<< HEAD
-    this.part = 0;
-=======
+
     this.part = 0; 
->>>>>>> origin/origin
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.lastX = this.x;
@@ -2998,19 +2889,12 @@ Witch.prototype.updateDialogue = function () {
                     this.game.entities[0].addQuest(this.quest);
                 }
                 if (this.part === 2 && this.game.entities[0].inventory.hasItem("Book of Spells")) {
-<<<<<<< HEAD
-                    this.game.entities[0].inventory.addItem(this.quest.reward);
-                    this.part++;
-                    this.showDialog();
-                } else if (this.part === 3) {
-                    this.part++;
-=======
+
                      this.game.entities[0].inventory.addItem(this.quest.reward);
                      this.part++; 
                      this.showDialog();
                  } else if (this.part === 3) {
                     this.part++; 
->>>>>>> origin/origin
                 }
             }
             this.game.next = false;
@@ -3655,7 +3539,6 @@ SoundManager.prototype.playSound = function (sound) {
     }
 }
 
-<<<<<<< HEAD
 SoundManager.prototype.toggleSound = function () {
     if (this.background.paused) {
         this.background.play();
@@ -3664,8 +3547,7 @@ SoundManager.prototype.toggleSound = function () {
         this.background.pause();
     }
 }
-SoundManager.prototype.playSong = function (sound) {
-=======
+
 SoundManager.prototype.toggleSound = function()
 {
     if(this.background.paused)
@@ -3679,7 +3561,6 @@ SoundManager.prototype.toggleSound = function()
 }
 SoundManager.prototype.playSong = function(sound)
 {
->>>>>>> origin/origin
     this.background.pause();
     switch (sound) {
         case "world1":
