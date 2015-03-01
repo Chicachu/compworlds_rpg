@@ -16,6 +16,7 @@ ASSET_MANAGER.queueDownload("./imgs/witch.png");
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
 ASSET_MANAGER.queueDownload("./imgs/roomInteriorSpritesSheet.png")
 ASSET_MANAGER.queueDownload("./imgs/dragoncave.png");
+ASSET_MANAGER.queueDownload("./imgs/ice_cave.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -83,7 +84,9 @@ ASSET_MANAGER.downloadAll(function () {
                                            ["Hello again, kid. You've been a great help to the town so far.",
                                             "Not to brag or anything, but this town's economy relies solely on the health of this store.",
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
-                                            ["Seriously, kid, go kill that dragon."]], storekeeper_sprites,
+                                            ["Seriously, kid, go kill that dragon."],
+                                            ["Wow! I didn't actually think you'd do it! Congratulations! Oh, sorry, but the store wont be open for a while yet.",
+                                            "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], storekeeper_sprites,
                                             [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1");
 										
 	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 
@@ -121,9 +124,10 @@ ASSET_MANAGER.downloadAll(function () {
 
 												witch_sprites, [new Point(864, 289)], .1, false, [1,2], witch_quest, "level1");
 	
-	var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 4, 64.3, 4107, .1, 1, true, false), null, null, null);
+    var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 5, 55, 107, .1, 1, true, false), null, null, null);
 
-	var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."]], dragon1_NPC_sprites, [new Point(100, 100)], .1, false, [0], "level1");
+    var dragon1_NPC = new NPC(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Now prepare to get fucked up."], ["Nigga."]], dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
+    dragon1_NPC.setScale(1.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
@@ -221,7 +225,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
                         null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave),
-                            new Portal(16, 6, 1, gameEngine, TalkToDragon)], "dragon_cave", "./imgs/ice_cave.png");
+                            new Portal(15, 5, 1, gameEngine, TalkToDragon)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro"]);
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
 
