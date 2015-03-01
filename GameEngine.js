@@ -248,7 +248,8 @@ GameEngine.prototype.draw = function (drawCallBack) {
     var hero_drawn = false;
     this.queueActions();
     for (var i = 1; i < this.entities.length; i++) {
-        if (this.entities[i].map_name === this.current_environment && !this.is_battle) {
+        if (this.entities[i].map_name === this.current_environment && !this.is_battle
+            && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quad)) {
             if (!this.is_battle) {
                 if (this.entities[0].x - this.entities[i].x < 35 && !hero_drawn) {
                     if (this.entities[i].y < this.entities[0].y) {
