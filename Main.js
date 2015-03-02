@@ -51,7 +51,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
 	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
 	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
-    var warrior = new Warrior(gameEngine, new Statistics(100, 15, 25, 4, 3, 1));
+    var warrior = new Warrior(gameEngine, new Statistics(100, 20, 25, 4, 3, 1));
+
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
@@ -59,14 +60,15 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(npc_sprites, 0, 11, 64, 64, 0.25, 9, true, false),
                                             null, null, null);
 
-    var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
+    var girl_npc = new NPC(gameEngine, [["Oh! My love!! You're back from the war! *sobs heavily*",
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "... except the store keeper. I'm not sure how he made it out alive.",
                                         "We must do something about the dragon! I saw it fly to the southeast *points determinedly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
                                         "And by rebuild, I mean repopulate. *wink wink*",
                                         "Oh, before you go! The healing berry bushes along the road have finally grown their berries for the season!",
-                                        "You should pick a few for your journey!"], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
+                                        "You should pick a few for your journey!"],
+                                           ["I'm so glad you're back from the war, my love, but right now this village faces destruction from the dragon! Please! Go save us!"]], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
 
     var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
@@ -76,7 +78,8 @@ ASSET_MANAGER.downloadAll(function () {
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 10);
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
-                                             "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*"],
+                                             "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*",
+                                                "Well actually all I have is an old ax, but it will just have to do! Think of the honor you will bring this town."],
                                            ["Look kid, I'd really love to sell you some gear but those skeletons are making it impossible to keep the store open.",
                                              "You're the last person in the village I'd want to ask, but since you basically ARE the last person in the village...",
                                              "I'll have a reward for you when you're done helping me out."],
@@ -128,7 +131,11 @@ ASSET_MANAGER.downloadAll(function () {
 	
     var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), null, null, null);
 
-    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Your journey ends here."], ["And you'll never make it to my super secret treasure room."], ["That's secret."], ["The one that's behind me."], ["That no one knows about."], ["Did I mention that it's a secret?"], ["And also the secret passageway leading to the mountains."], ["Which is also behind me."], ["And is also secret."]], dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
+    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you.",
+        "Your journey ends here.", "And you'll never make it to my super secret treasure room.",
+        "That's secret.", "The one that's behind me.", "That no one knows about.", "Did I mention that it's a secret?",
+        "And also the secret passageway leading to the mountains.", "Which is also behind me.", "And is also secret."]],
+        dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
     dragon1_NPC.setScale(1.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
@@ -241,7 +248,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [0, 0, 80, 87, 86, 85, 87, 0, 80, 0, 86, 85, 87, 85, 0, 80, 0, 0, 0, 0, 94, 94, 95, 95, 121, 122, 123, 124, 5, 6, 29, 0, 0, 0, 28, 0, 0, 0, 28, 29, 62, 64],
                 [7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 95, 95, 94, 94, 125, 126, 127, 128, 0, 0, 0, 0, 3, 4, 29, 0, 0, 0, 29, 0, 3, 4],
                 [9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 9, 10, 0, 94, 95, 95, 129, 130, 131, 132, 0, 0, 28, 62, 5, 6, 65, 0, 0, 0, 0, 0, 5, 6],
-                [0, 66, 0, 104, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 0, 0, 0],
+                [0, 66, 0, 104, 94, 0, 0, 94, 0, 0, 66, 0, 86, 87, 85, 86, 87, 85, 7, 8, 94, 95, 94, 3, 4, 0, 0, 0, 0, 62, 29, 62, 63, 3, 4, 0, 0, 3, 4, 37, 38, 0],
                 [67, 68, 69, 94, 95, 0, 0, 95, 94, 67, 68, 69, 85, 86, 87, 85, 86, 87, 9, 10, 95, 94, 95, 5, 6, 0, 0, 0, 103, 37, 38, 3, 4, 5, 6, 0, 0, 5, 6, 3, 4, 0],
                 [70, 71, 72, 95, 94, 0, 0, 94, 95, 70, 71, 72, 0, 90, 91, 94, 90, 91, 7, 8, 0, 95, 3, 4, 81, 82, 81, 82, 81, 82, 65, 5, 6, 0, 0, 0, 20, 3, 4, 5, 6, 103],
                 [73, 74, 75, 94, 95, 0, 0, 95, 94, 73, 74, 75, 94, 92, 93, 95, 92, 93, 9, 10, 88, 89, 5, 6, 83, 84, 83, 84, 83, 84, 81, 82, 0, 0, 0, 64, 19, 5, 6, 65, 30, 30],
@@ -266,7 +273,7 @@ ASSET_MANAGER.downloadAll(function () {
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
-                new HealBerry(11, 8, 5, gameEngine), new Log(12, 10, 4, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro"], "level1", "./imgs/woods.png");
+                new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro"], "level1", "./imgs/woods.png");
 
     gameEngine.addEnvironment(level1.name, level1);
     //gameEngine.addAuxillaryEntity(mal);

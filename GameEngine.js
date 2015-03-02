@@ -430,9 +430,9 @@ GameEngine.prototype.setBattle = function (args) {
     }
 
 
-    window.setTimeout(game.esc_menu.showMenu(false), 3000);
+    window.setTimeout(game.esc_menu.showMenu(false), 500);
     window.setTimeout(game.menu.init.bind(game.menu, game), 10);
-    window.setTimeout(game.menu.showMenu.bind(game.menu, true, game), 3000);
+    window.setTimeout(game.menu.showMenu.bind(game.menu, true, game), 500);
 }
 
 GameEngine.prototype.setNormalBattle = function(game)
@@ -466,7 +466,7 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    game.fiends.push(new Dragon1(game, new Statistics(100, 20, 15, 5, 10, 3)));
+    game.fiends.push(new Dragon1(game, new Statistics(125, 21, 18, 5, 10, 3)));
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
     game.fiends[0].init();
@@ -486,7 +486,7 @@ GameEngine.prototype.endBattle = function (game)
         game.alertHero("You've completed the quest");
     }
     game.is_battle = false;
-    game.menu.showMenu(false);
+    window.setTimeout(game.menu.showMenu.bind(game.menu, false, game), 0);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     game.context.canvas.focus();
     game.entities[0].x = game.entities[0].save_x;
@@ -963,6 +963,7 @@ Hero.prototype.flee = function (flee) {
 }
 Hero.prototype.checkSurroundings = function () {
     var distance_traveled = Math.sqrt(this.x * this.x + this.y * this.y) - Math.sqrt(this.save_x * this.save_x + this.save_y * this.save_y);
+
 
     if (Math.abs(distance_traveled) > 125) {
         return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3999;
@@ -1457,6 +1458,7 @@ NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
 
         //next variables for the npc's path
         this.path = path;
+        this.part = 0;
         this.speed = speed;
         this.pause = pause;
         this.next_point = null;
@@ -1604,11 +1606,14 @@ NPC.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
-            if (this.dialogue_index < this.dialogue.length - 1) {
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
-                text.innerHTML = this.dialogue[this.dialogue_index];
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
                 text_box.innerHTML = text.outerHTML;
             } else {
+                if (this.part === 0) {
+                    this.part++;
+                }
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
                 text_box.style.display = "none";
@@ -1638,7 +1643,7 @@ NPC.prototype.startInteraction = function () {
         var text_box = document.getElementById("dialogue_box");
 
         var text = document.createElement('p');
-        text.innerHTML = this.dialogue[this.dialogue_index];
+        text.innerHTML = this.dialogue[this.part][this.dialogue_index];
         text_box.innerHTML = text.outerHTML;
         text_box.style.visibility = "visible";
         text_box.style.display = "block";
@@ -1674,9 +1679,9 @@ Boss.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
-            if (this.dialogue_index < this.dialogue.length - 1) {
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
-                text.innerHTML = this.dialogue[this.dialogue_index];
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
                 text_box.innerHTML = text.outerHTML;
             } else {
                 this.dialogue_index = 0;
@@ -1883,22 +1888,26 @@ Interactable.prototype.startInteraction = function () {
 // requires an ax to chop apart, usuaully to get to a chest or to a secret area. 
 Log = function (x, y, quad, game) {
     Interactable.call(this, x, y, quad, game);
+    this.broken = false; 
 }
 
 Log.prototype = new Interactable();
 Log.prototype.constructor = Log;
 
 Log.prototype.startInteraction = function () {
-    if (Interactable.prototype.startInteraction.call(this)) {
-        if (this.game.entities[0].inventory.hasItem("Ax", 1)) {
-            this.game.alertHero("You use your ax to break the log!");
-            var loc_point = this.game.changeXYForQuad(new Point(this.x / 32, this.y / 32), 4);
-            var ax = this.game.entities[0].inventory.getItem("Ax");
-            ax.doAction();
-            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 0;
-            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x - 1] = 0;
-        } else {
-            this.game.alertHero("This log requires an ax to break.");
+    if (!this.broken) {
+        if (Interactable.prototype.startInteraction.call(this)) {
+            if (this.game.entities[0].inventory.hasItem("Ax", 1)) {
+                this.game.alertHero("You use your ax to break the log!");
+                var loc_point = this.game.changeXYForQuad(new Point(this.x / 32, this.y / 32), this.quad);
+                var ax = this.game.entities[0].inventory.getItem("Ax");
+                ax.doAction();
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 0;
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x + 1] = 0;
+                this.broken = true; 
+            } else {
+                this.game.alertHero("This log requires an ax to break.");
+            }
         }
     }
 }
@@ -2101,10 +2110,10 @@ Environment.prototype.generateFiend = function (game) {
 Environment.prototype.initNewFiend = function (fiend) {
     switch (fiend) {
         case "Skeleton":
-            return (new Skeleton(this.game, new Statistics(50, 10, 5), false));
+            return (new Skeleton(this.game, new Statistics(35, 8, 5), false));
             break;
         case "Malboro":
-            return (new Malboro(this.game, new Statistics(75, 15, 10), false));
+            return (new Malboro(this.game, new Statistics(45, 13, 10), false));
             break;
         default:
             return null;
