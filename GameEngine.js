@@ -486,7 +486,7 @@ GameEngine.prototype.endBattle = function (game)
         game.alertHero("You've completed the quest");
     }
     game.is_battle = false;
-    game.menu.showMenu(false);
+    window.setTimeout(game.menu.showMenu.bind(game.menu, false, game), 0);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     game.context.canvas.focus();
     game.entities[0].x = game.entities[0].save_x;
