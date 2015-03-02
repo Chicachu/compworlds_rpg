@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "level1";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -102,7 +102,7 @@ GameEngine.prototype.init = function (context) {
     this.timer = new Timer();
     this.startInput();
     this.menu = new BattleMenu(document.getElementById("battle_menu"), this);
-    this.menu.init();
+    //this.menu.init();
     this.context.canvas.focus();
     this.esc_menu = new GeneralMenu(this);
     this.sound_manager = new SoundManager(this);
@@ -430,8 +430,9 @@ GameEngine.prototype.setBattle = function (args) {
     }
 
 
-    window.setTimeout(game.esc_menu.showMenu(false), 5000);
-    window.setTimeout(game.menu.showMenu(true), 5000);
+    window.setTimeout(game.esc_menu.showMenu(false), 3000);
+    window.setTimeout(game.menu.init.bind(game.menu, game), 10);
+    window.setTimeout(game.menu.showMenu.bind(game.menu, true, game), 3000);
 }
 
 GameEngine.prototype.setNormalBattle = function(game)
@@ -2345,7 +2346,7 @@ UseItemMenu.prototype.updateItems = function (game) {
     }
     for (var i = 0; i < this.list_items.length; i++) {
         this.list_items[i].html = this.menu.children[0].children[i];
-        this.list_items[i].input.call(this.list_items[i], game);
+        this.list_items[i].input(game);
     }
 }
 
@@ -2357,6 +2358,7 @@ List_item = function (game, item, index) {
 }
 
 List_item.prototype.input = function (game) {
+    this.game = game; 
     var that = this;
     this.html.addEventListener("keydown", function (e) {
         if (e.which === 40) {
@@ -2371,8 +2373,8 @@ List_item.prototype.input = function (game) {
             }
         } else if (String.fromCharCode(e.which) === ' ') {
             // use item
-            that.game.menu.use_item_list.updateItems(game);
-            that.item.doAction.call(that.item, game);
+            that.game.menu.use_item_list.updateItems(that.game);
+            that.item.doAction(that.game);
             //window.setTimeout(that.item.doAction(), 0);
             window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
         } else if (e.which === 27) {
@@ -2383,9 +2385,9 @@ List_item.prototype.input = function (game) {
     }, false);
 }
 
-BattleMenu.prototype.init = function () {
+BattleMenu.prototype.init = function (game) {
+    this.game = game;
     var that = this;
-
 
     this.attack.addEventListener("keydown", function (e) {
         if (that.game.entities[0].is_turn && that.game.canControl) {
@@ -2620,7 +2622,8 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
     }
 }
 
-BattleMenu.prototype.showMenu = function (flag) {
+BattleMenu.prototype.showMenu = function (flag, game) {
+    this.game = game;
     this.target_queue = [];
     for (var i = 0; i < this.game.fiends.length; i++) {
         this.target_queue.push(this.game.fiends[i]);
