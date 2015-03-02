@@ -2104,10 +2104,10 @@ Environment.prototype.generateFiend = function (game) {
 Environment.prototype.initNewFiend = function (fiend) {
     switch (fiend) {
         case "Skeleton":
-            return (new Skeleton(this.game, new Statistics(50, 10, 5), false));
+            return (new Skeleton(this.game, new Statistics(35, 8, 5), false));
             break;
         case "Malboro":
-            return (new Malboro(this.game, new Statistics(75, 15, 10), false));
+            return (new Malboro(this.game, new Statistics(45, 13, 10), false));
             break;
         default:
             return null;
