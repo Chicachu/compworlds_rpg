@@ -507,7 +507,7 @@ GameEngine.prototype.gameOver = function (args) {
     var background = args.background;
     game.setBackground(background);
     game.canControl = false;
-    game.menu.showMenu(false);
+    game.menu.showMenu(false, game);
     game.entities = [];
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
 }
@@ -752,6 +752,11 @@ Entity.prototype.drawHealthBar = function (context) {
     context.closePath();
 }
 
+Entity.prototype.calculatePhysicalDamage = function(player, foe)
+{
+    var base_damage = foe.stats.attack / player.stats.defense;
+    
+}
 Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
     game.animation_queue.push(new Event(foes, foes.animations.hit));
@@ -833,6 +838,7 @@ Statistics = function (health, attack, defense, strength, dex, intel) {
     this.strength = strength;
     this.dexterity = dex;
     this.intelligence = intel;
+
 }
 
 /* HERO and subclasses */
@@ -2521,6 +2527,7 @@ BattleMenu.prototype.init = function (game) {
             }
 
         }
+        e.stopImmediatePropagation();
         e.preventDefault();
     });
 
@@ -2571,6 +2578,7 @@ BattleMenu.prototype.init = function (game) {
                 that.is_selecting = true;
             }
         }
+        e.stopImmediatePropagation();
         e.preventDefault();
     });
 
@@ -2632,10 +2640,6 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
 
 BattleMenu.prototype.showMenu = function (flag, game) {
     this.game = game;
-    this.target_queue = [];
-    for (var i = 0; i < this.game.fiends.length; i++) {
-        this.target_queue.push(this.game.fiends[i]);
-    }
     if (flag) {
         this.game.context.canvas.tabIndex = 0;
         this.changeTabIndex("main", true);
