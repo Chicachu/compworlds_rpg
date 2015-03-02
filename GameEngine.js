@@ -466,7 +466,7 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    game.fiends.push(new Dragon1(game, new Statistics(100, 20, 15, 5, 10, 3)));
+    game.fiends.push(new Dragon1(game, new Statistics(125, 21, 18, 5, 10, 3)));
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
     game.fiends[0].init();
