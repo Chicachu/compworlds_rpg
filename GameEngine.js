@@ -507,7 +507,7 @@ GameEngine.prototype.gameOver = function (args) {
     var background = args.background;
     game.setBackground(background);
     game.canControl = false;
-    game.menu.showMenu(false);
+    game.menu.showMenu(false, game);
     game.entities = [];
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
 }
@@ -2527,6 +2527,7 @@ BattleMenu.prototype.init = function (game) {
             }
 
         }
+        e.stopImmediatePropagation();
         e.preventDefault();
     });
 
@@ -2577,6 +2578,7 @@ BattleMenu.prototype.init = function (game) {
                 that.is_selecting = true;
             }
         }
+        e.stopImmediatePropagation();
         e.preventDefault();
     });
 
@@ -2638,10 +2640,6 @@ BattleMenu.prototype.changeTabIndex = function (option, bool) {
 
 BattleMenu.prototype.showMenu = function (flag, game) {
     this.game = game;
-    this.target_queue = [];
-    for (var i = 0; i < this.game.fiends.length; i++) {
-        this.target_queue.push(this.game.fiends[i]);
-    }
     if (flag) {
         this.game.context.canvas.tabIndex = 0;
         this.changeTabIndex("main", true);
