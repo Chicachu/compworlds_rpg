@@ -1878,22 +1878,26 @@ Interactable.prototype.startInteraction = function () {
 // requires an ax to chop apart, usuaully to get to a chest or to a secret area. 
 Log = function (x, y, quad, game) {
     Interactable.call(this, x, y, quad, game);
+    this.broken = false; 
 }
 
 Log.prototype = new Interactable();
 Log.prototype.constructor = Log;
 
 Log.prototype.startInteraction = function () {
-    if (Interactable.prototype.startInteraction.call(this)) {
-        if (this.game.entities[0].inventory.hasItem("Ax", 1)) {
-            this.game.alertHero("You use your ax to break the log!");
-            var loc_point = this.game.changeXYForQuad(new Point(this.x / 32, this.y / 32), this.quad);
-            var ax = this.game.entities[0].inventory.getItem("Ax");
-            ax.doAction();
-            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 0;
-            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x + 1] = 0;
-        } else {
-            this.game.alertHero("This log requires an ax to break.");
+    if (!this.broken) {
+        if (Interactable.prototype.startInteraction.call(this)) {
+            if (this.game.entities[0].inventory.hasItem("Ax", 1)) {
+                this.game.alertHero("You use your ax to break the log!");
+                var loc_point = this.game.changeXYForQuad(new Point(this.x / 32, this.y / 32), this.quad);
+                var ax = this.game.entities[0].inventory.getItem("Ax");
+                ax.doAction();
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 0;
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x + 1] = 0;
+                this.broken = true; 
+            } else {
+                this.game.alertHero("This log requires an ax to break.");
+            }
         }
     }
 }
