@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -752,6 +752,11 @@ Entity.prototype.drawHealthBar = function (context) {
     context.closePath();
 }
 
+Entity.prototype.calculatePhysicalDamage = function(player, foe)
+{
+    var base_damage = foe.stats.attack / player.stats.defense;
+    
+}
 Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
     game.animation_queue.push(new Event(foes, foes.animations.hit));
@@ -833,6 +838,7 @@ Statistics = function (health, attack, defense, strength, dex, intel) {
     this.strength = strength;
     this.dexterity = dex;
     this.intelligence = intel;
+
 }
 
 /* HERO and subclasses */
