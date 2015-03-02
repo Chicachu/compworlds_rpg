@@ -78,7 +78,8 @@ ASSET_MANAGER.downloadAll(function () {
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 10);
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
-                                             "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*"],
+                                             "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*",
+                                                "Well actually all I have is an old ax, but it will just have to do! Think of the honor you will bring this town."],
                                            ["Look kid, I'd really love to sell you some gear but those skeletons are making it impossible to keep the store open.",
                                              "You're the last person in the village I'd want to ask, but since you basically ARE the last person in the village...",
                                              "I'll have a reward for you when you're done helping me out."],
