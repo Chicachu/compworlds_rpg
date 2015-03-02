@@ -60,14 +60,15 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(npc_sprites, 0, 11, 64, 64, 0.25, 9, true, false),
                                             null, null, null);
 
-    var girl_npc = new NPC(gameEngine, ["Oh! My love!! You're back from the war! *sobs heavily*",
+    var girl_npc = new NPC(gameEngine, [["Oh! My love!! You're back from the war! *sobs heavily*",
                                         "The village has been destroyed by an evil dragon, everyone... they are gone.",
                                         "... except the store keeper. I'm not sure how he made it out alive.",
                                         "We must do something about the dragon! I saw it fly to the southeast *points determinedly*",
                                         "Revenge must be had! And once we are safe from the dragon, we can start to rebuild the village.",
                                         "And by rebuild, I mean repopulate. *wink wink*",
                                         "Oh, before you go! The healing berry bushes along the road have finally grown their berries for the season!",
-                                        "You should pick a few for your journey!"], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
+                                        "You should pick a few for your journey!"],
+                                           ["I'm so glad you're back from the war, my love, but right now this village faces destruction from the dragon! Please! Go save us!"]], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
 
     var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
@@ -129,7 +130,11 @@ ASSET_MANAGER.downloadAll(function () {
 	
     var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), null, null, null);
 
-    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."], ["Your journey ends here."], ["And you'll never make it to my super secret treasure room."], ["That's secret."], ["The one that's behind me."], ["That no one knows about."], ["Did I mention that it's a secret?"], ["And also the secret passageway leading to the mountains."], ["Which is also behind me."], ["And is also secret."]], dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
+    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you.",
+        "Your journey ends here.", "And you'll never make it to my super secret treasure room.",
+        "That's secret.", "The one that's behind me.", "That no one knows about.", "Did I mention that it's a secret?",
+        "And also the secret passageway leading to the mountains.", "Which is also behind me.", "And is also secret."]],
+        dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
     dragon1_NPC.setScale(1.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 

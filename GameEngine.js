@@ -1452,6 +1452,7 @@ NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
 
         //next variables for the npc's path
         this.path = path;
+        this.part = 0;
         this.speed = speed;
         this.pause = pause;
         this.next_point = null;
@@ -1599,11 +1600,14 @@ NPC.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
-            if (this.dialogue_index < this.dialogue.length - 1) {
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
-                text.innerHTML = this.dialogue[this.dialogue_index];
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
                 text_box.innerHTML = text.outerHTML;
             } else {
+                if (this.part === 0) {
+                    this.part++;
+                }
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
                 text_box.style.display = "none";
@@ -1633,7 +1637,7 @@ NPC.prototype.startInteraction = function () {
         var text_box = document.getElementById("dialogue_box");
 
         var text = document.createElement('p');
-        text.innerHTML = this.dialogue[this.dialogue_index];
+        text.innerHTML = this.dialogue[this.part][this.dialogue_index];
         text_box.innerHTML = text.outerHTML;
         text_box.style.visibility = "visible";
         text_box.style.display = "block";
@@ -1669,9 +1673,9 @@ Boss.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
-            if (this.dialogue_index < this.dialogue.length - 1) {
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
-                text.innerHTML = this.dialogue[this.dialogue_index];
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
                 text_box.innerHTML = text.outerHTML;
             } else {
                 this.dialogue_index = 0;
