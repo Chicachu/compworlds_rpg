@@ -430,9 +430,9 @@ GameEngine.prototype.setBattle = function (args) {
     }
 
 
-    window.setTimeout(game.esc_menu.showMenu(false), 3000);
+    window.setTimeout(game.esc_menu.showMenu(false), 500);
     window.setTimeout(game.menu.init.bind(game.menu, game), 10);
-    window.setTimeout(game.menu.showMenu.bind(game.menu, true, game), 3000);
+    window.setTimeout(game.menu.showMenu.bind(game.menu, true, game), 500);
 }
 
 GameEngine.prototype.setNormalBattle = function(game)
