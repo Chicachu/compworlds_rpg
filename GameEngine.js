@@ -960,10 +960,29 @@ Hero.prototype.checkForUserInteraction = function () {
         return { ent: this.game.environment[this.game.current_environment].interactables[min_index] }
     }
 }
-
+/* this.health = health;
+this.total_health = health;
+this.attack = attack;
+this.total_attack = attack;
+this.defense = defense;
+this.total_defense = defense;
+this.strength = strength;
+this.dexterity = dex;
+this.intelligence = intel;
+*/
 Hero.prototype.updateStats = function () {
-    for (var i = 0; i < Object.keys(this.equipped).length; i++) {
-
+    var keys = Object.keys(this.equipped);
+    for (var i = 0; i < keys.length; i++) {
+        var armor_piece = this.equipped[keys[i]];
+        if (armor_piece) {
+            this.stats.health += armor_piece.stats.health;
+            this.stats.total_health += armor_piece.stats.total_health;
+            this.stats.attack += armor_piece.stats.attack;
+            this.stats.defense += armor_piece.stats.defense;
+            this.stats.strength += armor_piece.stats.strength;
+            this.stats.dexterity += armor_piece.stats.dexterity;
+            this.stats.intelligence += armor_piece.stats.intelligence; 
+        }
     }
 }
 
@@ -3045,6 +3064,10 @@ Storekeeper.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
+
+            if (this.part === 1 && this.quest.complete) {
+                this.part++;
+            }
             if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
                 text.innerHTML = this.dialogue[this.part][this.dialogue_index];
@@ -3450,6 +3473,7 @@ Armor.prototype.doAction = function () {
         this.game.entities[0].equipped[this.type] = this;
         this.isEquipped = true;
     }
+    this.game.entities[0].updateStats();
 }
 
 Armor.prototype.unequipOldArmor = function (bool) {
