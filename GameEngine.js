@@ -1297,7 +1297,7 @@ Warrior.prototype.checkKillQuest = function (enemy) {
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
-            if (this.quests[i].number_enemies >= this.quests[i].enemies_killed) {
+            if (this.quests[i].number_enemies <= this.quests[i].enemies_killed) {
                 this.quests[i].complete = true;
                 complete = true; 
             }
