@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -626,7 +626,7 @@ LootDispenser.prototype.generateItem = function(item)
         case "gold":
             var rand_gold = Math.floor(Math.random() * 11);
             this.acc_gold += rand_gold;
-            this.string.push("+ " + rand_gold.toString() + "gold");
+            this.string.push("+ " + rand_gold.toString() + " gold");
             return rand_gold;
             break;
         case "amulet of thick skin":
@@ -1529,6 +1529,29 @@ Malboro = function(game, stats, loop_while_standing)
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Malboro;
 
+Ogre = function (game, stats, loop_while_standing) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/ogre.png");
+    this.xp_base = 15;
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 100, 100, 0.07, 19, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 0, 100, 100, 0.071, 19, true, false),
+        hit: new Animation(this.spriteSheet, 0, 1, 100, 100, 0.15, 5, true, false),
+        death: new Animation(this.spriteSheet, 0, 2, 100, 100, 0.1, 1, true, false)
+    };
+    this.loot_table = [
+        ({ string: "gold", weight: 60 }),
+        ({ string: "heal berry", weight: 10 }),
+        ({ string: "amulet of thick skin", weight: 30 })
+    ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "ogre", false, this.loot_table);
+}
+
+Ogre.prototype = new Enemy();
+Ogre.prototype.constructor = Ogre;
 
 Dragon1 = function(game, stats, loop_while_standing)
 {
@@ -2225,6 +2248,8 @@ Environment.prototype.initNewFiend = function (fiend) {
         case "Malboro":
             return (new Malboro(this.game, new Statistics(65, 15, 5), false));
             break;
+        case "Ogre":
+            return (new Ogre(this.game, new Statistics(80, 15, 10), false));
         default:
             return null;
     }
