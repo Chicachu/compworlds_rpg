@@ -481,9 +481,10 @@ GameEngine.prototype.setBossBattle = function(game)
 
 GameEngine.prototype.endBattle = function (game)
 {
-    if (game.entities[0].checkKillQuest(game.entities[0]))
+    if (this.kill_quest_complete.complete)
     {
         game.alertHero("You've completed the quest");
+        this.kill_quest_complete = false; 
     }
     game.is_battle = false;
     window.setTimeout(game.menu.showMenu.bind(game.menu, false, game), 0);
@@ -704,6 +705,8 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.is_turn = false;
     this.is_targeted = false;
     this.level = 1;
+
+    this.kill_quest_complete = false;
     this.id = Math.random() * Math.random();
     if (animations) {
         this.animations = animations;
@@ -826,7 +829,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         rand_offset *= Math.floor(Math.random() * 2) == 1 ? 1 : -1
         game.loot_dispenser.acc_xp += foes.xp_base + rand_offset;
         // check to see if foe is one for a kill quest
-        //var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
+        this.kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
         if (foes.name === "Skeleton")
@@ -1338,9 +1341,9 @@ Warrior.prototype.checkKillQuest = function (enemy) {
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
-            if (this.quests[i].number_enemies <= this.quests[i].enemies_killed) {
+            if (this.quests[i].enemies_killed >= this.quests[i].number_enemies && !this.quests[i].complete) {
                 this.quests[i].complete = true;
-                complete = true; 
+                complete = this.quest[i]; 
             }
         }
     }
