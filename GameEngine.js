@@ -787,14 +787,14 @@ Entity.prototype.drawHealthBar = function (context) {
 Entity.prototype.calculatePhysicalDamage = function(player, foe)
 {   //enemydamage?
     //Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
-    var max_dmg = foe.stats.attack + 3;
-    var min_dmg = foe.stats.attack - 3;
+    var max_dmg = foe.stats.attack + 2;
+    var min_dmg = foe.stats.attack - 2;
     var base_damage = (Math.floor(Math.random() * (max_dmg - min_dmg + 1)) + min_dmg) - Math.ceil(player.stats.defense/10);  //original calc: foe.stats.attack - player.stats.defense;
 }
 Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     //herodamage?
     var max_atk = player.stats.attack + 5;
-    var min_atk = player.stats.attack - 5;
+    var min_atk = player.stats.attack - 2;
     foes.stats.health = foes.stats.health - (Math.floor(Math.random() * (max_atk - min_atk + 1)) + min_atk) - Math.ceil(foes.stats.defense / 10); //original calc: foes.stats.health - ((player.stats.attack - foes.stats.defense) * (Math.random() * 10));
     game.animation_queue.push(new Event(foes, foes.animations.hit));
     if (foes.stats.health <= 0) {
@@ -1975,7 +1975,7 @@ Log.prototype.startInteraction = function () {
 
 // PORTAL FUNCTIONS 
 EnterDragonCave = function () {
-   // if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
+    if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
         this.game.entities[0].sight = 30;
         this.game.environment[this.game.current_environment].setQuadrant(0);
@@ -2168,13 +2168,14 @@ Environment.prototype.generateFiend = function (game) {
     return fiend_array;
 }
 
+//enemystat
 Environment.prototype.initNewFiend = function (fiend) {
     switch (fiend) {
         case "Skeleton":
             return (new Skeleton(this.game, new Statistics(50, 10, 15), false));
             break;
         case "Malboro":
-            return (new Malboro(this.game, new Statistics(65, 20, 5), false));
+            return (new Malboro(this.game, new Statistics(65, 15, 5), false));
             break;
         default:
             return null;
@@ -3213,7 +3214,7 @@ Potion.prototype.constructor = Potion;
 Potion.prototype.doAction = function (game) {
     switch (this.potion_type) {
         case "health":
-            game.entities[0].stats.health += this.level * 100;
+            game.entities[0].stats.health += this.level * 75;
             break;
         case "stam":
 
