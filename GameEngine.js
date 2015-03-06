@@ -481,8 +481,7 @@ GameEngine.prototype.setBossBattle = function(game)
 
 GameEngine.prototype.endBattle = function (game)
 {
-    if (game.entities[0].checkKillQuest(game.entities[0]))
-    {
+    if (game.entities[0].quest.complete) {
         game.alertHero("You've completed the quest");
     }
     game.is_battle = false;
@@ -764,10 +763,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         foes.stats.health = 0;
         foes.is_dead = true;
         // check to see if foe is one for a kill quest
-        //var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
-        // TODO: alert hero if kill_quest_complete AFTER battle fades out
-        // use gameengine.alertHero(<dialog>); when world view is back in
-
+        var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
 
         game.removeFighters(foes);
         if (is_multi_attack) {
