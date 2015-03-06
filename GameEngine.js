@@ -481,7 +481,7 @@ GameEngine.prototype.setBossBattle = function(game)
 
 GameEngine.prototype.endBattle = function (game)
 {
-    if (this.kill_quest_complete.complete)
+    if (this.kill_quest_complete && this.kill_quest_complete.complete)
     {
         game.alertHero("You've completed the quest");
         this.kill_quest_complete = false; 
@@ -918,6 +918,13 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     // pick up on any interaction. 
     this.fleeing = false;
     this.next_level_up = 100;
+    
+    this.equipped = {
+        armor: false,
+        accessory: false,
+        offhand: false,
+        mainhand: false
+    }
 }
 
 Hero.prototype = new Entity();
@@ -951,6 +958,12 @@ Hero.prototype.checkForUserInteraction = function () {
         return { ent: this.game.entities[min_index], reposition: true };
     } else {
         return { ent: this.game.environment[this.game.current_environment].interactables[min_index] }
+    }
+}
+
+Hero.prototype.updateStats = function () {
+    for (var i = 0; i < Object.keys(this.equipped).length; i++) {
+
     }
 }
 
@@ -3429,12 +3442,12 @@ Armor.prototype.doAction = function () {
     if (this.isEquipped) {
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
-        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.game.entities[0].equipped[this.type] = false;
         this.isEquipped = false;
     } else {
         this.slot.style.backgroundImage = "none";
         this.slot.innerHTML = this.img.outerHTML;
-        this.game.entities[0].inventory.equipped[this.type] = this;
+        this.game.entities[0].equipped[this.type] = this;
         this.isEquipped = true;
     }
 }
@@ -3444,12 +3457,12 @@ Armor.prototype.unequipOldArmor = function (bool) {
         this.isEquipped = false;
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
-        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.game.entities[0].equipped[this.type] = false;
     } else {
         // check if item is already equipped
-        if (this.game.entities[0].inventory.equipped[this.type] &&
-            this.game.entities[0].inventory.equipped[this.type] !== this) {
-            var old_item = this.game.entities[0].inventory.equipped[this.type];
+        if (this.game.entities[0].equipped[this.type] &&
+            this.game.entities[0].equipped[this.type] !== this) {
+            var old_item = this.game.entities[0].equipped[this.type];
             old_item.isEquipped = false;
         }
     }
@@ -3483,12 +3496,6 @@ Inventory = function (game, coin, max_items) {
     this.initHtmlItems();
     this.selectInput();
     this.open = false;
-    this.equipped = {
-        armor: false,
-        accessory: false,
-        offhand: false,
-        mainhand: false
-    }
 }
 
 Inventory.prototype.initHtmlItems = function () {
