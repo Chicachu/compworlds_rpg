@@ -579,17 +579,48 @@ GameEngine.prototype.selectTarget = function () {
 LootDispenser = function (game) {
     this.encounters = 0;
     this.game = game;
+    this.accumulated_loot = [];
 }
 
 LootDispenser.prototype.dispenseLoot = function (hero) {
+    
     if (this.encounters % 6 === 0) {
         hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
     }
+    //for(let item in this.accumulated_loot)
+    //{
+    //    hero.recieveItem(this.generateItem(item));
+    //}
 }
 
 LootDispenser.prototype.increment = function () {
     this.encounters++;
 }
+
+LootDispenser.prototype.add = function(item)
+{
+    this.accumulated_loot.push(item);
+}
+
+LootDispenser.prototype.generateItem = function(item)
+{
+    var item_string = item.string;
+    switch(item_string)
+    {
+        case "gold":
+            return Math.floor(Math.random() * 11);
+            break;
+        case "amulet of thick skin":
+            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 2, 0, 0, 0, 0)));
+            break;
+        case "heal berry":
+            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
+            break;
+        default:
+            break;
+    }
+}
+
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
@@ -651,6 +682,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.curr_anim = null;
     this.is_turn = false;
     this.is_targeted = false;
+    this.level = 1;
     this.id = Math.random() * Math.random();
     if (animations) {
         this.animations = animations;
@@ -773,7 +805,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
 
-
+        //foes.drop();
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -1265,9 +1297,8 @@ Warrior.prototype.checkKillQuest = function (enemy) {
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
-            if (this.quests[i].number_enemies === this.quests[i].enemies_killed) {
+            if (this.quests[i].number_enemies >= this.quests[i].enemies_killed) {
                 this.quests[i].complete = true;
-
                 complete = true; 
             }
         }
@@ -1324,11 +1355,12 @@ Warrior.prototype.setAction = function (action, target) {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing) {
+Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing, loot_table) {
     this.x = 40;
     this.y = 150;
     this.loop_while_standing = loop_while_standing;
     Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
+    this.loot_table = loot_table;
     this.game = game;
     this.name = name;
 }
@@ -1372,6 +1404,25 @@ Enemy.prototype.update = function () {
 
 Enemy.prototype.hit = function () {
 
+}
+
+Enemy.prototype.drop = function()
+{
+    if(this.loot_table)
+    {
+        var result = 0;
+        var total = 0;
+        var rand = Math.floor(Math.random() * (this.loot_table.length));
+        for(result = 0; result < this.loot_table.length; result++)
+        {
+            total += this.loot_table[result].weight;
+            if(total >= rand)
+            {
+                break;
+            }
+        }
+        this.game.loot_dispenser.add(this.loot_table[result]);
+    }
 }
 
 Enemy.prototype.setAction = function (action, target) {
@@ -1419,7 +1470,12 @@ Malboro = function(game, stats, loop_while_standing)
         hit: new Animation(this.spriteSheet, 0, 2, 82, 91, 0.1, 3, true, false),
         death: new Animation(this.spriteSheet, 0, 3, 82, 91, 0.1, 1, true, false)
     };
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "malboro");
+    this.loot_table = [
+        ({ string: "gold", weight: 45 }),
+        ({ string: "heal berry", weight: 50 }),
+        ({ string: "amulet of thick skin", weight: 5 })
+    ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "malboro", false, this.loot_table);
 }
 
 Malboro.prototype = new Enemy();
