@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = [];
-    this.current_environment = "level1";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -499,7 +499,12 @@ GameEngine.prototype.endBattle = function (game)
     game.animation_queue = [];
     game.sound_manager.playSong("world1");
     game.loot_dispenser.increment();
-    game.loot_dispenser.dispenseLoot(game.entities[0]);
+    setTimeout(function () {
+        game.alertHero(game.loot_dispenser.toString());
+        game.loot_dispenser.dispenseLoot(game.entities[0]);
+        game.entities[0].levelUp();
+    }, 1000);
+    
 }
 
 GameEngine.prototype.gameOver = function (args) {
@@ -580,17 +585,28 @@ LootDispenser = function (game) {
     this.encounters = 0;
     this.game = game;
     this.accumulated_loot = [];
+    this.acc_xp = 0;
+    this.string = [];
+    this.acc_gold = 0;
 }
 
+LootDispenser.prototype.toString = function()
+{
+    return this.string.join("\n");
+}
 LootDispenser.prototype.dispenseLoot = function (hero) {
     
     if (this.encounters % 6 === 0) {
         hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
     }
-    //for(let item in this.accumulated_loot)
-    //{
-    //    hero.recieveItem(this.generateItem(item));
-    //}
+    for(var i = 0; i < this.accumulated_loot.length; i ++)
+    {
+        hero.recieveItem(this.accumulated_loot[i]);
+    }
+    hero.stats.xp += this.acc_xp;
+    this.accumulated_loot = [];
+    this.string = [];
+    this.acc_xp = 0;
 }
 
 LootDispenser.prototype.increment = function () {
@@ -599,7 +615,7 @@ LootDispenser.prototype.increment = function () {
 
 LootDispenser.prototype.add = function(item)
 {
-    this.accumulated_loot.push(item);
+    this.accumulated_loot.push(this.generateItem(item));
 }
 
 LootDispenser.prototype.generateItem = function(item)
@@ -608,12 +624,17 @@ LootDispenser.prototype.generateItem = function(item)
     switch(item_string)
     {
         case "gold":
-            return Math.floor(Math.random() * 11);
+            var rand_gold = Math.floor(Math.random() * 11);
+            this.acc_gold += rand_gold;
+            this.string.push("+ " + rand_gold.toString() + "gold");
+            return rand_gold;
             break;
         case "amulet of thick skin":
+            this.string.push("+ Amulet of Thick Skin");
             return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 2, 0, 0, 0, 0)));
             break;
         case "heal berry":
+            this.string.push("+ Heal Berry");
             return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
             break;
         default:
@@ -800,12 +821,19 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     if (foes.stats.health <= 0) {
         foes.stats.health = 0;
         foes.is_dead = true;
+
+        var rand_offset = Math.floor(Math.random() * 5); // this will get a number between 1 and 99;
+        rand_offset *= Math.floor(Math.random() * 2) == 1 ? 1 : -1
+        game.loot_dispenser.acc_xp += foes.xp_base + rand_offset;
         // check to see if foe is one for a kill quest
         //var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
-
-        //foes.drop();
+        if (foes.name === "Skeleton")
+        {
+            
+        }
+        foes.drop();
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -875,7 +903,7 @@ Statistics = function (health, attack, defense, strength, dex, intel) {
     this.strength = strength;
     this.dexterity = dex;
     this.intelligence = intel;
-
+    this.xp = 0;
 }
 
 /* HERO and subclasses */
@@ -886,6 +914,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
     // pick up on any interaction. 
     this.fleeing = false;
+    this.next_level_up = 100;
 }
 
 Hero.prototype = new Entity();
@@ -1034,6 +1063,18 @@ Hero.prototype.update = function () {
     }
 }
 
+Hero.prototype.levelUp = function()
+{
+    if(this.stats.xp >= this.next_level_up)
+    {
+        this.stats.xp = 0;
+        this.level++;
+        this.next_level_up = 2 * (this.level * this.level) + 100;
+        this.stats.attack = 4 * (this.level * this.level) + 15;
+        this.stats.defense = 4 * (this.level * this.level) + 15;
+        this.stats.health = 4 * (this.level * this.level) + 300;
+    }
+}
 Hero.prototype.reposition = function (other) {
     if (this.x < other.x && this.direction !== Direction.RIGHT) {
         this.direction = Direction.RIGHT;
@@ -1412,7 +1453,7 @@ Enemy.prototype.drop = function()
     {
         var result = 0;
         var total = 0;
-        var rand = Math.floor(Math.random() * (this.loot_table.length));
+        var rand = Math.floor(Math.random() * (100));
         for(result = 0; result < this.loot_table.length; result++)
         {
             total += this.loot_table[result].weight;
@@ -1440,6 +1481,7 @@ Enemy.prototype.setAction = function (action, target) {
 Skeleton = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
+    this.xp_base = 10;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -1449,7 +1491,12 @@ Skeleton = function (game, stats, loop_while_standing) {
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton");
+    this.loot_table =
+        [
+            ({ string: "gold", weight: 80 }),
+            ({ string: "heal berry", weight: 20 })
+        ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton", false, this.loot_table);
 }
 
 Skeleton.prototype = new Enemy();
@@ -1461,6 +1508,7 @@ Malboro = function(game, stats, loop_while_standing)
 {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
+    this.xp_base = 15;
     this.animations = {
         down: null,
         up: null,
@@ -1975,7 +2023,7 @@ Log.prototype.startInteraction = function () {
 
 // PORTAL FUNCTIONS 
 EnterDragonCave = function () {
-   // if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
+    if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
         this.game.entities[0].sight = 30;
         this.game.environment[this.game.current_environment].setQuadrant(0);
@@ -3719,6 +3767,8 @@ SoundManager = function (game) {
     this.game = game;
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
+    this.world1.volume = .01;
+    this.battle1.volume = .01;
     this.paused = false;
     this.background = this.world1;
     //this.background.play();
@@ -3770,5 +3820,7 @@ SoundManager.prototype.playSong = function(sound)
         default:
             break;
     }
-    this.background.play();
+    if (!this.background.paused) {
+        this.background.play();
+    }
 }
