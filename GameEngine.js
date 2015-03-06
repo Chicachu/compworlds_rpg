@@ -1919,15 +1919,15 @@ Log.prototype.startInteraction = function () {
 
 // PORTAL FUNCTIONS 
 EnterDragonCave = function () {
-    if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
+   // if (this.game.entities[0].inventory.hasItem("King Arthur's Rock")) {
         this.game.current_environment = "dragon_cave";
         this.game.entities[0].sight = 30;
         this.game.environment[this.game.current_environment].setQuadrant(0);
         this.game.entities[0].x = 32;
 
         this.game.entities[0].y = 200;
-    } else {
-        this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
+   } else {
+     this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
 }
 
