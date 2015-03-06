@@ -1531,7 +1531,7 @@ Skeleton = function (game, stats, loop_while_standing) {
             ({ string: "gold", weight: 80 }),
             ({ string: "heal berry", weight: 20 })
         ];
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton", false, this.loot_table);
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Skeleton", false, this.loot_table);
 }
 
 Skeleton.prototype = new Enemy();
@@ -1558,7 +1558,7 @@ Malboro = function(game, stats, loop_while_standing)
         ({ string: "heal berry", weight: 50 }),
         ({ string: "amulet of thick skin", weight: 5 })
     ];
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "malboro", false, this.loot_table);
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Malboro", false, this.loot_table);
 }
 
 Malboro.prototype = new Enemy();
