@@ -500,9 +500,11 @@ GameEngine.prototype.endBattle = function (game)
     game.sound_manager.playSong("world1");
     game.loot_dispenser.increment();
     setTimeout(function () {
-        game.alertHero(game.loot_dispenser.toString());
-        game.loot_dispenser.dispenseLoot(game.entities[0]);
-        game.entities[0].levelUp();
+        if (game.loot_dispenser.string.length > 0) {
+            game.alertHero(game.loot_dispenser.toString());
+            game.loot_dispenser.dispenseLoot(game.entities[0]);
+            game.entities[0].levelUp();
+        }
     }, 1000);
     
 }
@@ -626,15 +628,32 @@ LootDispenser.prototype.generateItem = function(item)
         case "gold":
             var rand_gold = Math.floor(Math.random() * 11);
             this.acc_gold += rand_gold;
-            this.string.push("+ " + rand_gold.toString() + " gold");
+            this.string["gold"] = (" + " + this.acc_gold.toString() + " gold");
             return rand_gold;
             break;
         case "amulet of thick skin":
-            this.string.push("+ Amulet of Thick Skin");
-            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 2, 0, 0, 0, 0)));
+            if(!this.string["amulet of thick skin"])
+            {
+                this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + "1");
+            }
+            else
+            {
+                var amu_string = this.string["amulet of thick skin"];
+                var amu_amount = (parseInt(amu_string.substr(amu_string.length - 1)) + 1);
+                this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + amu_amount.toString());
+            }
+            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0)));
             break;
         case "heal berry":
-            this.string.push("+ Heal Berry");
+            if (!this.string["heal berry"]) {
+                this.string["heal berry"] = (" + Heal Berry" + " x " + "1");
+            }
+            else {
+                var berry_string = this.string["heal berry"];
+                var berry_amount = (parseInt(berry_string.substr(berry_string.length - 1)) + 1);
+                this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + berry_amount.toString());
+            }
+            this.string.push(" + Heal Berry");
             return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
             break;
         default:
@@ -914,7 +933,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
     // pick up on any interaction. 
     this.fleeing = false;
-    this.next_level_up = 100;
+    this.next_level_up = 5;
 }
 
 Hero.prototype = new Entity();
@@ -987,6 +1006,10 @@ Hero.prototype.changeMoveAnimation = function () {
     }
 }
 
+Hero.prototype.drawLevelUp = function()
+{
+    this.game.context.drawImage(ASSET_MANAGER.getAsset("./imgs/level_up_icon.png"), this.x + 15, this.y - 30);
+}
 Hero.prototype.draw = function (context) {
     //if the game is not in battle, draw regular move animations
     if (!this.game.is_battle) {
@@ -1067,12 +1090,20 @@ Hero.prototype.levelUp = function()
 {
     if(this.stats.xp >= this.next_level_up)
     {
-        this.stats.xp = 0;
+        var xp_diff = this.stats.xp - this.next_level_up;
+        this.stats.xp = xp_diff;
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
-        this.stats.attack = 4 * (this.level * this.level) + 15;
-        this.stats.defense = 4 * (this.level * this.level) + 15;
-        this.stats.health = 4 * (this.level * this.level) + 300;
+        this.stats.attack = .3 * (this.level * this.level) + 15;
+        this.stats.defense = .3 * (this.level * this.level) + 15;
+        this.stats.health = 2 * (this.level * this.level) + 300;
+        this.drawLevelUp();
+        this.alertHero("You leveled up!")
+        this.levelUp();
+    }
+    else
+    {
+        return 0;
     }
 }
 Hero.prototype.reposition = function (other) {
@@ -1345,7 +1376,6 @@ Warrior.prototype.checkKillQuest = function (enemy) {
         }
     }
     return complete; 
-
 }
 
 Warrior.prototype.checkItemQuest = function (item) {
@@ -1532,7 +1562,7 @@ Malboro.prototype.constructor = Malboro;
 Ogre = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/ogre.png");
-    this.xp_base = 15;
+    this.xp_base = 20;
     this.animations = {
         down: null,
         up: null,
@@ -3793,8 +3823,8 @@ SoundManager = function (game) {
     this.game = game;
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
-    this.world1.volume = .01;
-    this.battle1.volume = .01;
+    this.world1.volume = .1;
+    this.battle1.volume = .1;
     this.paused = false;
     this.background = this.world1;
     //this.background.play();
@@ -3823,10 +3853,12 @@ SoundManager.prototype.toggleSound = function()
 {
     if(this.background.paused)
     {
+        this.paused = false;
         this.background.play();
     }
     else
     {
+        this.paused = true;
         this.background.pause();
     }
 }
@@ -3846,7 +3878,7 @@ SoundManager.prototype.playSong = function(sound)
         default:
             break;
     }
-    if (!this.background.paused) {
+    if (!this.paused) {
         this.background.play();
     }
 }
