@@ -93,6 +93,7 @@ GameEngine = function () {
     this.stage = null;
     this.loot_dispenser = null;
     this.quadrants = [[0, 0, 18, 12], [11, 0, 29, 12], [23, 0, 41, 12], [0, 11, 18, 23], [11, 11, 29, 23], [23, 11, 41, 23]];
+    this.game_over = false;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -120,28 +121,19 @@ GameEngine.prototype.addEnvironment = function (name, environment_object) {
 
 GameEngine.prototype.startInput = function () {
     var that = this;
-    //Temporary, space bar invokes attack
-
-    this.context.canvas.addEventListener("keyup", function(e)
-    {
-        if(e.which === 16 && !that.is_battle)
-        {
-            that.canControl = false;
-            that.key = 0;
-            that.space = 0; 
-            // lock user input controls here.
-            that.entities[0].game.fadeOut(that.entities[0].game, that.entities[0].game, that.entities[0].game.setBattle);
+    this.context.canvas.addEventListener("keyup", function (e) {
+        if (e.which === 13 && that.game_over) {
+            that.restartGame();
+            e.stopImmediatePropagation();
             
-
-        };
-        //e.stopImmediatePropagation();
+        }
         e.preventDefault();
     });
+
     this.context.canvas.addEventListener('keydown', function (e) {
         if (that.canControl) {
             if (String.fromCharCode(e.which) === ' ') {
                 that.space = true;
-
             } else if (e.which === 37
                         || e.which === 38
                         || e.which === 39
@@ -506,6 +498,10 @@ GameEngine.prototype.endBattle = function (game)
             game.loot_dispenser.dispenseLoot(game.entities[0]);
             game.entities[0].levelUp();
         }
+        else
+        {
+            game.alertHero("You got absolutely nothing!");
+        }
     }, 1000);
     
 }
@@ -513,10 +509,14 @@ GameEngine.prototype.endBattle = function (game)
 GameEngine.prototype.gameOver = function (args) {
     var game = args.game;
     var background = args.background;
+    game.game_over = true;
     game.setBackground(background);
+    game.context.canvas.focus();
     game.canControl = false;
     game.menu.showMenu(false, game);
+    game.auxillary_sprites.push(game.entities[0]);
     game.entities = [];
+    game.sound_manager.pauseBackground();
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
 }
 /**
@@ -584,6 +584,21 @@ GameEngine.prototype.selectTarget = function () {
 
 }
 
+GameEngine.prototype.restartGame = function()
+{
+    this.reLoadEntities();
+    this.entities[0].x = 15;
+    this.entities[0].y = 215;
+    this.environment[this.current_environment].curr_quadrant = 0;
+    this.entities[0].stats.health = this.entities[0].stats.total_health;
+    this.fiends = [];
+    this.fight_queue = [];
+    this.animation_queue = [];
+    this.sound_manager.playSong("world1");
+    this.is_battle = false;
+    this.sound_manager.playBackground();
+}
+
 LootDispenser = function (game) {
     this.encounters = 0;
     this.game = game;
@@ -595,7 +610,12 @@ LootDispenser = function (game) {
 
 LootDispenser.prototype.toString = function()
 {
-    return this.string.join("\n");
+    var str = "";
+    for (var s in this.string)
+    {
+        str += this.string[s];
+    }
+    return str;
 }
 LootDispenser.prototype.dispenseLoot = function (hero) {
     
@@ -610,6 +630,7 @@ LootDispenser.prototype.dispenseLoot = function (hero) {
     this.accumulated_loot = [];
     this.string = [];
     this.acc_xp = 0;
+    this.acc_gold = 0;
 }
 
 LootDispenser.prototype.increment = function () {
@@ -624,6 +645,7 @@ LootDispenser.prototype.add = function(item)
 LootDispenser.prototype.generateItem = function(item)
 {
     var item_string = item.string;
+    this.string.length++;
     switch(item_string)
     {
         case "gold":
@@ -654,7 +676,6 @@ LootDispenser.prototype.generateItem = function(item)
                 var berry_amount = (parseInt(berry_string.substr(berry_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + berry_amount.toString());
             }
-            this.string.push(" + Heal Berry");
             return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
             break;
         default:
@@ -903,6 +924,10 @@ Entity.prototype.update = function () {
     // code for NPCs and Enemies.
 }
 
+Entity.prototype.drop = function()
+{
+
+}
 Entity.prototype.reset = function () {
 
 }
@@ -938,6 +963,7 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     this.fleeing = false;
     this.next_level_up = 100;
     
+    this.draw_level_up = false;
     this.equipped = {
         armor: false,
         accessory: false,
@@ -1049,6 +1075,9 @@ Hero.prototype.draw = function (context) {
     //if the game is not in battle, draw regular move animations
     if (!this.game.is_battle) {
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y);
+        if (this.draw_level_up) {
+            this.drawLevelUp(this.game.context);
+        }
     }
     else {
         this.drawHealthBar(context);
@@ -1058,6 +1087,7 @@ Hero.prototype.draw = function (context) {
         else if (this.is_targeted) {
             this.drawSelector(context, 'yellow');
         }
+        
         if (this.fleeing) {
             this.direction = Direction.RIGHT;
             this.curr_anim = this.animations.right;
@@ -1131,10 +1161,11 @@ Hero.prototype.levelUp = function()
         this.next_level_up = 2 * (this.level * this.level) + 100;
         this.stats.attack = .3 * (this.level * this.level) + 15;
         this.stats.defense = .3 * (this.level * this.level) + 15;
-        this.stats.health = 2 * (this.level * this.level) + 300;
+        this.stats.total_health = 2 * (this.level * this.level) + 300;
         this.drawLevelUp();
-        this.alertHero("You leveled up!")
+        this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
         this.levelUp();
+        this.draw_level_up = true;
     }
     else
     {
@@ -1584,8 +1615,8 @@ Malboro = function(game, stats, loop_while_standing)
         death: new Animation(this.spriteSheet, 0, 3, 82, 91, 0.1, 1, true, false)
     };
     this.loot_table = [
-        ({ string: "gold", weight: 45 }),
-        ({ string: "heal berry", weight: 50 }),
+        ({ string: "gold", weight: 5 }),
+        ({ string: "heal berry", weight: 90 }),
         ({ string: "amulet of thick skin", weight: 5 })
     ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Malboro", false, this.loot_table);
@@ -1790,6 +1821,10 @@ GameEngine.prototype.alertHero = function (dialogue) {
             that.canControl = true;
             that.next = false;
             text_box.removeEventListener("keydown", _func);
+            if(that.entities[0].draw_level_up)
+            {
+                that.entities[0].draw_level_up = false;
+            }
         }
         e.preventDefault();
     }, false);
@@ -2314,7 +2349,7 @@ Environment.prototype.initNewFiend = function (fiend) {
             return (new Malboro(this.game, new Statistics(65, 15, 5), false));
             break;
         case "Ogre":
-            return (new Ogre(this.game, new Statistics(80, 15, 20), false));
+            return (new Ogre(this.game, new Statistics(80, 15, 15), false));
         default:
             return null;
     }
@@ -2604,6 +2639,7 @@ BattleMenu.prototype.init = function (game) {
     var that = this;
 
     this.attack.addEventListener("keydown", function (e) {
+        that.game.sound_manager.playSound("select");
         if (that.game.entities[0].is_turn && that.game.canControl) {
             if (e.which === 40) {
                 window.setTimeout(that.use_item.focus(), 0);
@@ -2625,6 +2661,7 @@ BattleMenu.prototype.init = function (game) {
     //    e.stopImmediatePropagation();
     //}, false); 
     this.use_item.addEventListener("keydown", function (e) {
+        that.game.sound_manager.playSound("select");
         this.pressed = false;
         if (e.which === 40) {
             window.setTimeout(that.flee.focus(), 0);
@@ -2643,6 +2680,7 @@ BattleMenu.prototype.init = function (game) {
         this.pressed = false;
     }, false);
     this.flee.addEventListener("keydown", function (e) {
+        that.game.sound_manager.playSound("select");
         if (that.game.entities[0].is_turn) {
             if (e.which === 38) {
                 window.setTimeout(that.use_item.focus(), 0);
@@ -2659,9 +2697,11 @@ BattleMenu.prototype.init = function (game) {
 
     // ATTACK MENU CONTROLS 
     this.single_attack.addEventListener("keydown", function (e) {
+        that.game.sound_manager.playSound("select");
         if (e.which === 40) {
             if (that.is_selecting) {
                 if (that.game.fiends[that.next_target]) {
+                    
                     that.game.fiends[that.next_target].is_targeted = false;
                     that.next_target += 1;
                     if (that.next_target > that.game.fiends.length - 1) {
@@ -2732,6 +2772,7 @@ BattleMenu.prototype.init = function (game) {
     });
 
     this.aoe_attack.addEventListener("keydown", function (e) {
+        that.game.sound_manager.playSound("select");
         if (e.which === 40) {
             if (!that.is_selecting) {
                 window.setTimeout(that.back.focus(), 0);
@@ -2783,6 +2824,7 @@ BattleMenu.prototype.init = function (game) {
     });
 
     this.back.addEventListener("keydown", function (e) {
+        that.game.sound_manager.playSound("select");
         if (e.which === 38) {
             window.setTimeout(that.aoe_attack.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
@@ -3857,21 +3899,27 @@ SoundManager = function (game) {
     this.game = game;
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
+    this.select = document.getElementById("selection_beep");
+    this.select.volume = .2;
     this.world1.volume = .1;
-    this.battle1.volume = .1;
+    this.battle1.volume = .07;
     this.paused = false;
+    this.sound = this.select;
     this.background = this.world1;
     //this.background.play();
 }
 
 SoundManager.prototype.playSound = function (sound) {
+    this.sound.pause();
+    this.sound.currentTime = 0;
     switch (sound) {
-        case "door":
-            this.sound = this.door;
+        case "select":
+            this.sound = this.select;
             break;
         default:
             break;
     }
+    this.sound.play();
 }
 
 SoundManager.prototype.toggleSound = function () {
@@ -3883,6 +3931,17 @@ SoundManager.prototype.toggleSound = function () {
     }
 }
 
+SoundManager.prototype.pauseBackground = function()
+{
+    this.paused = true;
+    this.background.pause();
+}
+
+SoundManager.prototype.playBackground = function()
+{
+    this.paused = false;
+    this.background.play();
+}
 SoundManager.prototype.toggleSound = function()
 {
     if(this.background.paused)
@@ -3901,12 +3960,11 @@ SoundManager.prototype.playSong = function(sound)
     this.background.pause();
     switch (sound) {
         case "world1":
+            this.world1.currentTime = 0;
             this.background = this.world1;
             break;
-        case "door":
-            this.curr_sound = this.door;
-            break;
         case "battle":
+            this.battle1.currentTime = 0;
             this.background = this.battle1;
             break;
         default:
