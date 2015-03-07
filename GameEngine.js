@@ -481,8 +481,11 @@ GameEngine.prototype.setBossBattle = function(game)
 
 GameEngine.prototype.endBattle = function (game)
 {
-    if (game.entities[0].quest.complete) {
+    if (this.kill_quest_complete && this.kill_quest_complete.complete)
+    {
+
         game.alertHero("You've completed the quest");
+        this.kill_quest_complete = false; 
     }
     game.is_battle = false;
     window.setTimeout(game.menu.showMenu.bind(game.menu, false, game), 0);
@@ -498,7 +501,12 @@ GameEngine.prototype.endBattle = function (game)
     game.animation_queue = [];
     game.sound_manager.playSong("world1");
     game.loot_dispenser.increment();
-    game.loot_dispenser.dispenseLoot(game.entities[0]);
+    setTimeout(function () {
+        game.alertHero(game.loot_dispenser.toString());
+        game.loot_dispenser.dispenseLoot(game.entities[0]);
+        game.entities[0].levelUp();
+    }, 1000);
+    
 }
 
 GameEngine.prototype.gameOver = function (args) {
@@ -578,17 +586,64 @@ GameEngine.prototype.selectTarget = function () {
 LootDispenser = function (game) {
     this.encounters = 0;
     this.game = game;
+    this.accumulated_loot = [];
+    this.acc_xp = 0;
+    this.string = [];
+    this.acc_gold = 0;
 }
 
+LootDispenser.prototype.toString = function()
+{
+    return this.string.join("\n");
+}
 LootDispenser.prototype.dispenseLoot = function (hero) {
+    
     if (this.encounters % 6 === 0) {
         hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
     }
+    for(var i = 0; i < this.accumulated_loot.length; i ++)
+    {
+        hero.recieveItem(this.accumulated_loot[i]);
+    }
+    hero.stats.xp += this.acc_xp;
+    this.accumulated_loot = [];
+    this.string = [];
+    this.acc_xp = 0;
 }
 
 LootDispenser.prototype.increment = function () {
     this.encounters++;
 }
+
+LootDispenser.prototype.add = function(item)
+{
+    this.accumulated_loot.push(this.generateItem(item));
+}
+
+LootDispenser.prototype.generateItem = function(item)
+{
+    var item_string = item.string;
+    switch(item_string)
+    {
+        case "gold":
+            var rand_gold = Math.floor(Math.random() * 11);
+            this.acc_gold += rand_gold;
+            this.string.push("+ " + rand_gold.toString() + " gold");
+            return rand_gold;
+            break;
+        case "amulet of thick skin":
+            this.string.push("+ Amulet of Thick Skin");
+            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 2, 0, 0, 0, 0)));
+            break;
+        case "heal berry":
+            this.string.push("+ Heal Berry");
+            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
+            break;
+        default:
+            break;
+    }
+}
+
 Timer = function () {
     this.gameTime = 0;
     this.maxStep = 0.5;
@@ -650,6 +705,9 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.curr_anim = null;
     this.is_turn = false;
     this.is_targeted = false;
+    this.level = 1;
+
+    this.kill_quest_complete = false;
     this.id = Math.random() * Math.random();
     if (animations) {
         this.animations = animations;
@@ -752,19 +810,34 @@ Entity.prototype.drawHealthBar = function (context) {
 }
 
 Entity.prototype.calculatePhysicalDamage = function(player, foe)
-{
-    var base_damage = foe.stats.attack / player.stats.defense;
-    
+{   //enemydamage?
+    //Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+    var max_dmg = foe.stats.attack + 2;
+    var min_dmg = foe.stats.attack - 2;
+    var base_damage = (Math.floor(Math.random() * (max_dmg - min_dmg + 1)) + min_dmg) - Math.ceil(player.stats.defense/10);  //original calc: foe.stats.attack - player.stats.defense;
 }
 Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
-    foes.stats.health = foes.stats.health - ((player.stats.attack / foes.stats.defense) * (Math.random() * 10));
+    //herodamage?
+    var max_atk = player.stats.attack + 5;
+    var min_atk = player.stats.attack - 2;
+    foes.stats.health = foes.stats.health - (Math.floor(Math.random() * (max_atk - min_atk + 1)) + min_atk) - Math.ceil(foes.stats.defense / 10); //original calc: foes.stats.health - ((player.stats.attack - foes.stats.defense) * (Math.random() * 10));
     game.animation_queue.push(new Event(foes, foes.animations.hit));
     if (foes.stats.health <= 0) {
         foes.stats.health = 0;
         foes.is_dead = true;
-        // check to see if foe is one for a kill quest
-        var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
 
+        var rand_offset = Math.floor(Math.random() * 5); // this will get a number between 1 and 99;
+        rand_offset *= Math.floor(Math.random() * 2) == 1 ? 1 : -1
+        game.loot_dispenser.acc_xp += foes.xp_base + rand_offset;
+        // check to see if foe is one for a kill quest
+        this.kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
+        // TODO: alert hero if kill_quest_complete AFTER battle fades out
+        // use gameengine.alertHero(<dialog>); when world view is back in
+        if (foes.name === "Skeleton")
+        {
+            
+        }
+        foes.drop();
         game.removeFighters(foes);
         if (is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 0));
@@ -834,7 +907,7 @@ Statistics = function (health, attack, defense, strength, dex, intel) {
     this.strength = strength;
     this.dexterity = dex;
     this.intelligence = intel;
-
+    this.xp = 0;
 }
 
 /* HERO and subclasses */
@@ -845,6 +918,14 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
     // pick up on any interaction. 
     this.fleeing = false;
+    this.next_level_up = 100;
+    
+    this.equipped = {
+        armor: false,
+        accessory: false,
+        offhand: false,
+        mainhand: false
+    }
 }
 
 Hero.prototype = new Entity();
@@ -878,6 +959,31 @@ Hero.prototype.checkForUserInteraction = function () {
         return { ent: this.game.entities[min_index], reposition: true };
     } else {
         return { ent: this.game.environment[this.game.current_environment].interactables[min_index] }
+    }
+}
+/* this.health = health;
+this.total_health = health;
+this.attack = attack;
+this.total_attack = attack;
+this.defense = defense;
+this.total_defense = defense;
+this.strength = strength;
+this.dexterity = dex;
+this.intelligence = intel;
+*/
+Hero.prototype.updateStats = function () {
+    var keys = Object.keys(this.equipped);
+    for (var i = 0; i < keys.length; i++) {
+        var armor_piece = this.equipped[keys[i]];
+        if (armor_piece) {
+            this.stats.health += armor_piece.stats.health;
+            this.stats.total_health += armor_piece.stats.total_health;
+            this.stats.attack += armor_piece.stats.attack;
+            this.stats.defense += armor_piece.stats.defense;
+            this.stats.strength += armor_piece.stats.strength;
+            this.stats.dexterity += armor_piece.stats.dexterity;
+            this.stats.intelligence += armor_piece.stats.intelligence; 
+        }
     }
 }
 
@@ -993,6 +1099,18 @@ Hero.prototype.update = function () {
     }
 }
 
+Hero.prototype.levelUp = function()
+{
+    if(this.stats.xp >= this.next_level_up)
+    {
+        this.stats.xp = 0;
+        this.level++;
+        this.next_level_up = 2 * (this.level * this.level) + 100;
+        this.stats.attack = 4 * (this.level * this.level) + 15;
+        this.stats.defense = 4 * (this.level * this.level) + 15;
+        this.stats.health = 4 * (this.level * this.level) + 300;
+    }
+}
 Hero.prototype.reposition = function (other) {
     if (this.x < other.x && this.direction !== Direction.RIGHT) {
         this.direction = Direction.RIGHT;
@@ -1256,10 +1374,9 @@ Warrior.prototype.checkKillQuest = function (enemy) {
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
-            if (this.quests[i].number_enemies === this.quests[i].enemies_killed) {
+            if (this.quests[i].enemies_killed >= this.quests[i].number_enemies && !this.quests[i].complete) {
                 this.quests[i].complete = true;
-
-                complete = true; 
+                complete = this.quest[i]; 
             }
         }
     }
@@ -1315,11 +1432,12 @@ Warrior.prototype.setAction = function (action, target) {
 }
 
 /* ENEMY and subclasses */
-Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing) {
+Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing, loot_table) {
     this.x = 40;
     this.y = 150;
     this.loop_while_standing = loop_while_standing;
     Entity.call(this, game, this.x, this.y, spriteSheet, anims, stats);
+    this.loot_table = loot_table;
     this.game = game;
     this.name = name;
 }
@@ -1365,6 +1483,25 @@ Enemy.prototype.hit = function () {
 
 }
 
+Enemy.prototype.drop = function()
+{
+    if(this.loot_table)
+    {
+        var result = 0;
+        var total = 0;
+        var rand = Math.floor(Math.random() * (100));
+        for(result = 0; result < this.loot_table.length; result++)
+        {
+            total += this.loot_table[result].weight;
+            if(total >= rand)
+            {
+                break;
+            }
+        }
+        this.game.loot_dispenser.add(this.loot_table[result]);
+    }
+}
+
 Enemy.prototype.setAction = function (action, target) {
     switch (action) {
         case "Single":
@@ -1380,6 +1517,7 @@ Enemy.prototype.setAction = function (action, target) {
 Skeleton = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
+    this.xp_base = 10;
     this.animations = {
         down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
         up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
@@ -1389,7 +1527,12 @@ Skeleton = function (game, stats, loop_while_standing) {
         hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton");
+    this.loot_table =
+        [
+            ({ string: "gold", weight: 80 }),
+            ({ string: "heal berry", weight: 20 })
+        ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Skeleton", false, this.loot_table);
 }
 
 Skeleton.prototype = new Enemy();
@@ -1401,6 +1544,7 @@ Malboro = function(game, stats, loop_while_standing)
 {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/malboro.png");
+    this.xp_base = 15;
     this.animations = {
         down: null,
         up: null,
@@ -1410,12 +1554,40 @@ Malboro = function(game, stats, loop_while_standing)
         hit: new Animation(this.spriteSheet, 0, 2, 82, 91, 0.1, 3, true, false),
         death: new Animation(this.spriteSheet, 0, 3, 82, 91, 0.1, 1, true, false)
     };
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "malboro");
+    this.loot_table = [
+        ({ string: "gold", weight: 45 }),
+        ({ string: "heal berry", weight: 50 }),
+        ({ string: "amulet of thick skin", weight: 5 })
+    ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Malboro", false, this.loot_table);
 }
 
 Malboro.prototype = new Enemy();
 Malboro.prototype.constructor = Malboro;
 
+Ogre = function (game, stats, loop_while_standing) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/ogre.png");
+    this.xp_base = 15;
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 100, 100, 0.07, 19, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 0, 100, 100, 0.071, 19, true, false),
+        hit: new Animation(this.spriteSheet, 0, 1, 100, 100, 0.15, 5, true, false),
+        death: new Animation(this.spriteSheet, 0, 2, 100, 100, 0.1, 1, true, false)
+    };
+    this.loot_table = [
+        ({ string: "gold", weight: 60 }),
+        ({ string: "heal berry", weight: 10 }),
+        ({ string: "amulet of thick skin", weight: 30 })
+    ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "ogre", false, this.loot_table);
+}
+
+Ogre.prototype = new Enemy();
+Ogre.prototype.constructor = Ogre;
 
 Dragon1 = function(game, stats, loop_while_standing)
 {
@@ -1917,8 +2089,8 @@ EnterDragonCave = function () {
         this.game.entities[0].x = 32;
 
         this.game.entities[0].y = 200;
-    } else {
-        this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
+   } else {
+     this.game.alertHero("There -must- be some way into this mountain. Perhaps through some hidden cave.");
     }
 }
 
@@ -2103,14 +2275,17 @@ Environment.prototype.generateFiend = function (game) {
     return fiend_array;
 }
 
+//enemystat
 Environment.prototype.initNewFiend = function (fiend) {
     switch (fiend) {
         case "Skeleton":
-            return (new Skeleton(this.game, new Statistics(35, 8, 5), false));
+            return (new Skeleton(this.game, new Statistics(50, 10, 15), false));
             break;
         case "Malboro":
-            return (new Malboro(this.game, new Statistics(45, 13, 10), false));
+            return (new Malboro(this.game, new Statistics(65, 15, 5), false));
             break;
+        case "Ogre":
+            return (new Ogre(this.game, new Statistics(80, 15, 10), false));
         default:
             return null;
     }
@@ -2890,6 +3065,10 @@ Storekeeper.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
+
+            if (this.part === 1 && this.quest.complete) {
+                this.part++;
+            }
             if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
                 text.innerHTML = this.dialogue[this.part][this.dialogue_index];
@@ -3148,7 +3327,7 @@ Potion.prototype.constructor = Potion;
 Potion.prototype.doAction = function (game) {
     switch (this.potion_type) {
         case "health":
-            game.entities[0].stats.health += this.level * 25;
+            game.entities[0].stats.health += this.level * 75;
             break;
         case "stam":
 
@@ -3287,14 +3466,15 @@ Armor.prototype.doAction = function () {
     if (this.isEquipped) {
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
-        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.game.entities[0].equipped[this.type] = false;
         this.isEquipped = false;
     } else {
         this.slot.style.backgroundImage = "none";
         this.slot.innerHTML = this.img.outerHTML;
-        this.game.entities[0].inventory.equipped[this.type] = this;
+        this.game.entities[0].equipped[this.type] = this;
         this.isEquipped = true;
     }
+    this.game.entities[0].updateStats();
 }
 
 Armor.prototype.unequipOldArmor = function (bool) {
@@ -3302,12 +3482,12 @@ Armor.prototype.unequipOldArmor = function (bool) {
         this.isEquipped = false;
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
-        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.game.entities[0].equipped[this.type] = false;
     } else {
         // check if item is already equipped
-        if (this.game.entities[0].inventory.equipped[this.type] &&
-            this.game.entities[0].inventory.equipped[this.type] !== this) {
-            var old_item = this.game.entities[0].inventory.equipped[this.type];
+        if (this.game.entities[0].equipped[this.type] &&
+            this.game.entities[0].equipped[this.type] !== this) {
+            var old_item = this.game.entities[0].equipped[this.type];
             old_item.isEquipped = false;
         }
     }
@@ -3341,12 +3521,6 @@ Inventory = function (game, coin, max_items) {
     this.initHtmlItems();
     this.selectInput();
     this.open = false;
-    this.equipped = {
-        armor: false,
-        accessory: false,
-        offhand: false,
-        mainhand: false
-    }
 }
 
 Inventory.prototype.initHtmlItems = function () {
@@ -3654,6 +3828,8 @@ SoundManager = function (game) {
     this.game = game;
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
+    this.world1.volume = .01;
+    this.battle1.volume = .01;
     this.paused = false;
     this.background = this.world1;
     //this.background.play();
@@ -3705,5 +3881,7 @@ SoundManager.prototype.playSong = function(sound)
         default:
             break;
     }
-    this.background.play();
+    if (!this.background.paused) {
+        this.background.play();
+    }
 }
