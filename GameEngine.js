@@ -466,7 +466,7 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    game.fiends.push(new Dragon1(game, new Statistics(125, 21, 18, 5, 10, 3)));
+    game.fiends.push(new Dragon1(game, new Statistics(500, 40, 60, 5, 10, 3)));
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
     game.fiends[0].init();
@@ -481,9 +481,10 @@ GameEngine.prototype.setBossBattle = function(game)
 
 GameEngine.prototype.endBattle = function (game)
 {
-    if (game.entities[0].checkKillQuest(game.entities[0]))
+    if (this.kill_quest_complete && this.kill_quest_complete.complete)
     {
         game.alertHero("You've completed the quest");
+        this.kill_quest_complete = false; 
     }
     game.is_battle = false;
     window.setTimeout(game.menu.showMenu.bind(game.menu, false, game), 0);
@@ -723,6 +724,8 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.is_turn = false;
     this.is_targeted = false;
     this.level = 1;
+
+    this.kill_quest_complete = false;
     this.id = Math.random() * Math.random();
     if (animations) {
         this.animations = animations;
@@ -845,7 +848,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         rand_offset *= Math.floor(Math.random() * 2) == 1 ? 1 : -1
         game.loot_dispenser.acc_xp += foes.xp_base + rand_offset;
         // check to see if foe is one for a kill quest
-        //var kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
+        this.kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
         if (foes.name === "Skeleton")
@@ -933,7 +936,14 @@ Hero = function (game, x, y, spriteSheet, animations, stats, turn_weight) {
     this.sight = 35; // this is how far the hero can interact. interactables (items or npcs) must be within this range (in pixels) for the space bar to
     // pick up on any interaction. 
     this.fleeing = false;
-    this.next_level_up = 5;
+    this.next_level_up = 100;
+    
+    this.equipped = {
+        armor: false,
+        accessory: false,
+        offhand: false,
+        mainhand: false
+    }
 }
 
 Hero.prototype = new Entity();
@@ -967,6 +977,31 @@ Hero.prototype.checkForUserInteraction = function () {
         return { ent: this.game.entities[min_index], reposition: true };
     } else {
         return { ent: this.game.environment[this.game.current_environment].interactables[min_index] }
+    }
+}
+/* this.health = health;
+this.total_health = health;
+this.attack = attack;
+this.total_attack = attack;
+this.defense = defense;
+this.total_defense = defense;
+this.strength = strength;
+this.dexterity = dex;
+this.intelligence = intel;
+*/
+Hero.prototype.updateStats = function () {
+    var keys = Object.keys(this.equipped);
+    for (var i = 0; i < keys.length; i++) {
+        var armor_piece = this.equipped[keys[i]];
+        if (armor_piece) {
+            this.stats.health += armor_piece.stats.health;
+            this.stats.total_health += armor_piece.stats.total_health;
+            this.stats.attack += armor_piece.stats.attack;
+            this.stats.defense += armor_piece.stats.defense;
+            this.stats.strength += armor_piece.stats.strength;
+            this.stats.dexterity += armor_piece.stats.dexterity;
+            this.stats.intelligence += armor_piece.stats.intelligence; 
+        }
     }
 }
 
@@ -1369,9 +1404,9 @@ Warrior.prototype.checkKillQuest = function (enemy) {
     for (var i = 0; i < this.quests.length; i++) {
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
-            if (this.quests[i].number_enemies <= this.quests[i].enemies_killed) {
+            if (this.quests[i].enemies_killed >= this.quests[i].number_enemies && !this.quests[i].complete) {
                 this.quests[i].complete = true;
-                complete = true; 
+                complete = this.quest[i]; 
             }
         }
     }
@@ -1526,7 +1561,7 @@ Skeleton = function (game, stats, loop_while_standing) {
             ({ string: "gold", weight: 80 }),
             ({ string: "heal berry", weight: 20 })
         ];
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "skeleton", false, this.loot_table);
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Skeleton", false, this.loot_table);
 }
 
 Skeleton.prototype = new Enemy();
@@ -1553,7 +1588,7 @@ Malboro = function(game, stats, loop_while_standing)
         ({ string: "heal berry", weight: 50 }),
         ({ string: "amulet of thick skin", weight: 5 })
     ];
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "malboro", false, this.loot_table);
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Malboro", false, this.loot_table);
 }
 
 Malboro.prototype = new Enemy();
@@ -2279,7 +2314,7 @@ Environment.prototype.initNewFiend = function (fiend) {
             return (new Malboro(this.game, new Statistics(65, 15, 5), false));
             break;
         case "Ogre":
-            return (new Ogre(this.game, new Statistics(80, 15, 10), false));
+            return (new Ogre(this.game, new Statistics(80, 15, 20), false));
         default:
             return null;
     }
@@ -3059,6 +3094,10 @@ Storekeeper.prototype.updateDialogue = function () {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
             var text = document.createElement('p');
+
+            if (this.part === 1 && this.quest.complete) {
+                this.part++;
+            }
             if (this.dialogue_index < this.dialogue[this.part].length - 1) {
                 this.dialogue_index++;
                 text.innerHTML = this.dialogue[this.part][this.dialogue_index];
@@ -3456,14 +3495,15 @@ Armor.prototype.doAction = function () {
     if (this.isEquipped) {
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
-        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.game.entities[0].equipped[this.type] = false;
         this.isEquipped = false;
     } else {
         this.slot.style.backgroundImage = "none";
         this.slot.innerHTML = this.img.outerHTML;
-        this.game.entities[0].inventory.equipped[this.type] = this;
+        this.game.entities[0].equipped[this.type] = this;
         this.isEquipped = true;
     }
+    this.game.entities[0].updateStats();
 }
 
 Armor.prototype.unequipOldArmor = function (bool) {
@@ -3471,12 +3511,12 @@ Armor.prototype.unequipOldArmor = function (bool) {
         this.isEquipped = false;
         this.slot.style.backgroundImage = this.background_img;
         this.slot.innerHTML = "";
-        this.game.entities[0].inventory.equipped[this.type] = false;
+        this.game.entities[0].equipped[this.type] = false;
     } else {
         // check if item is already equipped
-        if (this.game.entities[0].inventory.equipped[this.type] &&
-            this.game.entities[0].inventory.equipped[this.type] !== this) {
-            var old_item = this.game.entities[0].inventory.equipped[this.type];
+        if (this.game.entities[0].equipped[this.type] &&
+            this.game.entities[0].equipped[this.type] !== this) {
+            var old_item = this.game.entities[0].equipped[this.type];
             old_item.isEquipped = false;
         }
     }
@@ -3510,12 +3550,6 @@ Inventory = function (game, coin, max_items) {
     this.initHtmlItems();
     this.selectInput();
     this.open = false;
-    this.equipped = {
-        armor: false,
-        accessory: false,
-        offhand: false,
-        mainhand: false
-    }
 }
 
 Inventory.prototype.initHtmlItems = function () {
