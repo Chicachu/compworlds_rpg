@@ -2284,7 +2284,7 @@ Environment.prototype.initNewFiend = function (fiend) {
             return (new Malboro(this.game, new Statistics(65, 15, 5), false));
             break;
         case "Ogre":
-            return (new Ogre(this.game, new Statistics(80, 15, 10), false));
+            return (new Ogre(this.game, new Statistics(80, 15, 20), false));
         default:
             return null;
     }
