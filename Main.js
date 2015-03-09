@@ -55,7 +55,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
 
 
-    var warrior = new Warrior(gameEngine, new Statistics(300, 17, 25, 4, 3, 1));
+    var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
