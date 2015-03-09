@@ -458,7 +458,7 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    game.fiends.push(new Dragon1(game, new Statistics(500, 40, 60, 5, 10, 3)));
+    game.fiends.push(new Dragon1(game, new Statistics(250, 40, 60, 5, 10, 3)));
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
     game.fiends[0].init();
@@ -2343,13 +2343,13 @@ Environment.prototype.generateFiend = function (game) {
 Environment.prototype.initNewFiend = function (fiend) {
     switch (fiend) {
         case "Skeleton":
-            return (new Skeleton(this.game, new Statistics(50, 10, 15), false));
+            return (new Skeleton(this.game, new Statistics(30, 10, 15), false));
             break;
         case "Malboro":
-            return (new Malboro(this.game, new Statistics(65, 15, 5), false));
+            return (new Malboro(this.game, new Statistics(45, 15, 5), false));
             break;
         case "Ogre":
-            return (new Ogre(this.game, new Statistics(80, 15, 15), false));
+            return (new Ogre(this.game, new Statistics(60, 15, 15), false));
         default:
             return null;
     }
