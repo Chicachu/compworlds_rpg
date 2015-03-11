@@ -38,6 +38,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/quest_potion.png");
 ASSET_MANAGER.queueDownload("./imgs/items/stone.png");
 ASSET_MANAGER.queueDownload("./imgs/items/book.png");
 ASSET_MANAGER.queueDownload("./imgs/items/key.png");
+ASSET_MANAGER.queueDownload("./imgs/level_up_icon.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
@@ -53,7 +54,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
 	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
 
-    var warrior = new Warrior(gameEngine, new Statistics(300, 100, 25, 4, 3, 1));
+
+    var warrior = new Warrior(gameEngine, new Statistics(300, 17, 25, 4, 3, 1));
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
