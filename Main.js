@@ -76,7 +76,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(storekeeper_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
     var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { });
-    var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 10);
+    var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
                                              "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*",
