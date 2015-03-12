@@ -1809,7 +1809,7 @@ NPC.prototype.startInteraction = function () {
         this.reposition();
         var text_box = document.getElementById("dialogue_box");
 
-        var text = document.createElement('p');
+        var text = document.createElement('p'); 
         text.innerHTML = this.dialogue[this.part][this.dialogue_index];
         text_box.innerHTML = text.outerHTML;
         text_box.style.visibility = "visible";
@@ -3607,8 +3607,8 @@ Inventory.prototype.draw = function (ctx) {
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
-            this.html_items[i].actionInput();
-            this.html_items[i].updateShowItemMenu();
+            this.html_items[i].actionInput.call(this.html_items[i]);
+            this.html_items[i].updateShowItemMenu.call(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
