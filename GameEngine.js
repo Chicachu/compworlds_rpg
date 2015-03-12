@@ -1885,6 +1885,7 @@ NPC.prototype.startInteraction = function () {
         text_box.focus();
         this.interacting = true;
         this.game.canControl = false;
+
     }
 }
 
@@ -3081,10 +3082,10 @@ Ghost.prototype.draw = function (context) {
 
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
-Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
+Storekeeper = function (game, name, dialog, items, anims, path, speed, pause, quad, quest, map_name) {
 
     this.part = 0; 
-
+    this.items = items; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.y_offset = 25;
@@ -3680,8 +3681,8 @@ Inventory.prototype.draw = function (ctx) {
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
-            this.html_items[i].actionInput();
-            this.html_items[i].updateShowItemMenu();
+            this.html_items[i].actionInput.call(this.html_items[i]);
+            this.html_items[i].updateShowItemMenu.call(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
