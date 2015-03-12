@@ -1879,7 +1879,7 @@ NPC.prototype.startInteraction = function () {
         text.innerHTML = this.dialogue[this.part][this.dialogue_index];
         text_box.innerHTML = text.outerHTML;
         text_box.style.visibility = "visible";
-        text_box.style.display = "block";
+        text_box.style.display = "block";   
         this.game.context.canvas.tabIndex = 0;
         text_box.tabIndex = 1;
         text_box.focus();
@@ -3682,8 +3682,8 @@ Inventory.prototype.draw = function (ctx) {
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
-            this.html_items[i].actionInput.call(this.html_items[i]);
-            this.html_items[i].updateShowItemMenu.call(this.html_items[i]);
+            this.html_items[i].actionInput.bind(this.html_items[i]);
+            this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
