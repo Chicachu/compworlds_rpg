@@ -1886,8 +1886,9 @@ NPC.prototype.startInteraction = function () {
         this.interacting = true;
         this.game.canControl = false;
 
-        var amulet = new Armor(this.game, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
-        this.game.entities[0].recieveItem(amulet);
+        // test to see if item menu works after receiving in game play
+        //var amulet = new Armor(this.game, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+        //this.game.entities[0].recieveItem(amulet);
     }
 }
 
@@ -3683,8 +3684,8 @@ Inventory.prototype.draw = function (ctx) {
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
-            this.html_items[i].actionInput.call(this.html_items[i]);
-            this.html_items[i].updateShowItemMenu.call(this.html_items[i]);
+            this.html_items[i].actionInput.bind(this.html_items[i]);
+            this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
