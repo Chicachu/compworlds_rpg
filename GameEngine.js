@@ -1886,6 +1886,8 @@ NPC.prototype.startInteraction = function () {
         this.interacting = true;
         this.game.canControl = false;
 
+        var amulet = new Armor(this.game, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+        this.game.entities[0].recieveItem(amulet);
     }
 }
 
