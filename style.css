@@ -277,3 +277,46 @@ battle_menu_instructions {
     border: 1px solid black;
     border-radius: 15px;
 }
+
+#store {
+    height: 194px; 
+    width: 324px; 
+    position: relative; 
+    background-image: url("./imgs/menu_background.png"); 
+    margin: 0 auto; 
+    top: -280px;  
+    visibility: hidden; 
+    display: none;
+}
+
+#store_items {
+    position: relative; 
+    height: 144px; 
+    width: 180px;
+    border:  1px double #d8bca1;
+    padding: 25px;
+    display: inline-block; 
+    left: 1px;
+    float: left;
+}
+
+#sale {
+    position: relative; 
+    display: inline-block; 
+    padding: 25px; 
+    border:  1px double #d8bca1;
+    height: 144px; 
+    width: auto;
+    left: -1px; 
+}
+
+#sale p {
+    position: relative;
+    width: 60px;
+    height: 20px; 
+    color: #d8bca1;
+    font-size: 12px;
+    margin-left: -20px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-weight: 900;
+}

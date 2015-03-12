@@ -475,6 +475,7 @@ GameEngine.prototype.endBattle = function (game)
 {
     if (this.kill_quest_complete && this.kill_quest_complete.complete)
     {
+
         game.alertHero("You've completed the quest");
         this.kill_quest_complete = false; 
     }
@@ -1160,7 +1161,7 @@ Hero.prototype.levelUp = function()
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
         this.stats.attack = .3 * (this.level * this.level) + 15;
-        this.stats.defense = .3 * (this.level * this.level) + 15;
+        this.stats.defense = .3 * (this.level * this.level) + 25;
         this.stats.total_health = 2 * (this.level * this.level) + 300;
         this.drawLevelUp();
         this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
@@ -1884,6 +1885,7 @@ NPC.prototype.startInteraction = function () {
         text_box.focus();
         this.interacting = true;
         this.game.canControl = false;
+
     }
 }
 
@@ -3080,10 +3082,10 @@ Ghost.prototype.draw = function (context) {
 
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
-Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
+Storekeeper = function (game, name, dialog, items, anims, path, speed, pause, quad, quest, map_name) {
 
     this.part = 0; 
-
+    this.items = items; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.y_offset = 25;
