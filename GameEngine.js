@@ -475,6 +475,7 @@ GameEngine.prototype.endBattle = function (game)
 {
     if (this.kill_quest_complete && this.kill_quest_complete.complete)
     {
+
         game.alertHero("You've completed the quest");
         this.kill_quest_complete = false; 
     }
@@ -1160,7 +1161,7 @@ Hero.prototype.levelUp = function()
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
         this.stats.attack = .3 * (this.level * this.level) + 15;
-        this.stats.defense = .3 * (this.level * this.level) + 15;
+        this.stats.defense = .3 * (this.level * this.level) + 25;
         this.stats.total_health = 2 * (this.level * this.level) + 300;
         this.drawLevelUp();
         this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
@@ -1874,16 +1875,18 @@ NPC.prototype.startInteraction = function () {
         this.reposition();
         var text_box = document.getElementById("dialogue_box");
 
-        var text = document.createElement('p');
+        var text = document.createElement('p'); 
         text.innerHTML = this.dialogue[this.part][this.dialogue_index];
         text_box.innerHTML = text.outerHTML;
         text_box.style.visibility = "visible";
-        text_box.style.display = "block";
+        text_box.style.display = "block";   
         this.game.context.canvas.tabIndex = 0;
         text_box.tabIndex = 1;
         text_box.focus();
         this.interacting = true;
         this.game.canControl = false;
+        var amulet = new Armor(this.game, "Twisted Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+        this.game.entities[0].recieveItem(amulet); 
     }
 }
 
@@ -3086,10 +3089,10 @@ Ghost.prototype.draw = function (context) {
 
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
-Storekeeper = function (game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
+Storekeeper = function (game, name, dialog, items, anims, path, speed, pause, quad, quest, map_name) {
 
     this.part = 0; 
-
+    this.items = items; 
     NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
     this.curr_anim = this.animations.down;
     this.y_offset = 25;
@@ -3685,8 +3688,8 @@ Inventory.prototype.draw = function (ctx) {
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
-            this.html_items[i].actionInput();
-            this.html_items[i].updateShowItemMenu();
+            this.html_items[i].actionInput.bind(this.html_items[i]);
+            this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
