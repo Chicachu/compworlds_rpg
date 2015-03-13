@@ -2626,6 +2626,13 @@ List_item.prototype.input = function (game) {
             that.item.doAction(that.game);
             //window.setTimeout(that.item.doAction(), 0);
             window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
+            if(that.game.is_battle)
+            {
+                that.is_selecting = false;
+                that.game.entities[0].is_turn = false;
+                that.game.setNextFighter(that.game);
+            }
+
         } else if (e.which === 27) {
             window.setTimeout(that.game.menu.use_item_list.showMenu(), 0);
         }
@@ -2672,7 +2679,6 @@ BattleMenu.prototype.init = function (game) {
                 that.use_item_list.showMenu(that.game);
             }
         }
-
         e.preventDefault();
         e.stopImmediatePropagation();
     }, false);
@@ -3757,7 +3763,7 @@ Inventory.prototype.splitStack = function (item_name, qty) {
             new_stack = new Item(item_name, this.items[i].price, qty, this.items[i].img, this.items[i].stackable);
             this.items[i].qty -= qty;
         }
-    }
+    };
     return new_stack;
 }
 
