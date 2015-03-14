@@ -142,8 +142,11 @@ GameEngine.prototype.startInput = function () {
                 that.key = e.which;
             } else if (e.which === 27) {
                 that.esc_menu.showMenu(true);
+                e.stopImmediatePropagation();
             } else if (e.which === 73) {
-                that.key_i = true;
+                //that.key_i = true;
+                window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
+                e.stopImmediatePropagation();
             }
         }
         e.preventDefault();
@@ -1415,7 +1418,7 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    this.inventory.update();
+    //this.inventory.update();
     Hero.prototype.update.call(this);
 }
 
@@ -1880,6 +1883,11 @@ NPC.prototype.startInteraction = function () {
         text_box.focus();
         this.interacting = true;
         this.game.canControl = false;
+
+        // test to see if item menu works after receiving in game play
+        //var amulet = new Armor(this.game, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+        //this.game.entities[0].recieveItem(amulet);
+
     }
 }
 
@@ -2912,8 +2920,9 @@ GeneralMenu.prototype.init = function () {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.showMenu(false);
-            that.hero.inventory.showInventory.call(that.hero.inventory);
+            window.setTimeout(that.hero.inventory.showInventory.call(that.hero.inventory), 0);
         }
+        e.stopImmediatePropagation();
         e.preventDefault();
     });
     this.save.addEventListener("keydown", function (e) {
@@ -3091,12 +3100,12 @@ Storekeeper.prototype.constructor = Storekeeper;
 Storekeeper.prototype.startInteraction = function () {
     if (this.game.stage.part1 === false) {
         // if before dragon is dead, have storekeeper give hero a quest. 
-        //this.showDialog();
-    } else { }
+        this.showDialog();
+    } else { 
     var that = this.inventory;
         // after dragon is dead, show wares to the hero.
-        window.setTimeout(this.inventory.showWares.bind(that), 0);
-    //}
+        window.setTimeout(that.inventory.showWares.bind(that), 0);
+    }
 }
 
 Storekeeper.prototype.showDialog = function () {
@@ -3607,22 +3616,20 @@ Inventory.prototype.hasItem = function (item_name) {
 }
 
 Inventory.prototype.showInventory = function (flag) {
-    if (this.open === false) {
+    if (!this.open) {
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
         this.html_items[0].element.focus();
         this.open = true;
-        this.game.key_i = 0;
-    } else {
+    } else {    
         this.open = false;
         this.interface.style.visibility = "hidden";
         this.interface.style.display = "none";
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
-        this.game.key_i = 0;
     }
 }
 
@@ -3664,14 +3671,11 @@ Inventory.prototype.draw = function (ctx) {
 }
 
 Inventory.prototype.update = function () {
-    var that = this; 
-    if (this.game.key_i) {
-        this.showInventory(this);
-        //window.setTimeout(that.showInventory.bind(that), 0);
-    } else if (this.game.esc) {
-        this.showInventory(this);
-        //window.setTimeout(that.showInventory.bind(that), 0);
-    }
+    //if (this.game.key_i) {
+    //    this.showInventory();
+    //} else if (this.game.esc) {
+    //    this.showInventory();
+    //}
 }
 
 Inventory.prototype.addItem = function (item) {
@@ -4074,6 +4078,9 @@ StorekeeperInventory.prototype.selectInput = function (index) {
                 }
             } else if (e.which === 13) {
                 that.buyMode();
+            } else if (e.which === 27) {
+                that.showWares();
+                that.html_items[index].showItemMenu(false, that, index);
             }
             
             this.pressed = true;
