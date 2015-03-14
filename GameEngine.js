@@ -3540,7 +3540,17 @@ HTML_Item = function (element, game) {
     this.return = document.createElement("a");
     this.return.setAttribute("id", "return2");
     this.return.innerHTML = "Return";
+
+    
     this.og_children = this.menu.children[0].children;
+}
+
+HTML_Item.prototype.showItemDescription = function () {
+    if (!this.open) {
+        HTML_StoreItem.setItemDescription.call(this);
+        this.itemmenu.style.visibility = "visible";
+        this.itemmenu.style.display = "block";
+    }
 }
 
 HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
@@ -3701,6 +3711,9 @@ Inventory = function (game, coin, max_items) {
     this.initHtmlItems();
     this.selectInput();
     this.open = false;
+    this.itemmenu = document.getElementById("storeitem_menu");
+    this.itemName = document.getElementById("item_name");
+    this.itemDescription = document.getElementById("item_description");
 }
 
 Inventory.prototype.initHtmlItems = function () {
@@ -3749,12 +3762,16 @@ Inventory.prototype.showInventory = function (flag) {
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
-        this.html_items[0].element.focus();
+        this.itemmenu.style.visibility = "visible";
+        this.itemmenu.style.display = "block";
+        this.changeFocus(0);
         this.open = true;
     } else {    
         this.open = false;
         this.interface.style.visibility = "hidden";
         this.interface.style.display = "none";
+        this.itemmenu.style.visibility = "hidden";
+        this.itemmenu.style.display = "none";
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
@@ -3999,6 +4016,43 @@ HTML_Item.prototype.actionInput = function () {
 Inventory.prototype.changeFocus = function (index) {
     var element = this.html_items[index].element;
     window.setTimeout(element.focus(), 0);
+    this.setItemDescription(index);
+}
+
+Inventory.prototype.setItemDescription = function (index) {
+    this.itemName.innerHTML = this.html_items[index].item.name + "<br><hr>";
+    this.itemDescription.innerHTML = this.html_items[index].item.description + "<br>";
+    if (this.html_items[index].item.type) {
+        if (this.html_items[index].item.stats.health !== 0) {
+            this.itemDescription.innerHTML += "<br>Health: ";
+            this.itemDescription.innerHTML += this.html_items[index].item.stats.health;
+        }
+
+        if (this.html_items[index].item.stats.attack !== 0) {
+            this.itemDescription.innerHTML += "<br>Attack: ";
+            this.itemDescription.innerHTML += this.html_items[index].item.stats.attack;
+        }
+
+        if (this.html_items[index].item.stats.defense !== 0) {
+            this.itemDescription.innerHTML += "<br>Defense: ";
+            this.itemDescription.innerHTML += this.html_items[index].item.stats.defense;
+        }
+
+        if (this.html_items[index].item.stats.strength !== 0) {
+            this.itemDescription.innerHTML += "<br>STR: ";
+            this.itemDescription.innerHTML += this.html_items[index].item.stats.strength;
+        }
+
+        if (this.html_items[index].item.stats.dexterity !== 0) {
+            this.itemDescription.innerHTML += "<br>DEX: ";
+            this.itemDescription.innerHTML += this.html_items[index].item.stats.dexterity;
+        }
+
+        if (this.html_items[index].item.stats.intelligence !== 0) {
+            this.itemDescription.innerHTML += "<br>INT: ";
+            this.itemDescription.innerHTML += this.html_items[index].item.stats.intelligence;
+        }
+    }
 }
 
 StorekeeperInventory = function (game, coin, maxItems, items) {
@@ -4345,7 +4399,7 @@ HTML_StoreItem = function (element, game) {
     this.element = element;
     this.item = null;
     this.stock_qty = 0; 
-    this.menu = document.getElementById("storeitem_menu");
+    this.itemmenu = document.getElementById("storeitem_menu");
     this.itemName = document.getElementById("item_name");
     this.itemDescription = document.getElementById("item_description");
     // add elements for description of item
