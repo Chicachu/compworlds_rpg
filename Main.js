@@ -20,6 +20,7 @@ ASSET_MANAGER.queueDownload("./imgs/game_over_win.png");
 ASSET_MANAGER.queueDownload("./imgs/roomInteriorSpritesSheet.png")
 ASSET_MANAGER.queueDownload("./imgs/dragoncave.png");
 ASSET_MANAGER.queueDownload("./imgs/ice_cave.png");
+ASSET_MANAGER.queueDownload("./imgs/archer.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -55,8 +56,10 @@ ASSET_MANAGER.downloadAll(function () {
 	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
 
 
-    var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
-
+	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(250, 25, 28, 4, 3, 1));
+    gameEngine.heroes.push(warrior);
+    gameEngine.heroes.push(archer);
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.25, 9, true, false),
