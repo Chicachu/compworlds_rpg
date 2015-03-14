@@ -677,7 +677,7 @@ LootDispenser.prototype.generateItem = function(item)
                 var berry_amount = (parseInt(berry_string.substr(berry_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + berry_amount.toString());
             }
-            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
+            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP"));
             break;
         default:
             break;
@@ -2303,7 +2303,7 @@ Chest.prototype.lootChest = function () {
 
 HealBerry = function (x, y, quad, game) {
     this.picked = false;
-    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
+    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP");
 
     Interactable.call(this, x, y, quad, game);
 }
@@ -3390,10 +3390,11 @@ SpecialItem.prototype.update = function () {
 // types are: mana, health, str, dex, int, stam - exactly as typed here so other code works. 
 
 // level is 1, 2, or 3
-Potion = function (game, name, price, qty, img, type, level) {
+Potion = function (game, name, price, qty, img, type, level, itemDesc) {
     this.potion_type = type;
     this.level = level;
     UsableItem.call(this, game, name, price, qty, img);
+    this.itemDesc = "";
 }
 
 Potion.prototype = new UsableItem();
