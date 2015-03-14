@@ -655,7 +655,7 @@ LootDispenser.prototype.toString = function()
 LootDispenser.prototype.dispenseLoot = function (hero) {
     
     if (this.encounters % 6 === 0) {
-        hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
+        hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!"));
     }
     for(var i = 0; i < this.accumulated_loot.length; i ++)
     {
@@ -711,7 +711,7 @@ LootDispenser.prototype.generateItem = function(item)
                 var amu_amount = (parseInt(amu_string.substr(amu_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + amu_amount.toString());
             }
-            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0)));
+            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0), "Increase defense by 2"));
             break;
         case "heal berry":
             if (!this.string["heal berry"]) {
@@ -722,7 +722,7 @@ LootDispenser.prototype.generateItem = function(item)
                 var berry_amount = (parseInt(berry_string.substr(berry_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + berry_amount.toString());
             }
-            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1));
+            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP"));
             break;
         default:
             break;
@@ -2002,7 +2002,7 @@ NPC.prototype.startInteraction = function () {
         text_box.focus();
         this.interacting = true;
         this.game.canControl = false;
-        var amulet = new Armor(this.game, "Twisted Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+        var amulet = new Armor(this.game, "Twisted Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0), "");
         this.game.entities[0].recieveItem(amulet); 
     }
 }
@@ -2420,7 +2420,7 @@ Chest.prototype.lootChest = function () {
 
 HealBerry = function (x, y, quad, game) {
     this.picked = false;
-    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
+    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP");
 
     Interactable.call(this, x, y, quad, game);
 }
@@ -3486,13 +3486,14 @@ UsableItem.prototype.constructor = UsableItem;
 // Special items are not equipable, stackable, or usable in the normal sense, and they do not have a sale price.
 // special items have a number of uses and when they run out, the item will remove itself from the hero's inventory
 // actionFunction is the "doAction" function for special item, pass in whatever you need the item to do. 
-SpecialItem = function (game, name, img, uses, actionFunction) {
+SpecialItem = function (game, name, img, uses, actionFunction, itemDesc) {
     UsableItem.call(this, game, name, 0, 1, img);
     this.isStackable = false;
     this.isEquipped = false;
     this.uses = uses;
     this.actionFunction = actionFunction;
     this.usable = false;
+    this.itemDesc = "";
 }
 
 SpecialItem.prototype = new UsableItem();
@@ -3514,10 +3515,11 @@ SpecialItem.prototype.update = function () {
 // types are: mana, health, str, dex, int, stam - exactly as typed here so other code works. 
 
 // level is 1, 2, or 3
-Potion = function (game, name, price, qty, img, type, level) {
+Potion = function (game, name, price, qty, img, type, level, itemDesc) {
     this.potion_type = type;
     this.level = level;
     UsableItem.call(this, game, name, price, qty, img);
+    this.itemDesc = "";
 }
 
 Potion.prototype = new UsableItem();
@@ -3646,7 +3648,7 @@ Book.prototype.constructor = Book;
 
 
 
-Armor = function (game, name, price, img, type, stats) {
+Armor = function (game, name, price, img, type, stats, itemDesc) {
     this.isEquipped = false;
     this.type = type;
     this.slot = document.getElementById("equip_" + type);
@@ -3654,6 +3656,7 @@ Armor = function (game, name, price, img, type, stats) {
     Item.call(this, game, name, price, 1, img);
     this.isStackable = false;
     this.stats = stats;
+    this.itemDesc = "";
 }
 
 Armor.prototype = new Item();

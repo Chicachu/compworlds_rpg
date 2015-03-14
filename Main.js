@@ -80,7 +80,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
-    var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { });
+    var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { }, "A sturdy tool to chop those pesky logs blocking your treasure chests");
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
@@ -105,8 +105,8 @@ ASSET_MANAGER.downloadAll(function () {
                                         new Animation(ghost_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
                                         new Animation(ghost_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 											
-	var ghost_quest_potion = new SpecialItem(gameEngine, "Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
-	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { });	
+	var ghost_quest_potion = new SpecialItem(gameEngine, "Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { }, "Drug Facts: for ghosts only");	
+	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { }, "A small magical rock, perhaps it can open something...");	
 	var ghost_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", ghost_quest_reward, ghost_quest_potion);
 	var ghost = new Ghost(gameEngine, "Ghost", [["Set my soul free, Brave Warrior!", 
 												"Go to Purple Witch and get me the Heaven Potion! Let my soul fly away from this Sinful World!",
@@ -122,7 +122,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         new Animation(witch_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                         new Animation(witch_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 
-    var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { });
+    var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { }, "The Witch's spellbook, contains unreadable letters and strange inscriptions");
     var witch_quest_reward = ghost_quest_potion;
     var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Witch", witch_quest_reward, witch_quest_book);
     var witch = new Witch(gameEngine, "Witch", [["The witch simply glares at you as you approach her and her home."],
@@ -147,8 +147,8 @@ ASSET_MANAGER.downloadAll(function () {
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
     //test items
-    var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
-    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+    var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP");
+    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0), "");
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
 
@@ -275,8 +275,8 @@ ASSET_MANAGER.downloadAll(function () {
 	   new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
 
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
-                new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0)), 100], false),
-                new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1), 55], true),
+                new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "Increase Strength and Dexterity by 1"), 100], false),
+                new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP"), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png");
