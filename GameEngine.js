@@ -666,7 +666,7 @@ LootDispenser.prototype.generateItem = function(item)
                 var amu_amount = (parseInt(amu_string.substr(amu_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + amu_amount.toString());
             }
-            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0)));
+            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0), "Increase defense by 2"));
             break;
         case "heal berry":
             if (!this.string["heal berry"]) {
@@ -1885,7 +1885,7 @@ NPC.prototype.startInteraction = function () {
         text_box.focus();
         this.interacting = true;
         this.game.canControl = false;
-        var amulet = new Armor(this.game, "Twisted Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+        var amulet = new Armor(this.game, "Twisted Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0), "");
         this.game.entities[0].recieveItem(amulet); 
     }
 }
@@ -3522,7 +3522,7 @@ Book.prototype.constructor = Book;
 
 
 
-Armor = function (game, name, price, img, type, stats) {
+Armor = function (game, name, price, img, type, stats, itemDesc) {
     this.isEquipped = false;
     this.type = type;
     this.slot = document.getElementById("equip_" + type);
@@ -3530,6 +3530,7 @@ Armor = function (game, name, price, img, type, stats) {
     Item.call(this, game, name, price, 1, img);
     this.isStackable = false;
     this.stats = stats;
+    this.itemDesc = "";
 }
 
 Armor.prototype = new Item();
