@@ -142,8 +142,11 @@ GameEngine.prototype.startInput = function () {
                 that.key = e.which;
             } else if (e.which === 27) {
                 that.esc_menu.showMenu(true);
+                e.stopImmediatePropagation();
             } else if (e.which === 73) {
-                that.key_i = true;
+                //that.key_i = true;
+                window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
+                e.stopImmediatePropagation();
             }
         } else {
             that.key = 0;
@@ -1420,7 +1423,7 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    this.inventory.update();
+    //this.inventory.update();
     Hero.prototype.update.call(this);
 }
 
@@ -2921,8 +2924,9 @@ GeneralMenu.prototype.init = function () {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.showMenu(false);
-            that.hero.inventory.showInventory.call(that.hero.inventory);
+            window.setTimeout(that.hero.inventory.showInventory.call(that.hero.inventory), 0);
         }
+        e.stopImmediatePropagation();
         e.preventDefault();
     });
     this.save.addEventListener("keydown", function (e) {
@@ -3640,22 +3644,20 @@ Inventory.prototype.hasItem = function (item_name) {
 }
 
 Inventory.prototype.showInventory = function (flag) {
-    if (this.open === false) {
+    if (!this.open) {
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
         this.interface.style.display = "block";
         this.html_items[0].element.focus();
         this.open = true;
-        this.game.key_i = 0;
-    } else {
+    } else {    
         this.open = false;
         this.interface.style.visibility = "hidden";
         this.interface.style.display = "none";
         this.interface.tabIndex = 0;
         this.game.context.canvas.tabIndex = 1;
         this.game.context.canvas.focus();
-        this.game.key_i = 0;
     }
 }
 
@@ -3697,11 +3699,11 @@ Inventory.prototype.draw = function (ctx) {
 }
 
 Inventory.prototype.update = function () {
-    if (this.game.key_i) {
-        this.showInventory();
-    } else if (this.game.esc) {
-        this.showInventory();
-    }
+    //if (this.game.key_i) {
+    //    this.showInventory();
+    //} else if (this.game.esc) {
+    //    this.showInventory();
+    //}
 }
 
 Inventory.prototype.addItem = function (item) {
