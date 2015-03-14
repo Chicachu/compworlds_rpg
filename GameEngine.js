@@ -621,7 +621,7 @@ LootDispenser.prototype.toString = function()
 LootDispenser.prototype.dispenseLoot = function (hero) {
     
     if (this.encounters % 6 === 0) {
-        hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }));
+        hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!"));
     }
     for(var i = 0; i < this.accumulated_loot.length; i ++)
     {
@@ -3361,13 +3361,14 @@ UsableItem.prototype.constructor = UsableItem;
 // Special items are not equipable, stackable, or usable in the normal sense, and they do not have a sale price.
 // special items have a number of uses and when they run out, the item will remove itself from the hero's inventory
 // actionFunction is the "doAction" function for special item, pass in whatever you need the item to do. 
-SpecialItem = function (game, name, img, uses, actionFunction) {
+SpecialItem = function (game, name, img, uses, actionFunction, itemDesc) {
     UsableItem.call(this, game, name, 0, 1, img);
     this.isStackable = false;
     this.isEquipped = false;
     this.uses = uses;
     this.actionFunction = actionFunction;
     this.usable = false;
+    this.itemDesc = "";
 }
 
 SpecialItem.prototype = new UsableItem();

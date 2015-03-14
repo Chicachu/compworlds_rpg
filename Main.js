@@ -77,7 +77,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
-    var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { });
+    var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { }, "A sturdy tool to chop those pesky logs blocking your treasure chests");
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
@@ -102,8 +102,8 @@ ASSET_MANAGER.downloadAll(function () {
                                         new Animation(ghost_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
                                         new Animation(ghost_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 											
-	var ghost_quest_potion = new SpecialItem(gameEngine, "Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { });	
-	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { });	
+	var ghost_quest_potion = new SpecialItem(gameEngine, "Potion", ASSET_MANAGER.getAsset("./imgs/items/quest_potion.png"), 1, function () { }, "Drug Facts: for ghosts only");	
+	var ghost_quest_reward = new SpecialItem(gameEngine, "King Arthur's Rock", ASSET_MANAGER.getAsset("./imgs/items/stone.png"), 1, function () { }, "A small magical rock, perhaps it can open something...");	
 	var ghost_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Ghost", ghost_quest_reward, ghost_quest_potion);
 	var ghost = new Ghost(gameEngine, "Ghost", [["Set my soul free, Brave Warrior!", 
 												"Go to Purple Witch and get me the Heaven Potion! Let my soul fly away from this Sinful World!",
@@ -119,7 +119,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         new Animation(witch_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                         new Animation(witch_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 
-    var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { });
+    var witch_quest_book = new SpecialItem(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"), 1, function () { }, "The Witch's spellbook, contains unreadable letters and strange inscriptions");
     var witch_quest_reward = ghost_quest_potion;
     var witch_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Witch", witch_quest_reward, witch_quest_book);
     var witch = new Witch(gameEngine, "Witch", [["The witch simply glares at you as you approach her and her home."],
