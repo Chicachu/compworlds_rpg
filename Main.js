@@ -79,6 +79,13 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
     var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { });
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
+    var storekeeper_items = [new Armor(gameEngine, "Leather Armor", 170, ASSET_MANAGER.getAsset("./imgs/items/leather_armor1.png"), "armor", new Statistics(2, 0, 3, 0, 2, 0)),
+                            new Armor(gameEngine, "Basic Iron Armor", 230, ASSET_MANAGER.getAsset("./imgs/items/armor1.png"), "armor", new Statistics(5, 0, 5, 1, 0, 0)),
+                            //new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0)),
+                            //new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0)),
+                            //new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0)),
+                            //new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0)),
+                            new Potion(gameEngine, "Heal Berry", 10, 3, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.")];
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
                                              "I'd pay handsomely if someone as strong looking as yourself would perhaps rid me of a few. *wink*",
@@ -94,8 +101,8 @@ ASSET_MANAGER.downloadAll(function () {
                                             "However, I cannot and will not open it back up again until that dragon is slain."],
                                             ["Seriously, kid, go kill that dragon."],
                                             ["Wow! I didn't actually think you'd do it! Congratulations! Oh, sorry, but the store wont be open for a while yet.",
-                                            "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], null,
-                                             storekeeper_sprites, [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1");
+                                            "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], storekeeper_items,
+                                             1200, storekeeper_sprites, [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1");
 										
 	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 
                                         new Animation(ghost_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
@@ -144,8 +151,8 @@ ASSET_MANAGER.downloadAll(function () {
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
     //test items
-    var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1);
-    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 0));
+    var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.");
+    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 0, 0));
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
 
