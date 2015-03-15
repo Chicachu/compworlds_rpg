@@ -24,6 +24,7 @@ ASSET_MANAGER.queueDownload("./imgs/roomInteriorSpritesSheet.png")
 ASSET_MANAGER.queueDownload("./imgs/dragoncave.png");
 ASSET_MANAGER.queueDownload("./imgs/ice_cave.png");
 ASSET_MANAGER.queueDownload("./imgs/archer.png");
+ASSET_MANAGER.queueDownload("./imgs/mage.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/accessory.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/armor.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/offhand.png");
@@ -76,10 +77,10 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 
-	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(300, 220, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(225, 25, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
-    gameEngine.heroes.push(archer);
+    //gameEngine.heroes.push(archer);
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.25, 9, true, false),
@@ -218,7 +219,7 @@ ASSET_MANAGER.downloadAll(function () {
         "Your journey ends here.", "And you'll never make it to my super secret treasure room.",
         "That's secret.", "The one that's behind me.", "That no one knows about.", "Did I mention that it's a secret?",
         "And also the secret passageway leading to the mountains.", "Which is also behind me.", "And is also secret."]],
-        dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave");
+        dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave", "Dragon");
     dragon1_NPC.setScale(1.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 

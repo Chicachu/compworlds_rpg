@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2"];
-    this.current_environment = "level2";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -991,6 +991,16 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
                     this.game.current_stage = this.game.stage[1];
                     this.game.removeEntityByName("Dragon");
+
+                    setTimeout(function () {
+                        var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
+                        var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), null, null, null);
+
+                        var siren_NPC = new Boss(game, [["Whaddup nigga.", "think youre hard bitch ass nigga?", "ima fuck you up nigga."]],
+                            siren_NPC_sprites, [new Point(450, 120)], .1, false, [2], "level2", "Siren");
+                        siren_NPC.setScale(.3);
+                    }, 10000);
+                    
                 }
                 else {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -1575,6 +1585,72 @@ Archer.prototype.setAction = function (action, target) {
     this.is_turn = false;
 }
 
+Mage = function (game, stats) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
+    this.animations = {
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 3, 64, 64, 0.05, 12, true, false),
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
+        special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
+        death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
+    };
+    this.x = 10;
+    this.y = 215;
+
+    Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
+}
+
+Mage.prototype = new Hero();
+Mage.prototype.constructor = Mage;
+
+Mage.prototype.draw = function (context) {
+    Hero.prototype.draw.call(this, context);
+}
+
+Mage.prototype.update = function () {
+    Hero.prototype.update.call(this);
+}
+
+Mage.prototype.setAction = function (action, target) {
+    var that = this;
+    switch (action) {
+        case "Single":
+            this.game.animation_queue.push(new Event(this, this.animations.destroy));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            that.doDamage(that, target[0], that.game, false);
+            break;
+        case "Sweep":
+            this.game.animation_queue.push(new Event(this, this.animations.destroy));
+            this.game.animation_queue.push(new Event(this, this.stop_move_animation));
+            var last_index = 0;
+            var len = target.length;
+            for (var i = 0; i < len; i++) {
+                if (target.length < len) {
+                    len = target.length;
+                    i--;
+                }
+                if (target[i]) {
+                    if (i === target.length - 1 || !target[target.length - 1]) {
+                        that.doDamage(that, target[i], that.game, false);
+                    }
+                    else {
+                        that.doDamage(that, target[i], that.game, true);
+                    }
+                }
+                else {
+                    //this.game.setNextFighter(this.game);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    this.is_turn = false;
+}
 
 Warrior = function (game, stats) {
     this.game = game;
@@ -1589,7 +1665,7 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 320;
+    this.x = 220;
     this.y = 208;
 
     this.quests = [];
@@ -1720,7 +1796,7 @@ Enemy.prototype.draw = function (context) {
 
 Enemy.prototype.update = function () {
     if (this.game.fight_queue[0].id === this.id && this.is_turn) {
-        var target = Math.floor(Math.random() * (this.game.heroes.length - 0 + 1));
+        var target = Math.floor(Math.random() * (this.game.heroes.length));
         var place_holder = target;
         while (this.game.heroes[target].is_dead)
         {
@@ -1823,7 +1899,7 @@ DireWolf = function(game, stats, loop_while_standing)
             ({ string: "gold", weight: 80 }),
             ({ string: "heal berry", weight: 20 })
         ];
-    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Dire Wolf", false, this.loot_table);
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "DireWolf", false, this.loot_table);
 }
 
 DireWolf.prototype = new Enemy();
@@ -2165,10 +2241,10 @@ NPC.prototype.reposition = function () {
     }
 }
 
-Boss = function (game, dialogue, anims, path, speed, pause, quad, map_name)
+Boss = function (game, dialogue, anims, path, speed, pause, quad, map_name, name)
 {
     this.spriteSheet = anims.right.spriteSheet;
-    this.name = "Dragon";
+    this.name = name;
     NPC.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
 }
 
@@ -2176,6 +2252,40 @@ Boss.prototype = new NPC();
 Boss.prototype.constructor = Boss;
 
 Boss.prototype.updateDialogue = function () {
+    if (this.game) {
+        if (this.game.next === true) {
+            var text_box = document.getElementById("dialogue_box");
+            var text = document.createElement('p');
+            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                this.dialogue_index++;
+                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                text_box.innerHTML = text.outerHTML;
+            } else {
+                this.dialogue_index = 0;
+                text_box.style.visibility = "hidden";
+                text_box.style.display = "none";
+                text_box.tabIndex = 2;
+                this.game.context.canvas.tabIndex = 1;
+                this.game.context.canvas.focus();
+                //this.game.canControl = true;
+                this.interacting = false;
+                this.game.fadeOut(this.game, { game: this.game, battle_type: "boss" }, this.game.setBattle);
+            }
+            this.game.next = false;
+        }
+    }
+}
+
+SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
+    this.spriteSheet = anims.right.spriteSheet;
+    this.name = "SirenNPC";
+    NPC.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
+}
+
+SirenNPC.prototype = new NPC();
+SirenNPC.prototype.constructor = SirenNPC;
+
+SirenNPC.prototype.updateDialogue = function () {
     if (this.game) {
         if (this.game.next === true) {
             var text_box = document.getElementById("dialogue_box");
@@ -4737,7 +4847,7 @@ SoundManager = function (game) {
     this.paused = false;
     this.sound = this.select;
     this.background = this.world1;
-    this.background.play();
+    //this.background.play();
 }
 
 SoundManager.prototype.playSound = function (sound) {
@@ -4767,7 +4877,7 @@ SoundManager.prototype.playSound = function (sound) {
 
 SoundManager.prototype.toggleSound = function () {
     if (this.background.paused) {
-        this.background.play();
+        //this.background.play();
     }
     else {
         this.background.pause();
@@ -4783,14 +4893,14 @@ SoundManager.prototype.pauseBackground = function()
 SoundManager.prototype.playBackground = function()
 {
     this.paused = false;
-    this.background.play();
+    //this.background.play();
 }
 SoundManager.prototype.toggleSound = function()
 {
     if(this.background.paused)
     {
         this.paused = false;
-        this.background.play();
+        //this.background.play();
     }
     else
     {
@@ -4818,6 +4928,6 @@ SoundManager.prototype.playSong = function(sound)
             break;
     }
     if (!this.paused) {
-        this.background.play();
+        //this.background.play();
     }
 }
