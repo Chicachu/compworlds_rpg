@@ -76,7 +76,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 
 
-	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(300, 2200, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(225, 25, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     gameEngine.heroes.push(archer);
