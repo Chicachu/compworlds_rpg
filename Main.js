@@ -314,7 +314,7 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
-    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Shelly", "DireWolf", 5);
+    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Shelly", "Dire Wolf", 5);
     var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
                                                                   "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
                                                                   "This village is counting on you!"],
@@ -525,7 +525,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [407,408,409,410,411,412,413,414,415,416,417,484,485,486,487,488,489,490,0,168,169,164,165,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,0,0,0],
                 [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
                 [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
-                [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5], [], [], "level2", "./imgs/woods.png", 3);
+                [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5], [], ["Dire Wolf"], "level2", "./imgs/woods.png", 3);
 
     gameEngine.addEnvironment(level1.name, level1);
     gameEngine.addEnvironment(level2.name, level2);
