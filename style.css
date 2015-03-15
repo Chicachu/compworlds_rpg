@@ -26,6 +26,9 @@ body {
     visibility: hidden;
     display: none; 
 }
+hr {
+    color: #d8bca1;
+}
 
 #dialogue_box p {
     color: #d8bca1;
@@ -85,7 +88,7 @@ body {
     margin-left: -150px;
 }
 
-#esc_menu, #item_menu {
+#esc_menu, #item_menu, #storeitem_menu {
     position: relative;
     z-index: 2; 
     visibility: hidden; 
@@ -96,6 +99,29 @@ body {
     top: -300px;
     text-align: center; 
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+}
+
+#storeitem_menu {
+    width: 100px;
+    height: auto;
+    top: 0;
+    background-image: url("./imgs/menu_background.png"); 
+    border-radius: 15px;
+    top: -480px;
+    left: -215px;
+    margin: 5px auto;
+    padding: 0px 0px 3px 0px;
+    border:  1px solid #d8bca1;
+}
+
+#storeitem_menu p {
+    color: #d8bca1;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
+    font-size: 12px;
+}
+
+#item_name {
+    font-weight: 900;
 }
 
 #esc_menu ul, #item_menu ul {
@@ -150,6 +176,7 @@ body {
     display: none;
     top: -280px;  
     visibility: hidden;
+    display: none;
 }
 
 #items {
@@ -160,16 +187,15 @@ body {
     padding: 25px;
     display: inline-block; 
     left: 1px;
-    top: -10px;
 }
 
 #items p {
     display: block; 
     position: relative; 
     text-align: right; 
-    color: #d8bca1;
     margin-bottom: 3px;
     font-weight: 900;
+    color: #d8bca1;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; 
 }
 
@@ -208,6 +234,19 @@ body {
     padding: 25px; 
     border:  1px double #d8bca1;
     left: -1px; 
+    top: -160px;
+}
+
+#equipment p {
+    position: relative; 
+    top: -7px;
+    width: 30px;
+    height: 12px;
+    font-size: 12px;
+    font-weight: 900;
+    margin: 0 auto; 
+    margin-top: -10px;
+    color: #d8bca1;
 }
 
 #equip_armor {
@@ -319,4 +358,48 @@ battle_menu_instructions {
     margin-left: -20px;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-weight: 900;
+}
+
+#store_items p {
+    position: relative; 
+    top: -10px; 
+    
+    color: #d8bca1;
+    font-size: 10px; 
+    outline: none; 
+    border: 0; 
+}
+
+#mode {
+    margin-top: -5px;
+    margin-bottom: -5px;
+}
+
+#store_items p::-moz-focus-inner {
+    border: 0; 
+}
+
+#store_items div p {
+    outline: none; 
+}
+
+#store_items img, #store_coin p {
+    color: #d8bca1;
+    float: left;
+    display: block;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+#store_coin {
+    position: relative;
+    margin-left: -15px;
+    width: 200px;
+    top: 3px;
+    height: 20px;
+}
+
+#store_coin p {    
+    margin-top: 10px; 
+    margin-bottom: 10px;
 }

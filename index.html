@@ -17,8 +17,13 @@
     <div id="battle_menu_instructions">
     </div>
     <audio id="world_theme" src="./sounds/AncientForest.wav" preload="auto" autoplay loop></audio>
+    <audio id="world_theme2" src="./sounds/Shivershade Mountain.mp3" preload="auto" autoplay loop></audio>
     <audio id="battle_theme" src="./sounds/FirstBattle.mp3" preload="auto" loop></audio>
     <audio id="selection_beep" src="./sounds/selection_beep.mp3" preload="auto"></audio>
+    <audio id="coin_sound" src="./sounds/coin_sound.mp3" preload="auto"></audio>
+    <audio id="door_open" src="./sounds/door_open.wav" preload="auto"></audio>
+    <audio id="door_close" src="./sounds/door_close.wav" preload="auto"></audio>
+    <audio id="nope" src="./sounds/heckno.wav" preload="auto"></audio>
     <div id="battle_menu">
         <ul>
             <li><a id="attack">Attack</a></li>
@@ -52,10 +57,10 @@
             <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
             
                 <img src="./imgs/items/coin.png" style="height: 20px; width: 20px;" />
-            <p id="coin">
-            </p>
+            <p id="coin"></p>
         </div>
         <div id="equipment">
+            <p id="hero_name">Theon</p>
             <div class="equip" id="equip_armor"></div>
             <div class="equip" id="equip_accessory"></div>
             <div class="equip" id="equip_mainhand"></div>
@@ -64,15 +69,24 @@
     </div>
     <div id="store">
         <div id="store_items">
+            <p id="mode" tabindex="0">Sell: </p>
             <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
             <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
             <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
             <div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div><div class="item" tabindex="1"></div>
+            <div id="store_coin">
+                <p>Hero's</p><img src="./imgs/items/coin.png" />
+                <p id="hero_coin"></p>
+                <p style="padding-left: 10px;">Storekeeper's</p><img src="./imgs/items/coin.png"  />
+                <p id="keeper_coin"></p>
+            </div>
         </div>
         <div id="sale">
-            <p id="quantity">Qty: </p>
-            <p id="last_price">Last Item: </p>
-            <p id="total_price">Total: </p>
+            <p style="font-size: 10px;">Current Item: </p>
+            <p id="quantity">Qty: 0</p>
+            <p id="item_price">Price: 0</p>
+            <hr style="width: auto;" />
+            <p id="total_price" style="font-weight: 900;">Total: 0</p>
             <p></p>
         </div>
     </div>
@@ -87,10 +101,15 @@
             <li></li>
         </ul>
     </div>
+    <div id="storeitem_menu">
+        <p id="item_name"></p>
+        <p id="item_description"></p>
+    </div>
     
     <div id="instructions">
         <p>Focus is already on canvas. Trying to make it so that you can't lose focus.</p>
         <p>Use arrow keys to move and space bar to interact. Press I to open inventory. Sometimes you need to double tap.</p>
+        <p>Use Enter to switch between sell and buy mode in the shop.</p>
         <p></p>
     </div>
     
