@@ -6,6 +6,7 @@ ASSET_MANAGER.queueDownload("./imgs/Hero-Warrior.png");
 ASSET_MANAGER.queueDownload("./imgs/npc-female.png");
 ASSET_MANAGER.queueDownload("./imgs/dragon_1.png");
 ASSET_MANAGER.queueDownload("./imgs/dragon_1_npc.png");
+ASSET_MANAGER.queueDownload("./imgs/water_elemental.png");
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/tiles.png");
@@ -73,8 +74,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 
 
-	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
-	var archer = new Archer(gameEngine, new Statistics(250, 25, 28, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(1, 22, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(1, 25, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     gameEngine.heroes.push(archer);
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
