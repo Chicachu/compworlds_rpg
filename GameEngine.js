@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2"];
-    this.current_environment = "level1";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -429,10 +429,10 @@ GameEngine.prototype.setBattle = function (args) {
         heroes[0].y = game.height / 2;
     }
     else if (heroes.length === 2) {
-        heroes[0].y = (game.height / 2) - 40;
+        heroes[0].y = (game.height / 2) + 40;
         heroes[0].x = heroes[0].x;
-        heroes[1].y = (game.height / 2) + 40;
-        heroes[1].x = heroes[0].x + 20;
+        heroes[1].y = (game.height / 2) - 40;
+        heroes[1].x = heroes[0].x - 20;
     }
 
     else if (heroes.length === 3) {
@@ -490,7 +490,7 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    if (game.current_environment === "ice_cave") {
+    if (game.current_environment === "dragon_cave") {
         game.fiends.push(new Dragon1(game, new Statistics(250, 40, 60, 5, 10, 3)));
     }
     else if (game.current_environment === "level2")
@@ -1558,7 +1558,7 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 320;
+    this.x = 220;
     this.y = 208;
 
     this.quests = [];
@@ -1676,15 +1676,15 @@ Enemy.prototype.draw = function (context) {
         this.drawSelector(context, 'yellow');
 
     }
-    if (this.name === "dragon1") {
+    //if (this.name === "dragon1") {
 
-            this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 3);
-    }
+            
+    //}
 
-    else
-    {
+    //else
+    //{
         this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.5);
-    }
+    //}
 }
 
 Enemy.prototype.update = function () {
@@ -1767,6 +1767,36 @@ Siren = function (game, stats, loop_while_standing) {
 
 Siren.prototype = new Enemy();
 Siren.prototype.constructor = Siren;
+
+Siren.prototype.draw = function(context)
+{
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, .4);
+}
+
+DireWolf = function(game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/wolf.png");
+    this.xp_base = 15;
+    this.animations = {
+        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
+        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
+        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
+        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 3, 64, 64, 0.1, 7, true, false),
+        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
+        death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
+    };
+    this.loot_table =
+        [
+            ({ string: "gold", weight: 80 }),
+            ({ string: "heal berry", weight: 20 })
+        ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Dire Wolf", false, this.loot_table);
+}
+
+DireWolf.prototype = new Enemy();
+DireWolf.prototype.constructor = DireWolf;
 
 Skeleton = function (game, stats, loop_while_standing) {
     this.game = game;
@@ -1864,6 +1894,15 @@ Dragon1 = function(game, stats, loop_while_standing)
 
 Dragon1.prototype = new Enemy();
 Dragon1.prototype.constructor = Dragon1;
+
+Dragon1.prototype.draw = function (context) {
+    this.drawHealthBar(context);
+    if (this.is_targeted) {
+        this.drawSelector(context, 'yellow');
+
+    }
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 3);
+}
 /* NPC 
 game : the game engine
 dialogue : array of strings which will be used as the NPC's dialogue
