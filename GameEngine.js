@@ -946,8 +946,6 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         game.loot_dispenser.acc_xp += foes.xp_base + rand_offset;
         // check to see if foe is one for a kill quest
         this.kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
-        // TODO: alert hero if kill_quest_complete AFTER battle fades out
-        // use gameengine.alertHero(<dialog>); when world view is back in
         foes.drop();
 
         game.removeFighters(foes);
@@ -958,13 +956,14 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
             if (game.fiendBattleOver(game)) {
                 game.canControl = false;
-                //if(foes.name === "dragon1")
-                //{
-                //    setTimeout(function () { game.fadeOut(game, {game: game, background: "./imgs/game_over_win.png"}, game.gameOver); }, 5000);
-                //}
-                //else {
+                if(foes.name === "dragon1")
+                {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                //}
+                    this.game.current_stage = this.game.stage[1];
+                }
+                else {
+                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                }
             }
             else if(game.heroBattleOver(game))
             {
