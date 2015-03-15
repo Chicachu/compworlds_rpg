@@ -361,14 +361,14 @@ ASSET_MANAGER.downloadAll(function () {
                                                                         }
                                                                     }]);
 
-    var mage_npc_sprites = new SpriteSet(new Animation(mage_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
+    var mage_npc_sprites = new SpriteSet(new Animation(mage_spritesheet, 0, 10, 64, 64, 0.05, 9, true, false),
+                                                new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 9, true, false),
+                                                new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 9, true, false),
+                                                new Animation(mage_spritesheet, 0, 11, 64, 64, 0.05, 9, true, false), null, null, null);
 
-    var mage_npc = NPC(gameEngine, [["Thank you for saving me, hero! I am forever in your debt.",
-                                                "In fact, I think I'll follow you around everywhere you go! I will never leave your arm. *swoon*"]],
-                                           mage_npc_sprites, /* point here */[], .06, false, [0], "level2", 1);
+    //var mage_npc = NPC(gameEngine, [["Thank you for saving me, hero! I am forever in your debt.",
+    //                                 "In fact, I think I'll follow you around everywhere you go! I will never leave your arm. *swoon*"]],
+    //                                       mage_npc_sprites, /* point here */[], .06, false, [0], "level2", 1);
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
