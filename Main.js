@@ -234,11 +234,11 @@ ASSET_MANAGER.queueDownload("./imgs/staff2.png");
 ASSET_MANAGER.queueDownload("./imgs/robe1.png");
 ASSET_MANAGER.queueDownload("./imgs/robe2.png");
 ASSET_MANAGER.queueDownload("./imgs/amulet3.png"); */
-    var mountain_man_items = [new Armor(gameEngine, "Magical Rod", 130, ASSET_MANAGER.getAsset("./imgs/staff1.png"), "mainhand", new Statistics(0, 5, 0, 0, 0, 2), "This is your great great great grandfather's Amulet. STR +1"),
-                                new Armor(gameEngine, "Powerful Rod", 130, ASSET_MANAGER.getAsset("./imgs/staff2.png"), "mainhand", new Statistics(0, 10, 0, 0, 0, 4), "This is your great great great grandfather's Amulet. STR +1"),
-                                new Armor(gameEngine, "Flowing Robes", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 5, 0, 0, 2), "This is your great great great grandfather's Amulet. STR +1"),
-                                new Armor(gameEngine, "Sexy Flowing Robes", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 10, 0, 0, 4), "This is your great great great grandfather's Amulet. STR +1"),
-                                new Armor(gameEngine, "Pendant of Magic", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 3), "This is your great great great grandfather's Amulet. STR +1")];
+    var mountain_man_items = [new Armor(gameEngine, "Magical Rod", 130, ASSET_MANAGER.getAsset("./imgs/staff1.png"), "mainhand", new Statistics(0, 5, 0, 0, 0, 2), "This looks like a glowstick, it shines whenever you move it."),
+                                new Armor(gameEngine, "Powerful Rod", 130, ASSET_MANAGER.getAsset("./imgs/staff2.png"), "mainhand", new Statistics(0, 10, 0, 0, 0, 4), "It emits strong light power, capable of fending off monsters with ease"),
+                                new Armor(gameEngine, "Flowing Robes", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 5, 0, 0, 2), "The protective robe suitable for any mages, experienced or not"),
+                                new Armor(gameEngine, "Sexy Flowing Robes", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 10, 0, 0, 4), "This robe is definitely not skimpy, but still sexy nonetheless"),
+                                new Armor(gameEngine, "Pendant of Magic", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 3), "It has mystical powers that will make you smarter")];
                                
     var mountain_man_sprites = new SpriteSet(new Animation(mountain_man_spritesheet, 0, 2, 24, 32, 0.05, 1, true, false),
                                             new Animation(mountain_man_spritesheet, 0, 0, 24, 32, 0.05, 1, true, false),
