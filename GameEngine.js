@@ -530,7 +530,7 @@ GameEngine.prototype.endBattle = function (game)
     game.fight_queue = [];
     game.animation_queue = [];
     //game.sound_manager.playSong("world1");
-    if (game.current_environment === "level1") {
+    if (game.current_environment === "level1" || game.current_environment === "dragon_cave") {
         game.sound_manager.playSong("world1");
     } else if (game.current_environment === "level2") {
         game.sound_manager.playSong("world2");
@@ -1562,7 +1562,7 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 320;
+    this.x = 220;
     this.y = 208;
 
     this.quests = [];
