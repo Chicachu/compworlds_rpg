@@ -175,8 +175,8 @@ hr {
     margin: 0 auto; 
     display: none;
     top: -280px;  
-    visibility: visible;
-    display: block;
+    visibility: hidden;
+    display: none;
 }
 
 #items {

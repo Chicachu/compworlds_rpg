@@ -80,8 +80,8 @@ GameEngine = function () {
     this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
-    this.environment = [];
-    this.current_environment = "level1";
+    this.environment = ["level1", "level2"];
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1432,6 +1432,10 @@ Hero.prototype.isPassable = function (tile, index) {
     } else if (this.game.current_environment === "dragon_cave") {
         if (tile === 33 || tile === 34 || (tile >= 1 && tile <= 9)) {
             return true;
+        }
+    } else if (this.game.current_environment === "level2") {
+        if (tile === 142 || tile === 143 || tile === 164 || tile === 165 || tile === 0 || tile === 87 || tile === 5) {
+            return true; 
         }
     } else {
         return true;
