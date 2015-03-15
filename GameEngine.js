@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2"];
-    this.current_environment = "level2";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -109,11 +109,11 @@ GameEngine.prototype.init = function (context) {
     this.context.canvas.focus();
     this.esc_menu = new GeneralMenu(this);
     this.sound_manager = new SoundManager(this);
-    this.stage = {
-        part1: false, // part 1 will turn true after our hero kills the level 1 dragon
-        part2: false, 
-        part3: false
-    }
+    // part0 = beginning until dragon is dead
+    // part1 = after dragon is dead and until mountain level is complete. 
+    this.stage = ["part0", "part1", "part2", "part3"]; 
+    
+    this.current_stage = this.stage[1];
     this.loot_dispenser = new LootDispenser(this);
 }
 
@@ -940,7 +940,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                     else if(foes.name === "dragon1")
                     {
                         setTimeout(function () { game.fadeOut(game, { game: game, background: "./imgs/game_over_win.png" }, game.gameOver); }, 5000);
-                        game.stage.part1 = true; 
+                        game.current_stage = game.stage[1]; 
                     }
                     else {
                         setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -1043,7 +1043,12 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs((this.game.environment[this.game.current_environment].interactables[i].x) - (this.x + 5));
         var ent_y_difference = Math.abs((this.game.environment[this.game.current_environment].interactables[i].y) - (this.y + 45));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
+        if (this.game.environment[this.game.current_environment].interactables[i].portal && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
+            min_distance = ent_distance;
+            min_index = i;
+            array = 1;
+            break;
+        } else if (ent_distance < min_distance && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
             min_distance = ent_distance;
             min_index = i;
             array = 1;
@@ -2185,10 +2190,11 @@ Environment.prototype.getBattleBackground = function()
 {
     return this.battle_background;
 }
-EnvironmentAnimation = function (animation, coords, quads) {
+EnvironmentAnimation = function (animation, coords, quads, stage) {
     this.animation = animation;
     this.coords = coords;
     this.quads = quads;
+    this.stage = stage; 
 }
 
 OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background, start_quad) {
@@ -2293,21 +2299,52 @@ ExitDragonCave = function () {
     this.game.entities[0].y = 192;
 }
 
-TalkToDragon = function () {
-    
+EnterHouse1 = function () {
+    this.game.current_environment = "house1";
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 256;
+
+    this.game.entities[0].y = 352;
+}
+
+ExitHouse1 = function () {
+    this.game.current_environment = "level1";
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 128;
+
+    this.game.entities[0].y = 192;
+}
+
+EnterHouse2 = function () {
+    this.game.current_environment = "house2";
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 256;
+    this.game.entities[0].y = 352;
+}
+
+ExitHouse2 = function () {
+    this.game.current_environment = "level1";
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 256;
+
+    this.game.entities[0].y = 192;
 }
 
 // used to change maps or to initiate special battles. 
-Portal = function (x, y, quad, game, func) {
-    this.func = func; 
+Portal = function (x, y, quad, game, func, stage) {
+    this.func = func;
+    this.stage = stage; 
     Interactable.call(this, x, y, quad, game);
+    this.portal = true; 
 }
 
 Portal.prototype = new Interactable();
 Portal.prototype.constructor = Portal;
 
 Portal.prototype.startInteraction = function () {
-    this.func();
+    if (this.stage && this.game.current_stage === this.game.stage[this.stage]) {
+        this.func();
+    }
 }
 
 Door = function (x, y, quad, game) {
@@ -2324,12 +2361,12 @@ Door.prototype.startInteraction = function () {
         var y = this.y / 32;
         var x = this.x / 32;
         var loc_point = this.game.changeXYForQuad(new Point(x, y), this.quad);
-        if (this.game.stage.part2) {
+        if (this.current_stage !== this.game.stage[0]) {
             this.locked = false;
         }
 
         if (this.locked) {
-            if (this.game.stage.part1) {
+            if (this.current_stage === this.game.stage[0]) {
                 this.game.alertHero("This door is locked. Try coming back after the village isn't burning down.");
             }
         } else {
@@ -2578,7 +2615,7 @@ Environment.prototype.drawEnvironmentAnimations = function () {
     var loc_point = null;
     for (var i = 0; i < this.animations.length; i++) {
         // only draw if the animation belongs in the current quad
-        if (includes(this.animations[i].quads, this.curr_quadrant)) {
+        if (includes(this.animations[i].quads, this.curr_quadrant) && this.game.current_stage === this.game.stage[this.stage]) {
             for (var j = 0; j < this.animations[i].coords.length; j++) {
                 var coord = this.animations[i].coords[j];
                 var coord_point = new Point(coord[0], coord[1]);
@@ -3125,7 +3162,7 @@ Ghost.prototype = new NPC_QUEST();
 Ghost.prototype.constructor = Ghost;
 
 Ghost.prototype.startInteraction = function () {
-    if (this.game.stage.part1 === false) {
+    if (this.game.current_stage === this.game.stage[0]) {
         // if before dragon is dead, have Ghost give hero a quest. 
         this.showDialog();
     } else {
@@ -3315,10 +3352,9 @@ Witch.prototype = new NPC_QUEST();
 Witch.prototype.constructor = Witch;
 
 Witch.prototype.startInteraction = function () {
-    if (this.game.stage.part1 === false) {
         // if before dragon is dead, have Witch give hero a quest. 
         this.showDialog();
-    } 
+    
 }
 
 Witch.prototype.showDialog = function () {
@@ -4423,7 +4459,7 @@ HTML_StoreItem = function (element, game) {
     this.element = element;
     this.item = null;
     this.stock_qty = 0; 
-    this.itemmenu = document.getElementById("storeitem_menu");
+    this.menu = document.getElementById("storeitem_menu");
     this.itemName = document.getElementById("item_name");
     this.itemDescription = document.getElementById("item_description");
     // add elements for description of item
