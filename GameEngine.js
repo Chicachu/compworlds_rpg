@@ -219,6 +219,14 @@ GameEngine.prototype.removeEntity = function(entity){
  }
 }
 
+GameEngine.prototype.removeEntityFromAux = function (entity) {
+    var index = this.auxillary_sprites.indexOf(entity);
+
+    if (index > -1) {
+        this.entities.splice(index, 1);
+    }
+}
+
 GameEngine.prototype.clearEntities = function (save_entities) {
     if (save_entities) {
         this.auxillary_sprites = this.entities.splice(0, this.entities.length);
@@ -965,6 +973,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                 {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
                     this.game.current_stage = this.game.stage[1];
+                    this.game.removeEntityFromAux(foes);
                 }
                 else {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -1062,7 +1071,8 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs(this.game.entities[i].x - this.x);
         var ent_y_difference = Math.abs(this.game.entities[i].y - this.y);
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance && includes(this.game.entities[i].quad, this.game.environment[this.game.current_environment].curr_quadrant) && this.game.entities[i].map_name === this.game.environment[this.game.current_environment].name) {
+        if (ent_distance < min_distance && includes(this.game.entities[i].quad, this.game.environment[this.game.current_environment].curr_quadrant)
+            && this.game.entities[i].map_name === this.game.environment[this.game.current_environment].name) {
             min_distance = ent_distance;
             min_index = i;
         }
@@ -1780,16 +1790,16 @@ Siren.prototype.draw = function(context)
 DireWolf = function(game, stats, loop_while_standing)
 {
     this.game = game;
-    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/wolf.png");
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/wolf1.png");
     this.xp_base = 15;
     this.animations = {
-        down: new Animation(this.spriteSheet, 0, 10, 64, 64, 0.05, 9, true, false),
-        up: new Animation(this.spriteSheet, 0, 8, 64, 64, 0.05, 9, true, false),
-        left: new Animation(this.spriteSheet, 0, 9, 64, 64, 0.05, 9, true, false),
-        right: new Animation(this.spriteSheet, 0, 11, 64, 64, 0.05, 9, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 3, 64, 64, 0.1, 7, true, false),
-        hit: new Animation(this.spriteSheet, 0, 20, 64, 64, 0.08, 5, true, false),
-        death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 5, 104, 104, 0.07, 6, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 1, 120, 104, 0.08, 5, true, false),
+        hit: new Animation(this.spriteSheet, 0, 6, 104, 104, 0.08, 7, true, false),
+        death: new Animation(this.spriteSheet, 6, 6, 104, 104, 0.1, 1, true, false)
     };
     this.loot_table =
         [
@@ -2699,6 +2709,9 @@ Environment.prototype.initNewFiend = function (fiend) {
             break;
         case "Ogre":
             return (new Ogre(this.game, new Statistics(60, 15, 15), false));
+        case "Dire Wolf":
+            return (new DireWolf(this.game, new Statistics(50, 15, 5), true));
+            break;
         default:
             return null;
     }
