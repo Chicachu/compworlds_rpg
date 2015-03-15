@@ -1298,9 +1298,9 @@ Hero.prototype.levelUp = function()
         this.stats.xp = xp_diff;
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
-        this.stats.attack = .3 * (this.level * this.level) + 15;
-        this.stats.defense = .3 * (this.level * this.level) + 25;
-        this.stats.total_health = 2 * (this.level * this.level) + 300;
+        this.stats.attack = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.defense = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.total_health = this.stats.total_health + ( 2 * (this.level * this.level) );
         this.drawLevelUp();
         this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
         this.levelUp();
