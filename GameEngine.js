@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2"];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1683,7 +1683,7 @@ Warrior = function (game, stats) {
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
 
-    this.x = 180;
+    this.x = 280;
     this.y = 208;
 
     this.quests = [];
@@ -1907,7 +1907,7 @@ WolfRider = function(game, stats, loop_while_standing)
         up: null,
         left: null,
         right: new Animation(this.spriteSheet, 0, 0, 138.75, 128.15, .1, 1, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 3, 138.75, 128.15, .1, 1, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 3, 138.75, 128.15, .1, 6, true, false),
         hit: new Animation(this.spriteSheet, 0, 7, 138.75, 128.15, .07, 6, true, false),
         death: new Animation(this.spriteSheet, 5, 7, 138.75, 128.15, .1, 1, true, false)
     }
