@@ -525,6 +525,7 @@ GameEngine.prototype.endBattle = function (game)
         if (game.loot_dispenser.string.length > 0) {
             game.alertHero(game.loot_dispenser.toString());
             game.loot_dispenser.dispenseLoot(game.entities[0]);
+            game.sound_manager.playSound("coin");
             for (var i = 0; i < game.heroes.length; i++)
             {
                 game.heroes[i].levelUp();
@@ -4505,6 +4506,10 @@ SoundManager = function (game) {
     this.world1 = document.getElementById("world_theme");
     this.battle1 = document.getElementById("battle_theme");
     this.select = document.getElementById("selection_beep");
+    this.coin = document.getElementById("coin_sound");
+    this.door_open = document.getElementById("door_open");
+    this.door_close = document.getElementById("door_close");
+    this.nope = document.getElementById("nope");
     this.select.volume = .2;
     this.world1.volume = .1;
     this.battle1.volume = .07;
@@ -4520,6 +4525,18 @@ SoundManager.prototype.playSound = function (sound) {
     switch (sound) {
         case "select":
             this.sound = this.select;
+            break;
+        case "coin":
+            this.sound = this.coin;
+            break;
+        case "door_open":
+            this.sound = this.door_open;
+            break;
+        case "door_close":
+            this.sound = this.door_close;
+            break;
+        case "nope":
+            this.sound = this.nope;
             break;
         default:
             break;

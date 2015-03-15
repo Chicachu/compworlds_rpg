@@ -9,6 +9,7 @@ ASSET_MANAGER.queueDownload("./imgs/dragon_1_npc.png");
 ASSET_MANAGER.queueDownload("./imgs/woods.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/tiles.png");
+ASSET_MANAGER.queueDownload("./imgs/tileslevel2.png");
 ASSET_MANAGER.queueDownload("./imgs/fire.png");
 ASSET_MANAGER.queueDownload("./imgs/fire2.png");
 ASSET_MANAGER.queueDownload("./imgs/malboro.png");
@@ -84,14 +85,14 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 1, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
-    var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { }, "A sturdy tool to chop those pesky logs blocking your treasure chests");
+    var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { }, "A sturdy tool to chop those pesky logs blocking the treasure chests");
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
-    var storekeeper_items = [new Armor(gameEngine, "Leather Armor", 170, ASSET_MANAGER.getAsset("./imgs/items/leather_armor1.png"), "armor", new Statistics(2, 0, 3, 0, 2, 0)),
-                            new Armor(gameEngine, "Basic Iron Armor", 230, ASSET_MANAGER.getAsset("./imgs/items/armor1.png"), "armor", new Statistics(5, 0, 5, 1, 0, 0)),
-                            //new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0)),
-                            //new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0)),
-                            //new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0)),
-                            //new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0)),
+    var storekeeper_items = [new Armor(gameEngine, "Leather Armor", 170, ASSET_MANAGER.getAsset("./imgs/items/leather_armor1.png"), "armor", new Statistics(2, 0, 3, 0, 2, 0), "The suit's leather is somewhat of low quality, but it's quite effective as defense-wear. Max HP +2, DEF +3, DEX +2"),
+                            new Armor(gameEngine, "Basic Iron Armor", 230, ASSET_MANAGER.getAsset("./imgs/items/armor1.png"), "armor", new Statistics(5, 0, 5, 1, 0, 0), "A sturdy armor made from iron. It's a bit rusty, but it definitely helps you survive most encounters out there. Max HP +5, DEF +5, STR +1"),
+                            //new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0), "A fancy looking amulet made from titanium. STR +3"),
+                            //new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0), "A high quality sharpened steel sword. It can cut monsters like butter. ATK +10, STR +4"),
+                            //new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0), "A shabby round shield. It's not too big, but not too small. DEF +5"),
+                            //new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0), "A "better than Basic Shield" shield. It's sturdy and thicker, capable of withstanding numerous attacks. DEF +10),
                             new Potion(gameEngine, "Heal Berry", 10, 3, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.")];
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
@@ -159,7 +160,7 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(warrior);
     //test items
     var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.");
-    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 0, 0));
+    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 0, 0), "This is your great great great grandfather's Amulet. STR +1");
 
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
@@ -281,19 +282,52 @@ ASSET_MANAGER.downloadAll(function () {
                 [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 37, 38, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
                 [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]],
-        [house1, dragonCave], [level1_animation1, level1_animation2],
+        [house1, dragonCave], [],
 
        
 	   new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
 
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
-                new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "Increase Strength and Dexterity by 1"), 100], false),
-                new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP"), 55], true),
+                new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "It's so shiny it gives you power. STR +1, DEX +1"), 100], false),
+                new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png");
+				
+	
+	var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
+                [220,221,222,223,224,225,226,227,228,229,300,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,0,109,175,175,175,175,175],
+                [242,243,244,245,246,247,248,249,250,251,252,142,143,142,142,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,0,131,7,7,7,7,7],
+                [264,265,266,267,268,269,270,271,272,273,274,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,0,131,7,7,7,7,7],
+                [286,287,288,289,290,291,292,293,294,295,296,142,143,144,5,0,0,0,0,0,144,146,147,146,147,146,147,22,23,24,25,26,27,142,143,0,131,7,7,7,7,7],
+                [308,309,310,311,312,313,314,315,316,317,318,164,165,166,5,0,0,8,0,0,166,168,169,168,169,168,169,44,45,46,47,48,49,164,165,0,131,7,7,7,7,7],
+                [330,331,332,333,334,335,336,337,338,339,340,142,143,144,5,0,29,30,31,0,146,147,144,146,147,146,147,66,67,68,69,70,71,142,143,0,131,7,7,7,7,7],
+                [352,353,354,355,356,357,358,359,360,361,362,164,165,166,5,0,51,52,53,0,168,169,166,168,169,168,169,0,0,0,0,148,149,164,165,0,131,7,7,7,7,7],
+                [374,375,376,377,378,379,380,381,382,383,384,142,143,144,5,72,73,74,75,76,0,0,0,0,0,0,0,0,0,0,0,170,171,142,143,0,131,7,7,7,7,7],
+                [396,397,398,399,400,401,402,403,404,405,406,164,165,166,5,94,95,96,97,98,0,0,0,0,0,0,0,0,0,0,0,0,0,164,165,0,131,7,7,7,7,7],
+                [418,419,420,421,422,423,424,425,426,427,428,142,143,144,5,116,117,118,119,120,0,142,143,142,143,142,143,142,143,142,143,142,143,142,143,0,131,7,7,7,7,7],
+                [440,441,442,443,444,445,446,447,448,449,450,164,165,166,5,5,5,5,0,0,0,164,165,164,165,164,165,164,165,164,165,164,165,164,165,0,153,197,197,197,197,197],
+                [209,210,211,212,213,214,215,216,217,218,219,142,143,144,146,147,0,0,146,147,144,142,143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                [231,232,233,234,235,236,237,238,239,240,241,164,165,166,168,169,0,144,168,169,166,164,165,0,0,0,0,0,0,0,11,12,13,14,15,0,16,17,18,19,20,0],
+                [253,254,255,256,257,258,259,260,261,262,263,142,143,146,147,0,0,166,0,146,147,142,143,0,88,89,90,91,92,0,33,34,35,36,37,0,38,39,40,41,42,0],
+                [275,276,277,278,279,280,281,282,283,284,285,164,165,168,169,144,0,0,0,168,169,164,165,0,110,111,112,113,114,0,55,56,57,58,59,0,60,61,62,63,64,0],
+                [297,298,299,300,301,302,303,304,305,306,307,142,143,144,0,166,146,147,0,146,147,142,143,0,132,133,134,135,136,0,77,78,79,80,81,0,82,83,84,85,86,0],
+                [319,320,321,322,323,324,325,326,327,328,329,164,165,166,146,147,168,169,0,168,169,164,165,21,154,155,156,157,158,21,99,100,101,102,103,21,104,105,106,107,108,21],
+                [341,342,343,344,345,346,347,348,349,350,351,142,143,144,168,169,144,144,0,144,144,142,143,43,176,177,178,179,180,43,121,122,123,124,125,43,126,127,128,129,130,43],
+                [363,364,365,366,367,368,369,370,371,372,373,164,165,166,0,0,166,166,0,166,166,164,165,65,0,0,87,0,0,65,0,0,87,0,0,65,0,0,87,0,0,65],
+                [385,386,387,388,389,390,391,392,393,394,395,462,463,464,465,466,467,468,0,146,147,142,143,0,0,0,87,0,0,0,0,0,87,0,0,0,0,0,87,0,0,0],
+                [407,408,409,410,411,412,413,414,415,416,417,484,485,486,487,488,489,490,0,168,169,164,165,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,0,0,0],
+                [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
+                [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
+        [], [],
+
+       
+	   new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5],
+
+                [], ["Skeleton", "Malboro", "Ogre"], "level2", "./imgs/woods.png");
 
     gameEngine.addEnvironment(level1.name, level1);
+	gameEngine.addEnvironment(level2.name, level2);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
