@@ -125,7 +125,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], storekeeper_items,
                                              1200, storekeeper_sprites, [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1", 1.2, 
                                                [function () {
-                                                   if (this.game.stage.part1 === false) {
+                                                   if (this.game.current_stage === this.game.stage[0]) {
                                                        // if before dragon is dead, have storekeeper give hero a quest. 
                                                        if (this.part === 1 && this.quest.complete) {
                                                            this.part++;
