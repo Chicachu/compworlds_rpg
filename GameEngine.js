@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2"];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -538,7 +538,7 @@ GameEngine.prototype.endBattle = function (game)
     game.fight_queue = [];
     game.animation_queue = [];
     //game.sound_manager.playSong("world1");
-    if (game.current_environment === "level1") {
+    if (game.current_environment === "level1" || game.current_environment === "dragon_cave") {
         game.sound_manager.playSong("world1");
     } else if (game.current_environment === "level2") {
         game.sound_manager.playSong("world2");
@@ -1071,7 +1071,8 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs(this.game.entities[i].x - this.x);
         var ent_y_difference = Math.abs(this.game.entities[i].y - this.y);
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (ent_distance < min_distance && includes(this.game.entities[i].quad, this.game.environment[this.game.current_environment].curr_quadrant)) {
+        if (ent_distance < min_distance && includes(this.game.entities[i].quad, this.game.environment[this.game.current_environment].curr_quadrant)
+            && this.game.entities[i].map_name === this.game.environment[this.game.current_environment].name) {
             min_distance = ent_distance;
             min_index = i;
         }
@@ -2193,16 +2194,90 @@ pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
 
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale) {
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale, functions) {
     this.name = name;
     this.quest = quest; 
     NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name, scale);
+    if (functions) {
+        this.start_interaction = functions[0];
+        this.update_dialog = functions[1];
+    }
+
+    this.firstQuadx = this.x;
+    this.firstQuady = this.y;
 }
 
 NPC_QUEST.prototype = new NPC();
 NPC_QUEST.prototype.constructor = NPC_QUEST;
 
+NPC_QUEST.prototype.startInteraction = function () {
+    this.start_interaction();
+}
 
+NPC_QUEST.prototype.showDialog = function () {
+    this.reposition();
+    var text_box = document.getElementById("dialogue_box");
+
+    var text = document.createElement('p');
+    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+    text_box.innerHTML = text.outerHTML;
+    text_box.style.visibility = "visible";
+    text_box.style.display = "block";
+    this.game.context.canvas.tabIndex = 0;
+    text_box.tabIndex = 1;
+    text_box.focus();
+    this.interacting = true;
+    this.game.canControl = false;
+}
+
+NPC_QUEST.prototype.update = function () {
+    if (!this.interacting) {
+        NPC.prototype.update.call(this);
+        this.firstQuadx = this.x;
+        this.firstQuady = this.y;
+    } else {
+        this.curr_anim = this.stopAnimation(this.curr_anim);
+        this.updateDialogue();
+    }
+}
+
+NPC_QUEST.prototype.updateDialogue = function () {
+    this.update_dialog();
+}
+
+NPC_QUEST.prototype.draw = function (context) {
+    this.changeCoordsForQuad(this.game.environment[this.game.current_environment].curr_quadrant);
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
+
+}
+
+NPC_QUEST.prototype.changeCoordsForQuad = function (quad) {
+    this.x = this.firstQuadx;
+    this.y = this.firstQuady;
+    // change x value 
+    if (quad - this.quad[0] === 1) {
+        if (quad === 2 || quad === 5) {
+            this.x -= 12 * 32;
+        } else if (quad === 1 || quad === 4) {
+            this.x -= 11 * 32;
+        }
+    } else if (quad - this.quad[0] === -1) {
+        if (quad === 2 || quad === 5) {
+            this.x += 12 * 32;
+        } else if (quad === 1 || quad === 4) {
+            this.x += 11 * 32;
+        }
+    }
+    // change y value 
+    if (Math.abs(quad - this.quad[0]) === 3) {
+        if (quad - this.quad[0] < 0) {
+            this.y += 11 * 32;
+        } else if (quad - this.quad[0] > 0) {
+            this.y -= 11 * 32;
+        }
+    }
+
+}
 /* QUEST OBJECT abstract class
  Parameters: giverName (who gave the quest), 
              reward (what the reward is for finishing that quest)
@@ -2752,33 +2827,6 @@ Environment.prototype.drawEnvironmentAnimations = function () {
         }
     }
 }
-
-//Environment.prototype.drawFlames = function () {
-//    // draw flames
-//    if (this.curr_quadrant === 0) {
-//        for (var i = 0; i < this.flame1_locations.length; i++) {
-//            var x = this.flame1_locations[i][0];
-//            var y = this.flame1_locations[i][1];
-//            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
-//        }
-//        for (var i = 0; i < this.flame2_locations.length; i++) {
-//            var x = this.flame2_locations[i][0];
-//            var y = this.flame2_locations[i][1];
-//            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-//        }
-//    } else if (this.curr_quadrant === 3) {
-//        for (var i = 0; i < this.flame3_locations.length; i++) {
-//            var x = this.flame3_locations[i][0];
-//            var y = this.flame3_locations[i][1];
-//            this.flame1_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32 - 32, 1.3);
-//        }
-//        for (var i = 0; i < this.flame4_locations.length; i++) {
-//            var x = this.flame4_locations[i][0];
-//            var y = this.flame4_locations[i][1];
-//            this.flame2_animation.drawFrame(this.game.clockTick, this.context, x * 32, y * 32, 1.3);
-//        }
-//    }
-//}
 
 Environment.prototype.update = function () {
 
