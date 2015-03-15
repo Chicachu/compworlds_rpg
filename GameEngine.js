@@ -1562,7 +1562,7 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 220;
+    this.x = 320;
     this.y = 208;
 
     this.quests = [];
@@ -1903,7 +1903,6 @@ Dragon1.prototype.draw = function (context) {
     this.drawHealthBar(context);
     if (this.is_targeted) {
         this.drawSelector(context, 'yellow');
-
     }
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 3);
 }
