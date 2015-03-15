@@ -87,12 +87,12 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(storekeeper_spritesheet, 1, 2, 32, 32, 0.05, 1, true, false), null, null, null);
     var sk_quest_reward = new SpecialItem(gameEngine, "Ax", ASSET_MANAGER.getAsset("./imgs/items/ax.png"), 3, function () { }, "A sturdy tool to chop those pesky logs blocking the treasure chests");
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
-    var storekeeper_items = [new Armor(gameEngine, "Leather Armor", 170, ASSET_MANAGER.getAsset("./imgs/items/leather_armor1.png"), "armor", new Statistics(2, 0, 3, 0, 2, 0), "The suit's leather is somewhat of low quality, but it's quite effective as defense-wear. Max HP +2, DEF +3, DEX +2"),
-                            new Armor(gameEngine, "Basic Iron Armor", 230, ASSET_MANAGER.getAsset("./imgs/items/armor1.png"), "armor", new Statistics(5, 0, 5, 1, 0, 0), "A sturdy armor made from iron. It's a bit rusty, but it definitely helps you survive most encounters out there. Max HP +5, DEF +5, STR +1"),
-                            //new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0), "A fancy looking amulet made from titanium. STR +3"),
-                            //new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0), "A high quality sharpened steel sword. It can cut monsters like butter. ATK +10, STR +4"),
-                            //new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0), "A shabby round shield. It's not too big, but not too small. DEF +5"),
-                            //new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0), "A "better than Basic Shield" shield. It's sturdy and thicker, capable of withstanding numerous attacks. DEF +10),
+    var storekeeper_items = [new Armor(gameEngine, "Leather Armor", 170, ASSET_MANAGER.getAsset("./imgs/items/leather_armor1.png"), "armor", new Statistics(2, 0, 3, 0, 2, 0), "The suit's leather is somewhat of low quality, but it's quite effective as defense-wear."),
+                            new Armor(gameEngine, "Basic Iron Armor", 230, ASSET_MANAGER.getAsset("./imgs/items/armor1.png"), "armor", new Statistics(5, 0, 5, 1, 0, 0), "A sturdy armor made from iron. It's a bit rusty, but it definitely helps you survive most encounters out there."),
+                            //new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0), "A fancy looking amulet made from titanium."),
+                            //new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0), "A high quality sharpened steel sword. It can cut monsters like butter."),
+                            //new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0), "A shabby round shield. It's not too big, but not too small."),
+                            //new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0), "A "better than Basic Shield" shield. It's sturdy and thicker, capable of withstanding numerous attacks.),
                             new Potion(gameEngine, "Heal Berry", 10, 3, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.")];
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
@@ -160,7 +160,7 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(warrior);
     //test items
     var heal_berry = new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.");
-    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 0, 0), "This is your great great great grandfather's Amulet. STR +1");
+    var amulet = new Armor(gameEngine, "Inherited Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 0, 0), "This is your great great great grandfather's Amulet.");
 
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
@@ -284,7 +284,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]],
                  [house1, dragonCave], [],new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
-                new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "It's so shiny it gives you power. STR +1, DEX +1"), 100], false),
+                new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "It's so shiny it gives you power."), 100], false),
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
