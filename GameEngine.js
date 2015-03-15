@@ -1470,7 +1470,7 @@ Hero.prototype.checkBoundaries = function () {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant -= 3);
             this.y += 11 * 32;
         }
-    } else if (this.boundaryDown() && this.game.current_environment !== "dragon_cave" && this.game.current_environment !== "house1" && this.game.current_environment !== "house2") {
+    } else if (this.boundaryDown() && this.game.current_environment !== "dragon_cave" && this.game.current_environment !== "house1" && this.game.current_environment !== "house2"&& this.game.current_environment !== "church") {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 3);
             this.y -= 11 * 32;
@@ -1682,7 +1682,6 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    //this.inventory.update();
     Hero.prototype.update.call(this);
 }
 
@@ -2114,9 +2113,9 @@ NPC.prototype.update = function () {
             else if (this.next_point.getY() < this.y) {
                 this.curr_anim = this.animations.up;
                 this.direction = Direction.UP;
-                if (this.y - this.next_point.getY() < this.speed) {
+                //if (this.y - this.next_point.getY() < this.speed) {
                     this.changeCoordinates(0, this.speed, 0, 0);
-                }
+                //}
             }
             else {
                 if (this.pause) {
@@ -2624,7 +2623,7 @@ EnterHouse1 = function () {
     this.game.current_environment = "house1";
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 256;
-
+    this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 352;
 }
 
@@ -2632,8 +2631,25 @@ ExitHouse1 = function () {
     this.game.current_environment = "level1";
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 256;
+    this.game.sound_manager.playSound("door_open");
 
     this.game.entities[0].y = 192;
+}
+
+EnterChurch = function () {
+    this.game.current_environment = "church";
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 448;
+    this.game.sound_manager.playSound("door_open");
+    this.game.entities[0].y = 384;
+}
+
+ExitChurch = function () {
+    this.game.current_environment = "level2";
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 554;
+    this.game.sound_manager.playSound("door_open");
+    this.game.entities[0].y = 300;
 }
 
 EnterHouse2 = function () {
@@ -2641,6 +2657,7 @@ EnterHouse2 = function () {
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 256;
     this.game.entities[0].y = 352;
+    this.game.sound_manager.playSound("door_open");
 }
 
 ExitHouse2 = function () {
@@ -2648,7 +2665,15 @@ ExitHouse2 = function () {
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 64;
 
+    this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 192;
+}
+
+EnterLevel2 = function () {
+    this.game.current_environment = "level2";
+    this.game.environment[this.game.current_environment].setQuadrant(3);
+    this.game.entities[0].x = 320;
+    this.game.entities[0].y = 208;
 }
 
 // used to change maps or to initiate special battles. 
