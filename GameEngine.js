@@ -529,7 +529,12 @@ GameEngine.prototype.endBattle = function (game)
     game.fiends = [];
     game.fight_queue = [];
     game.animation_queue = [];
-    game.sound_manager.playSong("world1");
+    //game.sound_manager.playSong("world1");
+    if (game.current_environment === "level1") {
+        game.sound_manager.playSong("world1");
+    } else if (game.current_environment === "level2") {
+        game.sound_manager.playSong("world2");
+    }
     game.loot_dispenser.increment();
     setTimeout(function () {
         if (game.loot_dispenser.string.length > 0) {
@@ -4616,7 +4621,7 @@ SoundManager = function (game) {
     this.paused = false;
     this.sound = this.select;
     this.background = this.world1;
-    //this.background.play();
+    this.background.play();
 }
 
 SoundManager.prototype.playSound = function (sound) {
