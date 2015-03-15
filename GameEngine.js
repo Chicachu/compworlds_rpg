@@ -4489,6 +4489,7 @@ SoundManager = function (game) {
     this.curr_sound = null;
     this.game = game;
     this.world1 = document.getElementById("world_theme");
+    this.world2 = document.getElementById("world_theme2");
     this.battle1 = document.getElementById("battle_theme");
     this.select = document.getElementById("selection_beep");
     this.coin = document.getElementById("coin_sound");
@@ -4497,6 +4498,7 @@ SoundManager = function (game) {
     this.nope = document.getElementById("nope");
     this.select.volume = .2;
     this.world1.volume = .1;
+    this.world2.volume = .5;
     this.battle1.volume = .07;
     this.paused = false;
     this.sound = this.select;
@@ -4569,6 +4571,10 @@ SoundManager.prototype.playSong = function(sound)
         case "world1":
             this.world1.currentTime = 0;
             this.background = this.world1;
+            break;
+        case "world2":
+            this.world2.currentTime = 0;
+            this.background = this.world2;
             break;
         case "battle":
             this.battle1.currentTime = 0;
