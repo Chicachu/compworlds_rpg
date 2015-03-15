@@ -21,6 +21,10 @@ ASSET_MANAGER.queueDownload("./imgs/roomInteriorSpritesSheet.png")
 ASSET_MANAGER.queueDownload("./imgs/dragoncave.png");
 ASSET_MANAGER.queueDownload("./imgs/ice_cave.png");
 ASSET_MANAGER.queueDownload("./imgs/archer.png");
+ASSET_MANAGER.queueDownload("./imgs/equipment/accessory.png");
+ASSET_MANAGER.queueDownload("./imgs/equipment/armor.png");
+ASSET_MANAGER.queueDownload("./imgs/equipment/offhand.png");
+ASSET_MANAGER.queueDownload("./imgs/equipment/mainhand.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");

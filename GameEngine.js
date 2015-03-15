@@ -3711,6 +3711,9 @@ Inventory = function (game, coin, max_items) {
     this.initHtmlItems();
     this.selectInput();
     this.open = false;
+    this.hero_name = document.getElementById("hero_name");
+    this.current_name_index = 0; 
+    this.names = [{ name: "Theon", found: true }, { name: "Acele", found: true }, { name: "Efari", found: false }];
     this.itemmenu = document.getElementById("storeitem_menu");
     this.itemName = document.getElementById("item_name");
     this.itemDescription = document.getElementById("item_description");
@@ -3813,14 +3816,6 @@ Inventory.prototype.draw = function (ctx) {
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
 
-}
-
-Inventory.prototype.update = function () {
-    //if (this.game.key_i) {
-    //    this.showInventory();
-    //} else if (this.game.esc) {
-    //    this.showInventory();
-    //}
 }
 
 Inventory.prototype.addItem = function (item) {
@@ -3941,6 +3936,8 @@ Inventory.prototype.selectInput = function () {
                     }
                 } else if (e.which === 27 || e.which === 73) {
                     that.showInventory();
+                } else if (e.which === 13) {
+                    that.changeHero(); 
                 }
                 this.pressed = true;
             }
@@ -3952,6 +3949,47 @@ Inventory.prototype.selectInput = function () {
             this.pressed = false;
         });
     }
+}
+
+Inventory.prototype.changeHero = function () {
+    if (this.names[this.current_name_index+1].found) {
+        this.current_name_index++; 
+    } else if (this.names[this.current_name_index].found) {
+        this.current_name_index = 0; 
+    }
+    this.hero_name.innerHTML = this.names[this.current_name_index].name;
+    var armor_slot = document.getElementById("equip_armor");
+    var accessory_slot = document.getElementById("equip_accessory");
+    var mainhand_slot = document.getElementById("equip_mainhand");
+    var offhand_slot = document.getElementById("equip_offhand");
+
+    // change equip slots
+ 
+    if (this.game.heroes[this.current_name_index].equipped.armor) {
+         armor_slot.innerHTML = ""; 
+         armor_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.armor.img;
+    } else {
+        armor_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/armor.png").outerHTML;
+    }
+    if (this.game.heroes[this.current_name_index].equipped.accessory) {
+        accessory_slot.innerHTML = "";
+        accessory_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.accessory.img;
+    } else {
+        accessory_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/accessory.png").outerHTML;
+    }
+    if (this.game.heroes[this.current_name_index].equipped.mainhand) {
+        mainhand_slot.innerHTML = ""; 
+        mainhand_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.mainhand.img;
+    } else {
+        mainhand_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/mainhand.png").outerHTML;
+    }
+    if (this.game.heroes[this.current_name_index].equipped.offhand) {
+        offhand_slot.innerHTML = "";
+        offhand_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.offhand.img;
+    } else {
+        offhand_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/offhand.png").outerHTML;
+    }
+     
 }
 
 HTML_Item.prototype.actionInput = function () {

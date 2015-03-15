@@ -175,7 +175,8 @@ hr {
     margin: 0 auto; 
     display: none;
     top: -280px;  
-    visibility: hidden;
+    visibility: visible;
+    display: block;
 }
 
 #items {
@@ -186,7 +187,6 @@ hr {
     padding: 25px;
     display: inline-block; 
     left: 1px;
-    top: -10px;
 }
 
 #items p {
@@ -234,6 +234,19 @@ hr {
     padding: 25px; 
     border:  1px double #d8bca1;
     left: -1px; 
+    top: -160px;
+}
+
+#equipment p {
+    position: relative; 
+    top: -7px;
+    width: 30px;
+    height: 12px;
+    font-size: 12px;
+    font-weight: 900;
+    margin: 0 auto; 
+    margin-top: -10px;
+    color: #d8bca1;
 }
 
 #equip_armor {
