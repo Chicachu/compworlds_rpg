@@ -371,8 +371,8 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mage_spritesheet, 0, 11, 64, 64, 0.05, 1, true, false), null, null, null);
 
     var mage_npc = new NPC(gameEngine, [["Thank you for saving me, hero! I was captured by the dragon and have been stuck here for days!! I am forever in your debt.",
-                                     "In fact, I think I'll follow you around everywhere you go! I will never leave your side. *swoon*"],
-                                        ["Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
+                                     "In fact, I think I'll follow you around everywhere you go! I will never leave your side. *swoon*",
+                                        "Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
                                            mage_npc_sprites, [new Point(475,115)], .06, false, [2], "dragon_cave", 1);
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
@@ -459,7 +459,7 @@ ASSET_MANAGER.downloadAll(function () {
                             [0,58,0,0,48,9,9,9,9,9,9,9,14,0,0,0,13,9,9,9,9,9,9,9,49,0,0,58,0],
                             [0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
                            [0,0,0,0,0,0,0,0,0,0,0,0,48,9,9,9,49,0,0,0,0,0,0,0,0,0,0,0,0]]],
-                            null, new Tilesheet("./imgs/churchInterior.png", 32, 20), [0], [new Portal(15,13, 0, gameEngine, ExitChurch)], "church", null, null, 0);
+                            null, new Tilesheet("./imgs/churchInterior.png", 32, 20), [0], [new Portal(9,12, 0, gameEngine, ExitChurch)], "church", null, null, 0);
 
     
 
@@ -477,8 +477,6 @@ ASSET_MANAGER.downloadAll(function () {
                         [35, 35, 35, 35, 35, 35, 33, 33, 33, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 33, 33, 33, 0, 0, 33, 33, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35],
                         [0, 0, 0, 0, 0, 0, 33, 33, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 35, 35, 0, 0, 35, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 						[0, 0, 0, 0, 0, 0, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-
-
                         [[34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 11, 34, 34, 13, 17, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 16, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 31, 12, 34, 34, 23, 34, 34, 34, 11, 34, 34, 34, 15, 34, 34, 22, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 12, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 27, 34, 34, 34, 30, 21, 34, 14, 31, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
@@ -563,7 +561,8 @@ ASSET_MANAGER.downloadAll(function () {
 
                 [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
                 [new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
-                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!")], true)],
+                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
+                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch)],
                 ["Dire Wolf"], "level2", "./imgs/woods.png", 3);
 
 

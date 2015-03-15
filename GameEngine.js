@@ -2195,12 +2195,14 @@ NPC.prototype.updateDialogue = function () {
                 text.innerHTML = this.dialogue[this.part][this.dialogue_index];
                 text_box.innerHTML = text.outerHTML;
             } else {
-                if (this.part === 0) {
-                    this.part++;
-                }
-                if (this.game.environment[this.game.current_environment] === "dragon_cave" && this.part === 1) {
-                    var mage_hero = new Mage(gameEngine, new Statistics(200, 160, 25, 1, 1, 5));
+
+                if (this.game.current_environment === "dragon_cave") {
+                    var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));
                     this.game.heroes.push(mage_hero);
+                    this.x = 3098204981238;
+                    this.y = 384923784928374;
+                } else if (this.part === 0) {
+                    this.part++;
                 }
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
@@ -2210,6 +2212,9 @@ NPC.prototype.updateDialogue = function () {
                 this.game.context.canvas.focus();
                 this.game.canControl = true;
                 this.interacting = false;
+                if (this.game.current_environment === "dragon_cave") {
+                    this.game.alertHero("Acele has joined your party!");
+                }
             }
             this.game.next = false;
         }
@@ -2629,6 +2634,13 @@ EnterDragonCave = function () {
     }
 }
 
+EnterDragonCaveFromLevel2 = function () {
+    this.game.current_environment = "dragon_cave";
+    this.game.entities[0].x = 560;
+    this.game.entities[0].y = 192;
+    this.game.environment[this.game.current_environment].setQuadrant(2);
+}
+
 ExitDragonCave = function () {
     this.game.current_environment = "level1";
     this.game.environment[this.game.current_environment].setQuadrant(5);
@@ -2664,7 +2676,7 @@ EnterChurch = function () {
 
 ExitChurch = function () {
     this.game.current_environment = "level2";
-    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.environment[this.game.current_environment].setQuadrant(1);
     this.game.entities[0].x = 554;
     this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 300;
@@ -4669,9 +4681,10 @@ StorekeeperInventory.prototype.selectInput = function (index) {
             } else if (String.fromCharCode(e.which) === ' ') {
                 if ((that.sell_mode && that.game.entities[0].inventory.coin >= that.shopping_cart.total)
                      || (that.coin >= that.shopping_cart.total)) {
-                    that.checkOut(index); 
+                    that.checkOut(index);
+                    that.game.sound_manager.playSound("coin");
                 } else {
-                    that.game.sound_manager.playSound("select");
+                    that.game.sound_manager.playSound("nope");
                 }
             } else if (e.which === 13) {
                 that.buyMode();
