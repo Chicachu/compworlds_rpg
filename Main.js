@@ -25,7 +25,17 @@ ASSET_MANAGER.queueDownload("./imgs/archer.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/accessory.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/armor.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/offhand.png");
-ASSET_MANAGER.queueDownload("./imgs/equipment/mainhand.png");
+ASSET_MANAGER.queueDownload("./imgs/equipment/main_hand.png");
+
+// level 2 stuffs. 
+ASSET_MANAGER.queueDownload("./imgs/mountain_man.png");
+ASSET_MANAGER.queueDownload("./imgs/mountain_woman.png");
+ASSET_MANAGER.queueDownload("./imgs/potion_int.png");
+ASSET_MANAGER.queueDownload("./imgs/staff1.png");
+ASSET_MANAGER.queueDownload("./imgs/staff2.png");
+ASSET_MANAGER.queueDownload("./imgs/robe1.png");
+ASSET_MANAGER.queueDownload("./imgs/robe2.png");
+ASSET_MANAGER.queueDownload("./imgs/amulet3.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -59,6 +69,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
 	var witch_spritesheet = ASSET_MANAGER.getAsset("./imgs/witch.png");
 	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
+	var mountain_man_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_man.png");
+	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 
 
 	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
@@ -110,7 +122,57 @@ ASSET_MANAGER.downloadAll(function () {
                                             ["Seriously, kid, go kill that dragon."],
                                             ["Wow! I didn't actually think you'd do it! Congratulations! Oh, sorry, but the store wont be open for a while yet.",
                                             "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], storekeeper_items,
-                                             1200, storekeeper_sprites, [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1");
+                                             1200, storekeeper_sprites, [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1", 1.2, 
+                                               [function () {
+                                                   if (this.game.stage.part1 === false) {
+                                                       // if before dragon is dead, have storekeeper give hero a quest. 
+                                                       if (this.part === 1 && this.quest.complete) {
+                                                           this.part++;
+                                                       }
+                                                       this.showDialog();
+                                                   } else {
+                                                       var that = this.inventory;
+                                                       // after dragon is dead, show wares to the hero.
+                                                       window.setTimeout(that.inventory.showWares.bind(that), 0);
+                                                   }
+                                               }, function () {
+                                                   if (this.game) {
+                                                       if (this.game.next === true) {
+                                                           var text_box = document.getElementById("dialogue_box");
+                                                           var text = document.createElement('p');
+
+                                                           if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                               this.dialogue_index++;
+                                                               text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                               text_box.innerHTML = text.outerHTML;
+                                                           } else {
+                                                               this.dialogue_index = 0;
+                                                               text_box.style.visibility = "hidden";
+                                                               text_box.style.display = "none";
+                                                               text_box.tabIndex = 2;
+                                                               this.game.context.canvas.tabIndex = 1;
+                                                               this.game.context.canvas.focus();
+                                                               this.game.canControl = true;
+                                                               this.interacting = false;
+                                                               if (this.part === 0) {
+                                                                   this.part++;
+                                                                   this.game.entities[0].addQuest(this.quest);
+                                                               }
+                                                               if (this.part === 2) {
+                                                                   this.game.entities[0].inventory.addItem(this.quest.reward);
+                                                                   this.part++;
+                                                               } else if (this.part === 3) {
+                                                                   this.part++;
+                                                               } else if (this.part === 4 && this.game.stage.part2) {
+                                                                   this.part++;
+                                                               } else if (this.part === 5) {
+                                                                   this.part++;
+                                                               }
+                                                           }
+                                                           this.game.next = false;
+                                                       }
+                                                   }
+                                               }]);
 										
 	var ghost_sprites	= new SpriteSet(new Animation(ghost_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false), 
                                         new Animation(ghost_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
@@ -164,6 +226,86 @@ ASSET_MANAGER.downloadAll(function () {
 
     warrior.recieveItem(heal_berry);
     warrior.recieveItem(amulet);
+
+
+    /* LEVEL 2 NPCS AND QUESTS AND ITEMS */
+    /* ASSET_MANAGER.queueDownload("./imgs/staff1.png");
+ASSET_MANAGER.queueDownload("./imgs/staff2.png");
+ASSET_MANAGER.queueDownload("./imgs/robe1.png");
+ASSET_MANAGER.queueDownload("./imgs/robe2.png");
+ASSET_MANAGER.queueDownload("./imgs/amulet3.png"); */
+    var mountain_man_items = [new Armor(gameEngine, "Magical Rod", 130, ASSET_MANAGER.getAsset("./imgs/staff1.png"), "mainhand", new Statistics(0, 5, 0, 0, 0, 2), "This is your great great great grandfather's Amulet. STR +1"),
+                                new Armor(gameEngine, "Powerful Rod", 130, ASSET_MANAGER.getAsset("./imgs/staff2.png"), "mainhand", new Statistics(0, 10, 0, 0, 0, 4), "This is your great great great grandfather's Amulet. STR +1"),
+                                new Armor(gameEngine, "Flowing Robes", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 5, 0, 0, 2), "This is your great great great grandfather's Amulet. STR +1"),
+                                new Armor(gameEngine, "Sexy Flowing Robes", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 10, 0, 0, 4), "This is your great great great grandfather's Amulet. STR +1"),
+                                new Armor(gameEngine, "Pendant of Magic", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 0, 0, 3), "This is your great great great grandfather's Amulet. STR +1"()];
+                               
+    var mountain_man_sprites = new SpriteSet(new Animation(mountain_man_spritesheet, 0, 2, 24, 32, 0.05, 1, true, false),
+                                            new Animation(mountain_man_spritesheet, 0, 0, 24, 32, 0.05, 1, true, false),
+                                            new Animation(mountain_man_spritesheet, 0, 3, 24, 32, 0.05, 1, true, false),
+                                            new Animation(mountain_man_spritesheet, 0, 1, 24, 32, 0.05, 1, true, false), null, null, null);
+    var mountain_man_quest =  new KILL_QUEST(gameEngine, "Hilbert",  "Siren", 1);
+
+    var mountain_man = new Storekeeper(gameEngine, "Hilbert", [["Well, hello there sonny! I haven't seen a newcomer in these remote parts in some time now.",
+                                           "My name is Hilbert, and this here beautiful dwarf is my wife, Eliza.",
+                                            "Eliza, dear! This is an incredible day, the Dwarven Gods must be smiling up on us today.",
+                                            "Excuse me, sonny, it's just that I try to run a shop here, but the goods we sell aren't your regular run of the mill goods, you see.",
+                                            "Every time we attempt to open our wares for our customers, which is very rare, by the way,",
+                                            "The terrifying yet *whispers in Theon's ear* very beautiful eheh *returns to normal voice* siren from the lake comes to terrorize us!",
+                                            "We believe it has something to do with the magical power of our products. Please, sonny, will you do something about her?"],
+                                             ["Please, sonny, I have a wife to feed! We need to be able to sell our wares, but we can't until that Siren goes away!"],
+                                              ["Oh how incredible, sonny! You did it! I don't think I will ever be able to repay you.",
+                                                "I know just the thing! You can now shop at my store!"]], mountain_man_items,
+                                             450, mountain_man_sprites, [new Point(576, 230)], .1, false, [1, 2], mountain_man_quest, "level2", 1.5,
+                                            [function () {
+                                                if (this.part < 3) {
+                                                    if (this.part === 1 && this.quest.complete) {
+                                                        this.part++;
+                                                    }
+                                                    this.showDialog();
+                                                } else {
+                                                    var that = this.inventory;                                                    
+                                                    window.setTimeout(that.inventory.showWares.bind(that), 0);
+                                                }
+                                            },  function () {
+                                                if (this.game) {
+                                                    if (this.game.next === true) {
+                                                        var text_box = document.getElementById("dialogue_box");
+                                                        var text = document.createElement('p');
+
+                                                        if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                            this.dialogue_index++;
+                                                            text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                            text_box.innerHTML = text.outerHTML;
+                                                        } else {
+                                                            this.dialogue_index = 0;
+                                                            text_box.style.visibility = "hidden";
+                                                            text_box.style.display = "none";
+                                                            text_box.tabIndex = 2;
+                                                            this.game.context.canvas.tabIndex = 1;
+                                                            this.game.context.canvas.focus();
+                                                            this.game.canControl = true;
+                                                            this.interacting = false;
+                                                            if (this.part === 0) {
+                                                                this.part++;
+                                                                this.game.entities[0].addQuest(this.quest);
+                                                                this.quest.complete = true;
+                                                            } if (this.part === 2) {
+                                                                this.part++;
+                                                            }
+                                                        }
+                                                        this.game.next = false;
+                                                    }
+                                                }
+                                            }]);
+
+    var mountain_woman_sprites = new SpriteSet(new Animation(mountain_woman_spritesheet, 0, 2, 24, 32, 0.05, 1, true, false),
+                                                new Animation(mountain_woman_spritesheet, 0, 0, 24, 32, 0.05, 1, true, false),
+                                                new Animation(mountain_woman_spritesheet, 0, 3, 24, 32, 0.05, 1, true, false),
+                                                new Animation(mountain_woman_spritesheet, 0, 1, 24, 32, 0.05, 1, true, false), null, null, null);
+    var mountain_woman = new NPC(gameEngine, [[],
+                                          []],
+                                           mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5);
 
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
@@ -326,6 +468,8 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(ghost);
 	gameEngine.addEntity(witch);
 	gameEngine.addEntity(dragon1_NPC);
+	gameEngine.addEntity(mountain_man);
+	gameEngine.addEntity(mountain_woman);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
     gameEngine.start();

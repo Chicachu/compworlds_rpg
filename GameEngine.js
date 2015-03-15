@@ -111,7 +111,7 @@ GameEngine.prototype.init = function (context) {
     this.sound_manager = new SoundManager(this);
     this.stage = {
         part1: false, // part 1 will turn true after our hero kills the level 1 dragon
-        part2: false,
+        part2: false, 
         part3: false
     }
     this.loot_dispenser = new LootDispenser(this);
@@ -939,7 +939,8 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                     }
                     else if(foes.name === "dragon1")
                     {
-                        setTimeout(function () { game.fadeOut(game, {game: game, background: "./imgs/game_over_win.png"}, game.gameOver); }, 5000);
+                        setTimeout(function () { game.fadeOut(game, { game: game, background: "./imgs/game_over_win.png" }, game.gameOver); }, 5000);
+                        game.stage.part1 = true; 
                     }
                     else {
                         setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -1797,10 +1798,10 @@ dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
+NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale) {
     if (game && dialogue && anims && path) {
         this.game = game;
-        this.scale = 1;
+        this.scale = (scale || 1);
         this.map_name = map_name; 
         this.animations = anims;
         this.spriteSheet = this.animations.right.spriteSheet;
@@ -2069,10 +2070,10 @@ pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
 
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name) {
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale) {
     this.name = name;
     this.quest = quest; 
-    NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name);
+    NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name, scale);
 }
 
 NPC_QUEST.prototype = new NPC();
@@ -2089,10 +2090,10 @@ QUEST = function (game, giverName, reward) {
     this.game = game;
     this.giverName = giverName;
     this.reward = reward;
-    this.complete = false;
     if (this.complete) { // if the quest has been complete
         this.game.alertHero("Your mission is complete, dear young hero!");
     }
+    this.complete = false;
 }
 
 /*RETRIEVE_ITEM_QUEST
@@ -3215,33 +3216,27 @@ Ghost.prototype.draw = function (context) {
 
 /*StoreKeeper NPC_QUEST with KILL_QUEST
 */
-Storekeeper = function (game, name, dialog, items, max_coin, anims, path, speed, pause, quad, quest, map_name) {
+Storekeeper = function (game, name, dialog, items, max_coin, anims, path, speed, pause, quad, quest, map_name, scale, functions) {
 
     this.part = 0; 
     this.inventory = new StorekeeperInventory(game, max_coin, 19, items);
-    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name);
+    NPC_QUEST.call(this, game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale);
     this.curr_anim = this.animations.down;
     this.y_offset = 25;
+    this.firstQuadx = this.x;
+    this.firstQuady = this.y;
+    this.start_interaction = functions[0];
+    this.update_dialog = functions[1];
 }
 
 Storekeeper.prototype = new NPC_QUEST();
 Storekeeper.prototype.constructor = Storekeeper;
 
 Storekeeper.prototype.startInteraction = function () {
-    if (this.game.stage.part1 === false) {
-        // if before dragon is dead, have storekeeper give hero a quest. 
-        this.showDialog();
-    } else { 
-    var that = this.inventory;
-        // after dragon is dead, show wares to the hero.
-        window.setTimeout(that.inventory.showWares.bind(that), 0);
-    }
+    this.start_interaction(); 
 }
 
 Storekeeper.prototype.showDialog = function () {
-    if (this.part === 1 && this.quest.complete) {
-        this.part++;
-    }
     this.reposition();
     var text_box = document.getElementById("dialogue_box");
 
@@ -3268,55 +3263,41 @@ Storekeeper.prototype.update = function () {
 }
 
 Storekeeper.prototype.updateDialogue = function () {
-    if (this.game) {
-        if (this.game.next === true) {
-            var text_box = document.getElementById("dialogue_box");
-            var text = document.createElement('p');
-
-            if (this.part === 1 && this.quest.complete) {
-                this.part++;
-            }
-            if (this.dialogue_index < this.dialogue[this.part].length - 1) {
-                this.dialogue_index++;
-                text.innerHTML = this.dialogue[this.part][this.dialogue_index];
-                text_box.innerHTML = text.outerHTML;
-            } else {
-                this.dialogue_index = 0;
-                text_box.style.visibility = "hidden";
-                text_box.style.display = "none";
-                text_box.tabIndex = 2;
-                this.game.context.canvas.tabIndex = 1;
-                this.game.context.canvas.focus();
-                this.game.canControl = true;
-                this.interacting = false;
-                if (this.part === 0) {
-                    this.part++;
-                    this.game.entities[0].addQuest(this.quest);
-                }
-                if (this.part === 2) {
-                    this.game.entities[0].inventory.addItem(this.quest.reward);
-                    this.part++;
-                } else if (this.part === 3) {
-                    this.part++;
-                } else if (this.part === 4 && this.game.stage.part2) {
-                    this.part++; 
-                } else if (this.part === 5) {
-                    this.part++;
-                }
-            }
-            this.game.next = false;
-        }
-    }
+    this.update_dialog();
 }
 
 Storekeeper.prototype.draw = function (context) {
-    if (this.game.environment[this.game.current_environment].curr_quadrant === 3) {
-        this.x = 485;
-        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
-    } else if (this.game.environment[this.game.current_environment].curr_quadrant === 4) {
-        this.x = 133;
-        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 1.2);
+    this.changeCoordsForQuad(this.game.environment[this.game.current_environment].curr_quadrant);
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
+    
+}
+
+Storekeeper.prototype.changeCoordsForQuad = function (quad) {
+    this.x = this.firstQuadx;
+    this.y = this.firstQuady; 
+    // change x value 
+    if (quad - this.quad[0] === 1 && quad !== 3) {
+        if (quad === 2) {
+            this.x -= 12 * 32; 
+        } else if (quad === 1) {
+            this.x -= 11 * 32; 
+        }
+    } else if (quad - this.quad[0] === -1 && quad !== 2) {
+        if (quad === 5) {
+            this.x += 12 * 32;
+        } else if (quad === 4) {
+            this.x += 11 * 32;
+        }
     }
+    // change y value 
+    if (Math.abs(quad - this.quad[0]) === 3) {
+        if (quad - this.quad[0] < 0) {
+            this.y += 11 * 32; 
+        } else if (quad - this.quad[0] > 0) {
+            this.y -= 11 * 32; 
+        }
+    }
+    
 }
 
 /*WITCH NPC_QUEST with KILL_QUEST
