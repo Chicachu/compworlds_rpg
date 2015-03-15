@@ -301,8 +301,8 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_woman_spritesheet, 0, 0, 24, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_woman_spritesheet, 0, 3, 24, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_woman_spritesheet, 0, 1, 24, 32, 0.05, 1, true, false), null, null, null);
-    var mountain_woman = new NPC(gameEngine, [[],
-                                          []],
+    var mountain_woman = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
+                                                "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."]],
                                            mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5);
 
     // Environments 
