@@ -1253,8 +1253,12 @@ Hero.prototype.update = function () {
     this.changeDirection();
     this.changeMoveAnimation();
     this.changeLocation();
-    if ((this.game.current_environment === "level1" && this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) ||
-        this.game.current_environment === "dragon_cave") {
+    //if ((this.game.current_environment === "level1" && this.game.environment[this.game.current_environment].curr_quadrant != 0 && this.game.environment[this.game.current_environment].curr_quadrant != 3) ||
+        //    this.game.current_environment === "dragon_cave") {
+    var quad = this.game.environment[this.game.current_environment].curr_quadrant;
+    var hos_quad = this.game.environment[this.game.current_environment].hostile_quads;
+    if(hos_quad.indexOf(quad) > -1)
+        {
         this.preBattle();
     }
     this.checkBoundaries();
@@ -1879,6 +1883,31 @@ Siren.prototype.draw = function(context)
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, .4);
 }
 
+WolfRider = function(game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/wolf_rider.png");
+    this.xp_base = 25;
+    this.animations = {
+        down: null,
+        up: null,
+        left: null,
+        right: new Animation(this.spriteSheet, 0, 0, 138.75, 128.15, .1, 1, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 3, 138.75, 128.15, .1, 1, true, false),
+        hit: new Animation(this.spriteSheet, 0, 7, 138.75, 128.15, .07, 6, true, false),
+        death: new Animation(this.spriteSheet, 5, 7, 138.75, 128.15, .1, 1, true, false)
+    }
+    this.loot_table =
+        [
+            ({ string: "gold", weight: 50 }),
+            ({ string: "heal berry", weight: 50 })
+        ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "WolfRider", false, this.loot_table);
+}
+
+WolfRider.prototype = new Enemy();
+WolfRider.prototype.constructor = WolfRider;
+
 DireWolf = function(game, stats, loop_while_standing)
 {
     this.game = game;
@@ -1995,6 +2024,12 @@ Dragon1 = function(game, stats, loop_while_standing)
         death: new Animation(this.spriteSheet, 0, 4, 64.3, 107, .1, 1, true, false),
         rest: new Animation(this.spriteSheet, 0, 3, 64.3, 107, .13, 7, true, false)
     };
+
+    this.loot_table = [
+        ({ string: "gold", weight: 20 }),
+        ({ string: "heal berry", weight: 80 })
+    ];
+
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1", true);
 }
 
@@ -2491,7 +2526,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
 }
 
-Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad) {
+Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad, hostile_quads) {
     this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = map;
@@ -2503,6 +2538,7 @@ Environment = function (game, map, animations, tilesheet, quads, interactables, 
     this.fiends = fiends;
     this.battle_background = battle_background;
     this.interactables = interactables;
+    this.hostile_quads = hostile_quads;
     //Environment.initInteractables.call(this, this.interactables);
 }
 
@@ -2517,10 +2553,10 @@ EnvironmentAnimation = function (animation, coords, quads, stage) {
     this.stage = stage; 
 }
 
-OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background, start_quad) {
+OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background, start_quad, hostile_quads) {
     this.indoor_maps = indoor_maps;
     this.fiends = fiends;
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad);
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad, hostile_quads);
     this.addIndoorEnvironments();
 }
 
@@ -2533,9 +2569,9 @@ OutdoorEnvironment.prototype.addIndoorEnvironments = function () {
     }
 }
 
-IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad) {
+IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad, hostile_quads) {
     this.fiends = fiends;
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad);
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad, hostile_quads);
 }
 
 
@@ -2862,8 +2898,12 @@ Environment.prototype.initNewFiend = function (fiend) {
             break;
         case "Ogre":
             return (new Ogre(this.game, new Statistics(60, 15, 15), false));
+            break;
         case "Dire Wolf":
             return (new DireWolf(this.game, new Statistics(50, 15, 5), true));
+            break;
+        case "Wolf Rider":
+            return (new WolfRider(this.game, new Statistics(80, 20, 15), true));
             break;
         default:
             return null;

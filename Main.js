@@ -16,6 +16,7 @@ ASSET_MANAGER.queueDownload("./imgs/fire2.png");
 ASSET_MANAGER.queueDownload("./imgs/malboro.png");
 ASSET_MANAGER.queueDownload("./imgs/ogre.png");
 ASSET_MANAGER.queueDownload("./imgs/wolf1.png");
+ASSET_MANAGER.queueDownload("./imgs/wolf_rider.png");
 ASSET_MANAGER.queueDownload("./imgs/storekeeper.png");
 ASSET_MANAGER.queueDownload("./imgs/witch.png");
 ASSET_MANAGER.queueDownload("./imgs/game_over.png");
@@ -401,7 +402,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [45, 0, 0, 53, 0, 53, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 0,0, 50],
                         [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]],
-                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(9, 12, 0, gameEngine, ExitHouse1)], "house1", null, null, 0);
+                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(9, 12, 0, gameEngine, ExitHouse1)], "house1", null, null, 0, []);
 
     var house2 = new IndoorEnvironment(gameEngine, [[[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
@@ -429,7 +430,7 @@ ASSET_MANAGER.downloadAll(function () {
                             [0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0],
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]],
-                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(9, 12, 0, gameEngine, ExitHouse2)], "house2", null, null, 0);
+                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(9, 12, 0, gameEngine, ExitHouse2)], "house2", null, null, 0, []);
 	
 	var church = new IndoorEnvironment(gameEngine, [[
 						 [30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30],
@@ -458,7 +459,7 @@ ASSET_MANAGER.downloadAll(function () {
                             [0,58,0,0,48,9,9,9,9,9,9,9,14,0,0,0,13,9,9,9,9,9,9,9,49,0,0,58,0],
                             [0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
                            [0,0,0,0,0,0,0,0,0,0,0,0,48,9,9,9,49,0,0,0,0,0,0,0,0,0,0,0,0]]],
-                            null, new Tilesheet("./imgs/churchInterior.png", 32, 20), [0], [new Portal(15,13, 0, gameEngine, ExitChurch)], "church", null, null, 0);
+                            null, new Tilesheet("./imgs/churchInterior.png", 32, 20), [0], [new Portal(15,13, 0, gameEngine, ExitChurch)], "church", null, null, 0, []);
 
     
 
@@ -492,7 +493,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 34, 30, 2, 5, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 20, 34, 34, 20,15],
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
-                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave), new Portal(18, 6, 1, gameEngine, EnterLevel2, 1)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0);
+                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave), new Portal(18, 6, 1, gameEngine, EnterLevel2, 1)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0]);
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4], 0);
@@ -531,7 +532,7 @@ ASSET_MANAGER.downloadAll(function () {
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1),
-                new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0);
+                new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 				
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
@@ -562,7 +563,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
                 [new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
                 new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!")], true)],
-                ["Dire Wolf"], "level2", "./imgs/woods.png", 3);
+                ["Dire Wolf", "Wolf Rider"], "level2", "./imgs/woods.png", 3, [0, 1, 2, 3, 4, 5]);
 
 
     gameEngine.addEnvironment(level1.name, level1);
