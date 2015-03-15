@@ -529,7 +529,12 @@ GameEngine.prototype.endBattle = function (game)
     game.fiends = [];
     game.fight_queue = [];
     game.animation_queue = [];
-    game.sound_manager.playSong("world1");
+    //game.sound_manager.playSong("world1");
+    if (game.current_environment === "level1") {
+        game.sound_manager.playSong("world1");
+    } else if (game.current_environment === "level2") {
+        game.sound_manager.playSong("world2");
+    }
     game.loot_dispenser.increment();
     setTimeout(function () {
         if (game.loot_dispenser.string.length > 0) {
@@ -946,8 +951,6 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         game.loot_dispenser.acc_xp += foes.xp_base + rand_offset;
         // check to see if foe is one for a kill quest
         this.kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
-        // TODO: alert hero if kill_quest_complete AFTER battle fades out
-        // use gameengine.alertHero(<dialog>); when world view is back in
         foes.drop();
 
         game.removeFighters(foes);
@@ -958,13 +961,14 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
             if (game.fiendBattleOver(game)) {
                 game.canControl = false;
-                //if(foes.name === "dragon1")
-                //{
-                //    setTimeout(function () { game.fadeOut(game, {game: game, background: "./imgs/game_over_win.png"}, game.gameOver); }, 5000);
-                //}
-                //else {
+                if(foes.name === "dragon1")
+                {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                //}
+                    this.game.current_stage = this.game.stage[1];
+                }
+                else {
+                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                }
             }
             else if(game.heroBattleOver(game))
             {
@@ -3422,16 +3426,16 @@ Storekeeper.prototype.changeCoordsForQuad = function (quad) {
     this.x = this.firstQuadx;
     this.y = this.firstQuady; 
     // change x value 
-    if (quad - this.quad[0] === 1 && quad !== 3) {
-        if (quad === 2) {
+    if (quad - this.quad[0] === 1) {
+        if (quad === 2 || quad === 5) {
             this.x -= 12 * 32; 
-        } else if (quad === 1) {
+        } else if (quad === 1 || quad === 4) {
             this.x -= 11 * 32; 
         }
-    } else if (quad - this.quad[0] === -1 && quad !== 2) {
-        if (quad === 5) {
+    } else if (quad - this.quad[0] === -1) {
+        if (quad === 2 || quad === 5) {
             this.x += 12 * 32;
-        } else if (quad === 4) {
+        } else if (quad === 1 || quad === 4) {
             this.x += 11 * 32;
         }
     }
@@ -4656,7 +4660,7 @@ SoundManager = function (game) {
     this.paused = false;
     this.sound = this.select;
     this.background = this.world1;
-    //this.background.play();
+    this.background.play();
 }
 
 SoundManager.prototype.playSound = function (sound) {

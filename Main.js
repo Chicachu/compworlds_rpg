@@ -74,8 +74,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 
 
-	var warrior = new Warrior(gameEngine, new Statistics(1, 22, 35, 4, 3, 1));
-	var archer = new Archer(gameEngine, new Statistics(1, 25, 28, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(225, 25, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     gameEngine.heroes.push(archer);
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
@@ -125,7 +125,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             "Trust me, I want this store open more than anyone around here. I'll be happy to take your money when the store is ready."]], storekeeper_items,
                                              1200, storekeeper_sprites, [new Point(485, 207)], .1, false, [3, 4], storekeeper_quest, "level1", 1.2, 
                                                [function () {
-                                                   if (this.game.stage.part1 === false) {
+                                                   if (this.game.current_stage === this.game.stage[0]) {
                                                        // if before dragon is dead, have storekeeper give hero a quest. 
                                                        if (this.part === 1 && this.quest.complete) {
                                                            this.part++;
@@ -302,8 +302,8 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_woman_spritesheet, 0, 0, 24, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_woman_spritesheet, 0, 3, 24, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_woman_spritesheet, 0, 1, 24, 32, 0.05, 1, true, false), null, null, null);
-    var mountain_woman = new NPC(gameEngine, [[],
-                                          []],
+    var mountain_woman = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
+                                                "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."]],
                                            mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5);
 
     // Environments 
