@@ -331,10 +331,11 @@ ASSET_MANAGER.downloadAll(function () {
                         [11, 13, 0, 0, 0, 0, 0, 0, 0, 0, 66, 62, 63, 62, 63, 66, 0, 0,0],
                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 64, 65, 64, 65, 66, 0,0, 49],
                         [45, 0, 0, 53, 0, 53, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 0,0, 50],
-                        [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 51]]],
-                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(8, 12, 0, gameEngine, ExitHouse1)], "house1", 0);
+                        [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51],
+                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]],
+                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(8, 12, 0, gameEngine, ExitHouse1)], "house1", null, null, 0);
 
-    var house2 = new IndoorEnvironment([[[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
+    var house2 = new IndoorEnvironment(gameEngine, [[[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 68, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 68, 67, 67],
@@ -358,8 +359,9 @@ ASSET_MANAGER.downloadAll(function () {
                             [0, 0, 0, 0, 0, 74, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 0],
                             [0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0]]],
-                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(8, 12, 0, gameEngine, ExitHouse2)], "house2", 0);
+                            [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]],
+                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(8, 12, 0, gameEngine, ExitHouse2)], "house2", null, null, 0);
 
     
 
@@ -425,7 +427,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 37, 38, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
                 [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]],
-                 [house1, dragonCave], [],new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
+                 [house1, dragonCave, house2], [],new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
                 new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "It's so shiny it gives you power."), 100], false),
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),
@@ -462,7 +464,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5], [], [], "level2", "./imgs/woods.png", 3);
 
     gameEngine.addEnvironment(level1.name, level1);
-	gameEngine.addEnvironment(level2.name, level2);
+    gameEngine.addEnvironment(level2.name, level2);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);

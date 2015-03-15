@@ -1043,7 +1043,8 @@ Hero.prototype.checkForUserInteraction = function () {
         var ent_x_difference = Math.abs((this.game.environment[this.game.current_environment].interactables[i].x) - (this.x + 5));
         var ent_y_difference = Math.abs((this.game.environment[this.game.current_environment].interactables[i].y) - (this.y + 45));
         var ent_distance = Math.sqrt(Math.pow(ent_x_difference, 2) + Math.pow(ent_y_difference, 2));
-        if (this.game.environment[this.game.current_environment].interactables[i].portal && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])) {
+        if (this.game.environment[this.game.current_environment].interactables[i].portal && Interactable.prototype.startInteraction.call(this.game.environment[this.game.current_environment].interactables[i])
+            && ent_distance < Math.sqrt(Math.pow(this.sight, 2) + Math.pow(this.sight, 2))) {
             min_distance = ent_distance;
             min_index = i;
             array = 1;
@@ -1403,7 +1404,7 @@ Hero.prototype.checkBoundaries = function () {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant -= 3);
             this.y += 11 * 32;
         }
-    } else if (this.boundaryDown() && this.game.current_environment !== "dragon_cave") {
+    } else if (this.boundaryDown() && this.game.current_environment !== "dragon_cave" && this.game.current_environment !== "house1" && this.game.current_environment !== "house2") {
         if (quadrant !== 3 && quadrant !== 4 && quadrant !== 5) {
             this.game.environment[this.game.current_environment].setQuadrant(this.game.environment[this.game.current_environment].curr_quadrant += 3);
             this.y -= 11 * 32;
@@ -1414,7 +1415,9 @@ Hero.prototype.checkBoundaries = function () {
 // returns the number associated with the tile that the hero is standing on. used for collision purposes.
 Hero.prototype.getTile = function (x, y, num) {
     if (this.game.environment[this.game.current_environment].map.length === 2) {
-       return this.game.environment[this.game.current_environment].map[num][y][x];
+        if (y < 13) {
+            return this.game.environment[this.game.current_environment].map[num][y][x];
+        }
 
     } else {
         if (y < this.game.environment[this.game.current_environment].map.length) {
@@ -2310,7 +2313,7 @@ EnterHouse1 = function () {
 ExitHouse1 = function () {
     this.game.current_environment = "level1";
     this.game.environment[this.game.current_environment].setQuadrant(0);
-    this.game.entities[0].x = 128;
+    this.game.entities[0].x = 256;
 
     this.game.entities[0].y = 192;
 }
@@ -2318,8 +2321,8 @@ ExitHouse1 = function () {
 EnterHouse2 = function () {
     this.game.current_environment = "house2";
     this.game.environment[this.game.current_environment].setQuadrant(0);
-    this.game.entities[0].x = 256;
-    this.game.entities[0].y = 352;
+    this.game.entities[0].x = 64;
+    this.game.entities[0].y = 192;
 }
 
 ExitHouse2 = function () {
@@ -2342,9 +2345,11 @@ Portal.prototype = new Interactable();
 Portal.prototype.constructor = Portal;
 
 Portal.prototype.startInteraction = function () {
-    if (this.stage && this.game.current_stage === this.game.stage[this.stage]) {
+    if (!this.stage) {
         this.func();
-    }
+    } else if (this.game.current_stage === this.game.stage[this.stage]) {
+        this.func();
+    } 
 }
 
 Door = function (x, y, quad, game) {
@@ -2592,6 +2597,7 @@ IndoorEnvironment.prototype.drawTiles = function (scaleBy) {
     for (var k = 0; k < this.map.length; k++) {
         for (var i = this.game.quadrants[this.curr_quadrant][1]; i <= this.game.quadrants[this.curr_quadrant][3]; i++) { // length of each column
             for (var j = this.game.quadrants[this.curr_quadrant][0]; j <= this.game.quadrants[this.curr_quadrant][2]; j++) { // length of each row
+                
                 var tile_index = this.map[k][i][j];
 
                 var x_start_clip = tile_index % this.tileSheet.sheetWidth * this.tileSheet.tileSize;
@@ -2602,11 +2608,11 @@ IndoorEnvironment.prototype.drawTiles = function (scaleBy) {
                 var draw_size = this.tileSheet.tileSize * scaleBy;
 
                 this.context.drawImage(this.tileSheet.sheet,
-                                  x_start_clip, y_start_clip, // where to start clipping
-                                  amount_clip, amount_clip,  // how much to clip
-                                  x_coord, y_coord, // coordinates to start drawing to 
-                                  draw_size, draw_size); // how big to draw. 
-            }
+                                    x_start_clip, y_start_clip, // where to start clipping
+                                    amount_clip, amount_clip,  // how much to clip
+                                    x_coord, y_coord, // coordinates to start drawing to 
+                                    draw_size, draw_size); // how big to draw. 
+           }           
         }
     }
 }
