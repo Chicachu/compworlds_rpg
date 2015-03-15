@@ -37,6 +37,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/staff2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/robe1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/robe2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/amulet3.png");
+ASSET_MANAGER.queueDownload("./imgs/mountainVillager.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -72,6 +73,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var dragon_spritesheet = ASSET_MANAGER.getAsset("./imgs/dragon_1_npc.png");
 	var mountain_man_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_man.png");
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
+	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 
 
 	var warrior = new Warrior(gameEngine, new Statistics(1, 22, 35, 4, 3, 1));
@@ -306,6 +308,58 @@ ASSET_MANAGER.downloadAll(function () {
                                                 "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."]],
                                            mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5);
 
+    var mountain_villager_sprites = new SpriteSet(new Animation(mountain_villager_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false),
+                                                new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
+                                                new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
+                                                new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
+    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Shelly", "DireWolf", 5);
+    var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
+                                                                  "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
+                                                                  "This village is counting on you!"],
+                                                                  ["What are you doing just standing around!? Do you want to be dog food!?"],
+                                                                    ["I can breathe again, thank you stranger. My name is Sherry, by the way.",
+                                                                     "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
+                                                                     "They come into town looking to loot our store every few months or so, it's an ongoing battle."],
+                                                                  ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
+                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(384, 64), new Point(384, 160)], .75, false, [4, 5],
+                                                                    mountain_villager_quest, "level2", 1, [function () {
+                                                                        if (this.part === 1 && this.quest.complete) {
+                                                                            this.part++;
+                                                                        }
+                                                                       this.showDialog();       
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        this.game.entities[0].addQuest(this.quest);
+                                                                                        this.quest.complete = true;
+                                                                                    } if (this.part === 2) {
+                                                                                        this.part++;
+                                                                                    }
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }]);
+
+
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -475,6 +529,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(dragon1_NPC);
 	gameEngine.addEntity(mountain_man);
 	gameEngine.addEntity(mountain_woman);
+	gameEngine.addEntity(mountain_villager);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
     gameEngine.start();
