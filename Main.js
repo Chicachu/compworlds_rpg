@@ -96,7 +96,7 @@ ASSET_MANAGER.downloadAll(function () {
                                         "And by rebuild, I mean repopulate. *wink wink*",
                                         "Oh, before you go! The healing berry bushes along the road have finally grown their berries for the season!",
                                         "You should pick a few for your journey!"],
-                                           ["I'm so glad you're back from the war, my love, but right now this village faces destruction from the dragon! Please! Go save us!"]], girl_sprites, [new Point(160, 200), new Point(280, 200)], .16, false, [0], "level1");
+                                           ["I'm so glad you're back from the war, my love, but right now this village faces destruction from the dragon! Please! Go save us!"]], girl_sprites, [new Point(160, 200), new Point(280, 200)], .10, false, [0], "level1");
 
     var storekeeper_sprites = new SpriteSet(new Animation(storekeeper_spritesheet, 1, 0, 32, 32, 0.05, 1, true, false),
                                             new Animation(storekeeper_spritesheet, 1, 3, 32, 32, 0.05, 1, true, false),
@@ -106,10 +106,10 @@ ASSET_MANAGER.downloadAll(function () {
     var storekeeper_quest = new KILL_QUEST(gameEngine, "Willy", sk_quest_reward, "Skeleton", 5);
     var storekeeper_items = [new Armor(gameEngine, "Leather Armor", 170, ASSET_MANAGER.getAsset("./imgs/items/leather_armor1.png"), "armor", new Statistics(2, 0, 3, 0, 2, 0), "The suit's leather is somewhat of low quality, but it's quite effective as defense-wear."),
                             new Armor(gameEngine, "Basic Iron Armor", 230, ASSET_MANAGER.getAsset("./imgs/items/armor1.png"), "armor", new Statistics(5, 0, 5, 1, 0, 0), "A sturdy armor made from iron. It's a bit rusty, but it definitely helps you survive most encounters out there."),
-                            //new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0), "A fancy looking amulet made from titanium."),
-                            //new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0), "A high quality sharpened steel sword. It can cut monsters like butter."),
-                            //new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0), "A shabby round shield. It's not too big, but not too small."),
-                            //new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0), "A "better than Basic Shield" shield. It's sturdy and thicker, capable of withstanding numerous attacks.),
+                            new Armor(gameEngine, "Fancy Strength Amulet", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 3, 0, 0), "A fancy looking amulet made from titanium."),
+                            new Armor(gameEngine, "Flawless Steel Sword", 200, ASSET_MANAGER.getAsset("./imgs/items/sword1.png"), "mainhand", new Statistics(0, 10, 0, 4, 0, 0), "A high quality sharpened steel sword. It can cut monsters like butter."),
+                            new Armor(gameEngine, "Basic Shield", 125, ASSET_MANAGER.getAsset("./imgs/items/shield1.png"), "offhand", new Statistics(0, 0, 5, 0, 0, 0), "A shabby round shield. It's not too big, but not too small."),
+                            new Armor(gameEngine, "Reinforced Shield", 220, ASSET_MANAGER.getAsset("./imgs/items/shield2.png"), "offhand", new Statistics(0, 0, 10, 0, 0, 0), "A better than Basic Shield shield. It's sturdy and thicker, capable of withstanding numerous attacks."),
                             new Potion(gameEngine, "Heal Berry", 10, 3, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.")];
     var storekeeper = new Storekeeper(gameEngine, "Willy", [["Why hello there! It's good to see another survivor in all of this destruction.",
                                              "Unfortunately, I'm dealing with even more damage to my store with all of these skeletons running about.",
