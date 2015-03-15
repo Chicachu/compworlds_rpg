@@ -421,6 +421,10 @@ GameEngine.prototype.setBattle = function (args) {
         heroes[i].direction = Direction.LEFT;
         heroes[i].changeMoveAnimation();
         heroes[i].changeLocation();
+        if (heroes[i].is_dead)
+        {
+            heroes[i].stop_move_animation = heroes[i].animations.death;
+        }
         game.animation_queue.push(new Event(heroes[i], heroes[i].stop_move_animation, 0));
     }
     if (heroes.length === 1) {
@@ -488,7 +492,13 @@ GameEngine.prototype.setNormalBattle = function(game)
 GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
-    game.fiends.push(new Dragon1(game, new Statistics(250, 40, 60, 5, 10, 3)));
+    if (game.current_environment === "ice_cave") {
+        game.fiends.push(new Dragon1(game, new Statistics(250, 40, 60, 5, 10, 3)));
+    }
+    else if (game.current_environment === "level2")
+    {
+        game.fiends.push(new Siren(game, new Statistics(325, 50, 50, 0, 0, 0)));
+    }
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
     game.fiends[0].init();
@@ -549,7 +559,7 @@ GameEngine.prototype.gameOver = function (args) {
     game.canControl = false;
     game.menu.showMenu(false, game);
     game.auxillary_sprites.push(game.entities[0]);
-    game.entities = [];
+    game.clearEntities(false);
     game.sound_manager.pauseBackground();
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
 }
@@ -557,20 +567,36 @@ GameEngine.prototype.gameOver = function (args) {
     checks if battle is over and invokes fadeOut by passing endBattle() to end the game and
     reset the hero to the world map
 */
-GameEngine.prototype.battleOver = function (game) {
+GameEngine.prototype.fiendBattleOver = function (game) {
     var net_health_1 = 0;
     for (var i = 0 ; i < game.fiends.length; i++) {
         if (game.fiends[i]) {
             net_health_1 += game.fiends[i].stats.health;
         }
     }
-    if (net_health_1 <= 0 || game.entities[0].stats.health <= 0) {
+    if (net_health_1 <= 0) {
         return true;
     }
     else {
         return false;
     }
 
+}
+
+GameEngine.prototype.heroBattleOver = function (game)
+{
+    var net_health_1 = 0;
+    for (var i = 0 ; i < game.heroes.length; i++) {
+        if (game.heroes[i]) {
+            net_health_1 += game.heroes[i].stats.health;
+        }
+    }
+    if (net_health_1 <= 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 GameEngine.prototype.decideFighters = function () {
@@ -590,7 +616,9 @@ GameEngine.prototype.decideFighters = function () {
     var fighter = 0;
     for (var i = 0; i < 100; i++) {
         fighter = i % this.entities.length;
-        this.fight_queue.push(this.entities[fighter]);
+        if (!this.entities[fighter].is_dead) {
+            this.fight_queue.push(this.entities[fighter]);
+        }
     }
     this.fight_queue[0].is_turn = true;
 }
@@ -791,7 +819,8 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.is_turn = false;
     this.is_targeted = false;
     this.level = 1;
-
+    this.is_dead = false;
+    
     this.kill_quest_complete = false;
     this.id = Math.random() * Math.random();
     if (animations) {
@@ -920,10 +949,6 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         this.kill_quest_complete = this.game.entities[0].checkKillQuest(foes);
         // TODO: alert hero if kill_quest_complete AFTER battle fades out
         // use gameengine.alertHero(<dialog>); when world view is back in
-        if (foes.name === "Skeleton")
-        {
-            
-        }
         foes.drop();
 
         game.removeFighters(foes);
@@ -932,20 +957,20 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         }
         else {
             game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
-            if (game.battleOver(game)) {
+            if (game.fiendBattleOver(game)) {
                 game.canControl = false;
-                if (game.is_battle) {
-                    if (game.entities[0].stats.health <= 0) {
-                        setTimeout(function () { game.fadeOut(game, { game: game, background: "./imgs/game_over.png" }, game.gameOver); }, 5000);
-                    }
-                    else if(foes.name === "dragon1")
-                    {
-                        setTimeout(function () { game.fadeOut(game, {game: game, background: "./imgs/game_over_win.png"}, game.gameOver); }, 5000);
-                    }
-                    else {
-                        setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                    }
-                }
+                //if(foes.name === "dragon1")
+                //{
+                //    setTimeout(function () { game.fadeOut(game, {game: game, background: "./imgs/game_over_win.png"}, game.gameOver); }, 5000);
+                //}
+                //else {
+                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                //}
+            }
+            else if(game.heroBattleOver(game))
+            {
+                game.canControl = false;
+                setTimeout(function () { game.fadeOut(game, { game: game, background: "./imgs/game_over.png" }, game.gameOver); }, 5000);
             }
         }
     }
@@ -958,7 +983,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
         }
 
     }
-    if (!is_multi_attack && !game.battleOver(game)) {
+    if (!is_multi_attack && !game.fiendBattleOver(game) && !game.heroBattleOver(game)) {
         game.animation_queue.push(new Event(null, null, 500, game.setNextFighter, game));
     }
 
@@ -1121,6 +1146,7 @@ Hero.prototype.drawLevelUp = function()
 {
     this.game.context.drawImage(ASSET_MANAGER.getAsset("./imgs/level_up_icon.png"), this.x + 15, this.y - 30);
 }
+
 Hero.prototype.draw = function (context) {
     //if the game is not in battle, draw regular move animations
     if (!this.game.is_battle) {
@@ -1652,7 +1678,22 @@ Enemy.prototype.draw = function (context) {
 
 Enemy.prototype.update = function () {
     if (this.game.fight_queue[0].id === this.id && this.is_turn) {
-        this.setAction("Single", this.game.entities[0]);
+        var target = Math.floor(Math.random() * (this.game.heroes.length - 0 + 1));
+        var place_holder = target;
+        while (this.game.heroes[target].is_dead)
+        {
+            target++;
+            if (target >= this.game.heroes.length)
+            {
+                target = 0;
+            }
+
+            if(target === place_holder)
+            {
+                break;
+            }
+        }
+        this.setAction("Single", this.game.heroes[target]);
         this.is_turn = false;
     }
 }
@@ -1691,6 +1732,30 @@ Enemy.prototype.setAction = function (action, target) {
             break;
     }
 }
+
+Siren = function (game, stats, loop_while_standing) {
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
+    this.xp_base = 100;
+    this.animations =
+        {
+            down: null,
+            up: null,
+            left: null,
+            right: new Animation(this.spriteSheet, 21, 1, 256, 256, .1, 4, true, false),
+            destroy: new Animation(this.spriteSheet, 5, 1, 256, 256, .1, 6, true, false),
+            hit: new Animation(this.spriteSheet, 3, 5, 256, 256, .1, 6, true, false),
+            death: new Animation(this.spriteSheet, 8, 5, 256, 256, .1, 1, true, false)
+        };
+    this.loot_table =
+        [
+            ({ string: "gold", weight: 100 })
+        ];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Siren", false, this.loot_table);
+}
+
+Siren.prototype = new Enemy();
+Siren.prototype.constructor = Siren;
 
 Skeleton = function (game, stats, loop_while_standing) {
     this.game = game;
@@ -3525,10 +3590,18 @@ Potion = function (game, name, price, qty, img, type, level, itemDesc) {
 Potion.prototype = new UsableItem();
 Potion.prototype.constructor = Potion;
 
-Potion.prototype.doAction = function (game) {
+Potion.prototype.doAction = function (game, target) {
+    var this_target
+    if (target)
+    {
+        this_target = target;
+    }
+    else {
+        this_target = this.game.entities[0];
+    }
     switch (this.potion_type) {
         case "health":
-            game.entities[0].stats.health += this.level * 75;
+            this_target.stats.health += this.level * 75;
             break;
         case "stam":
 
@@ -3537,13 +3610,13 @@ Potion.prototype.doAction = function (game) {
 
             break;
         case "str":
-            this.game.entities[0].strength += this.level * 1;
+            this_target.strength += this.level * 1;
             break;
         case "dex":
-            this.game.entities[0].dexterity += this.level * 1;
+            this_target.dexterity += this.level * 1;
             break;
         case "int":
-            this.game.entities[0].intelligence += this.level * 1;
+            this_target.intelligence += this.level * 1;
             break;
     }
     this.game.entities[0].inventory.removeItem(this.name, 1);
