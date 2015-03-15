@@ -3387,16 +3387,16 @@ Storekeeper.prototype.changeCoordsForQuad = function (quad) {
     this.x = this.firstQuadx;
     this.y = this.firstQuady; 
     // change x value 
-    if (quad - this.quad[0] === 1 && quad !== 3) {
-        if (quad === 2) {
+    if (quad - this.quad[0] === 1) {
+        if (quad === 2 || quad === 5) {
             this.x -= 12 * 32; 
-        } else if (quad === 1) {
+        } else if (quad === 1 || quad === 4) {
             this.x -= 11 * 32; 
         }
-    } else if (quad - this.quad[0] === -1 && quad !== 2) {
-        if (quad === 5) {
+    } else if (quad - this.quad[0] === -1) {
+        if (quad === 2 || quad === 5) {
             this.x += 12 * 32;
-        } else if (quad === 4) {
+        } else if (quad === 1 || quad === 4) {
             this.x += 11 * 32;
         }
     }
