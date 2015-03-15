@@ -81,7 +81,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2"];
-    this.current_environment = "church";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1589,8 +1589,8 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 32;
-    this.y = 32;
+    this.x = 320;
+    this.y = 208;
 
     this.quests = [];
 
