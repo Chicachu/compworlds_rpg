@@ -1434,7 +1434,7 @@ Hero.prototype.isPassable = function (tile, index) {
             return true;
         }
     } else if (this.game.current_environment === "level2") {
-        if (tile === 142 || tile === 143 || tile === 164 || tile === 165 || tile === 0 || tile === 87 || tile === 5) {
+        if (tile === 142 || tile === 143 || tile === 164 || tile === 165 || tile === 0 || tile === 87 || tile === 5 || tile === 350 || tile === 351 || tile === 373) {
             return true; 
         }
     } else {
@@ -1524,8 +1524,8 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 10;
-    this.y = 215;
+    this.x = 320;
+    this.y = 208;
 
     this.quests = [];
 
@@ -2165,7 +2165,7 @@ Tilesheet = function (tileSheetPathName, tileSize, sheetWidth) {
     this.sheetWidth = sheetWidth;
 }
 
-Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends) {
+Environment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad) {
     this.game = game;
     // "Map" will be a double array of integer values. 
     this.map = map;
@@ -2173,7 +2173,7 @@ Environment = function (game, map, animations, tilesheet, quads, interactables, 
     this.tileSheet = tilesheet;
     this.quads = quads;
     this.name = name;
-    this.curr_quadrant = 0;
+    this.curr_quadrant = start_quad;
     this.fiends = fiends;
     this.battle_background = battle_background;
     this.interactables = interactables;
@@ -2190,10 +2190,10 @@ EnvironmentAnimation = function (animation, coords, quads) {
     this.quads = quads;
 }
 
-OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background) {
+OutdoorEnvironment = function (game, map, indoor_maps, animations, tilesheet, quads, interactables, fiends, name, battle_background, start_quad) {
     this.indoor_maps = indoor_maps;
     this.fiends = fiends;
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends);
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad);
     this.addIndoorEnvironments();
 }
 
@@ -2206,9 +2206,9 @@ OutdoorEnvironment.prototype.addIndoorEnvironments = function () {
     }
 }
 
-IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends) {
+IndoorEnvironment = function (game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad) {
     this.fiends = fiends;
-    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends);
+    Environment.call(this, game, map, animations, tilesheet, quads, interactables, name, battle_background, fiends, start_quad);
 }
 
 

@@ -191,7 +191,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 66, 64, 65, 64, 65, 66, 0, 49],
                         [45, 0, 0, 53, 0, 0, 53, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 0, 50],
                         [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51]]],
-                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], null, "house1");
+                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], null, "house1", 0);
 
     var house2 = new IndoorEnvironment([[[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
@@ -217,7 +217,7 @@ ASSET_MANAGER.downloadAll(function () {
                             [0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 86, 0, 0, 0, 0, 0],
                             [0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0]]],
-                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], null, "house2");
+                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], null, "house2", 0);
 
 
     var dragonCave = new IndoorEnvironment(gameEngine,  
@@ -250,7 +250,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 34, 30, 2, 5, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 20, 34, 34, 20,15],
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
-                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre"]);
+                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre"], 0);
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4]);
@@ -288,7 +288,7 @@ ASSET_MANAGER.downloadAll(function () {
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
-                new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png");
+                new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0);
 				
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
@@ -315,7 +315,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [407,408,409,410,411,412,413,414,415,416,417,484,485,486,487,488,489,490,0,168,169,164,165,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,0,0,0],
                 [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
                 [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
-                [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5], [], [], "level2", "./imgs/woods.png");
+                [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5], [], [], "level2", "./imgs/woods.png", 3);
 
     gameEngine.addEnvironment(level1.name, level1);
 	gameEngine.addEnvironment(level2.name, level2);
