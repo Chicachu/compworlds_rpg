@@ -333,7 +333,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [45, 0, 0, 53, 0, 53, 0, 0, 0, 0, 66, 66, 66, 66, 66, 66, 0,0, 50],
                         [46, 0, 0, 54, 55, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 51],
                          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]],
-                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(8, 12, 0, gameEngine, ExitHouse1)], "house1", null, null, 0);
+                        null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(9, 12, 0, gameEngine, ExitHouse1)], "house1", null, null, 0);
 
     var house2 = new IndoorEnvironment(gameEngine, [[[67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
                          [67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67],
@@ -361,7 +361,7 @@ ASSET_MANAGER.downloadAll(function () {
                             [0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             [0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 85, 0, 0, 0, 85, 0, 0, 0],
                            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]],
-                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(8, 12, 0, gameEngine, ExitHouse2)], "house2", null, null, 0);
+                            null, new Tilesheet("./imgs/roomInteriorSpritesSheet.png", 32, 22), [0], [new Portal(9, 12, 0, gameEngine, ExitHouse2)], "house2", null, null, 0);
 
     
 
@@ -397,11 +397,11 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
                         null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre"], 0);
 
-    var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false, [0]), 
-                            [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4]);
+    var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
+                            [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4], 0);
 
-    var level1_animation2 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire2.png"), 0, 0, 32, 32, 0.5, 4, true, false, [0]),
-                              [[2, 1], [14, 1], [1, 2], [16, 2], [0, 11], [10, 12]], [0, 1, 3, 4]);
+    var level1_animation2 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire2.png"), 0, 0, 32, 32, 0.5, 4, true, false),
+                              [[2, 1], [14, 1], [1, 2], [16, 2], [0, 11], [10, 12]], [0, 1, 3, 4], 0);
 
     var level1 = new OutdoorEnvironment(gameEngine, [[0, 66, 0, 0, 90, 91, 0, 0, 66, 0, 0, 94, 94, 0, 0, 66, 0, 94, 0, 0, 90, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 62, 15, 0, 15, 0, 17, 3, 4, 62],
                 [67, 68, 69, 94, 92, 93, 94, 67, 68, 69, 94, 95, 95, 94, 67, 68, 69, 95, 90, 91, 92, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 17, 18, 15, 16, 5, 6, 63],
@@ -427,7 +427,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [90, 91, 36, 36, 95, 0, 58, 59, 60, 61, 0, 5, 6, 29, 29, 20, 29, 28, 64, 3, 4, 29, 37, 38, 0, 0, 0, 0, 3, 4, 0, 5, 6, 3, 4, 65, 30, 30, 65, 31, 65, 65],
                 [92, 93, 90, 91, 94, 0, 0, 0, 0, 0, 0, 3, 4, 37, 38, 19, 64, 29, 20, 5, 6, 0, 0, 28, 28, 0, 28, 0, 5, 6, 0, 28, 28, 5, 6, 32, 31, 31, 32, 62, 30, 63],
                 [0, 0, 92, 93, 95, 0, 0, 0, 0, 0, 0, 5, 6, 64, 37, 38, 62, 62, 19, 62, 103, 0, 0, 29, 29, 0, 29, 0, 0, 0, 0, 29, 29, 37, 38, 33, 63, 63, 33, 62, 31, 63]],
-                 [house1, dragonCave, house2], [],new Tilesheet("./imgs/tiles.png", 32, 26), [0,1,2,3,4,5],
+                 [house1, dragonCave, house2], [level1_animation1, level1_animation2], new Tilesheet("./imgs/tiles.png", 32, 26), [0, 1, 2, 3, 4, 5],
                 [new Door(2, 6, 0, gameEngine), new Door(8, 6, 0, gameEngine), new Door(15, 6, [0, 1], gameEngine),
                 new Door(1, 4, 3, gameEngine), new Door(10, 4, 3, gameEngine), new Chest(9, 12, 4, gameEngine, [new Armor(gameEngine, "Amulet of Strength", 130, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "accessory", new Statistics(0, 0, 0, 1, 1, 0), "It's so shiny it gives you power."), 100], false),
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),

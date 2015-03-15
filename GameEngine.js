@@ -113,7 +113,7 @@ GameEngine.prototype.init = function (context) {
     // part1 = after dragon is dead and until mountain level is complete. 
     this.stage = ["part0", "part1", "part2", "part3"]; 
     
-    this.current_stage = this.stage[1];
+    this.current_stage = this.stage[0];
     this.loot_dispenser = new LootDispenser(this);
 }
 
@@ -2321,14 +2321,14 @@ ExitHouse1 = function () {
 EnterHouse2 = function () {
     this.game.current_environment = "house2";
     this.game.environment[this.game.current_environment].setQuadrant(0);
-    this.game.entities[0].x = 64;
-    this.game.entities[0].y = 192;
+    this.game.entities[0].x = 256;
+    this.game.entities[0].y = 352;
 }
 
 ExitHouse2 = function () {
     this.game.current_environment = "level1";
     this.game.environment[this.game.current_environment].setQuadrant(0);
-    this.game.entities[0].x = 256;
+    this.game.entities[0].x = 64;
 
     this.game.entities[0].y = 192;
 }
@@ -2621,7 +2621,7 @@ Environment.prototype.drawEnvironmentAnimations = function () {
     var loc_point = null;
     for (var i = 0; i < this.animations.length; i++) {
         // only draw if the animation belongs in the current quad
-        if (includes(this.animations[i].quads, this.curr_quadrant) && this.game.current_stage === this.game.stage[this.stage]) {
+        if (includes(this.animations[i].quads, this.curr_quadrant) && this.game.current_stage === this.game.stage[this.animations[i].stage]) {
             for (var j = 0; j < this.animations[i].coords.length; j++) {
                 var coord = this.animations[i].coords[j];
                 var coord_point = new Point(coord[0], coord[1]);
