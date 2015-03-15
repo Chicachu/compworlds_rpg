@@ -1589,7 +1589,6 @@ Warrior.prototype.draw = function (context) {
 }
 
 Warrior.prototype.update = function () {
-    //this.inventory.update();
     Hero.prototype.update.call(this);
 }
 
@@ -2496,7 +2495,7 @@ EnterHouse1 = function () {
     this.game.current_environment = "house1";
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 256;
-
+    this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 352;
 }
 
@@ -2504,6 +2503,7 @@ ExitHouse1 = function () {
     this.game.current_environment = "level1";
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 256;
+    this.game.sound_manager.playSound("door_open");
 
     this.game.entities[0].y = 192;
 }
@@ -2513,6 +2513,7 @@ EnterHouse2 = function () {
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 256;
     this.game.entities[0].y = 352;
+    this.game.sound_manager.playSound("door_open");
 }
 
 ExitHouse2 = function () {
@@ -2520,7 +2521,15 @@ ExitHouse2 = function () {
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 64;
 
+    this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 192;
+}
+
+EnterLevel2 = function () {
+    this.game.current_environment = "level2";
+    this.game.environment[this.game.current_environment].setQuadrant(3);
+    this.game.entities[0].x = 320;
+    this.game.entities[0].y = 208;
 }
 
 // used to change maps or to initiate special battles. 

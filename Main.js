@@ -39,6 +39,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/robe1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/robe2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/amulet3.png");
 ASSET_MANAGER.queueDownload("./imgs/mountainVillager.png");
+ASSET_MANAGER.queueDownload("./imgs/mage.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -75,6 +76,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_man_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_man.png");
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
+	var mage_spritesheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
 
 	var warrior = new Warrior(gameEngine, new Statistics(300, 2200, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(225, 25, 28, 4, 3, 1));
@@ -359,7 +361,14 @@ ASSET_MANAGER.downloadAll(function () {
                                                                         }
                                                                     }]);
 
+    var mage_npc_sprites = new SpriteSet(new Animation(mage_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false),
+                                                new Animation(mage_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
+                                                new Animation(mage_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
+                                                new Animation(mage_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
 
+    var mage_npc = NPC(gameEngine, [["Thank you for saving me, hero! I am forever in your debt.",
+                                                "In fact, I think I'll follow you around everywhere you go! I will never leave your arm. *swoon*"]],
+                                           mage_npc_sprites, /* point here */[], .06, false, [0], "level2", 1);
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -450,7 +459,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 34, 30, 2, 5, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 20, 34, 34, 20,15],
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
-                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0);
+                        null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave), new Portal(18, 6, 1, gameEngine, EnterLevel2, 1)], "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0);
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4], 0);
@@ -488,8 +497,8 @@ ASSET_MANAGER.downloadAll(function () {
                 new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),
                 new Chest(18, 11, 2, gameEngine, [new Book(gameEngine, "Book of Spells", ASSET_MANAGER.getAsset("./imgs/items/book.png"))], false),
                 new HealBerry(3, 9, 0, gameEngine),new HealBerry(9, 4, 4, gameEngine), new HealBerry(8, 4, 4, gameEngine), new HealBerry(7, 5, 5, gameEngine), new HealBerry(8, 5, 5, gameEngine),
-                new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1), new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)],
-                ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0);
+                new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1),
+                new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0);
 				
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
