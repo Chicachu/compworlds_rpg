@@ -227,6 +227,23 @@ GameEngine.prototype.removeEntityFromAux = function (entity) {
     }
 }
 
+GameEngine.prototype.removeEntityByName = function(entity)
+{
+    for(var i = 0; i < this.entities.length; i++)
+    {
+        if(this.entities[i].name === entity)
+        {
+            this.entities.splice(i, 1);
+        }
+    }
+
+    for(var i = 0; i < this.auxillary_sprites.length; i++)
+    {
+        if (this.auxillary_sprites[i].name === entity) {
+            this.auxillary_sprites.splice(i, 1);
+        }
+    }
+}
 GameEngine.prototype.clearEntities = function (save_entities) {
     if (save_entities) {
         this.auxillary_sprites = this.entities.splice(0, this.entities.length);
@@ -973,7 +990,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                 {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
                     this.game.current_stage = this.game.stage[1];
-                    this.game.removeEntityFromAux(foes);
+                    this.game.removeEntityByName("Dragon");
                 }
                 else {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -2150,6 +2167,7 @@ NPC.prototype.reposition = function () {
 Boss = function (game, dialogue, anims, path, speed, pause, quad, map_name)
 {
     this.spriteSheet = anims.right.spriteSheet;
+    this.name = "Dragon";
     NPC.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
 }
 
