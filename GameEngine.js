@@ -990,6 +990,7 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                 {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
                     this.game.current_stage = this.game.stage[1];
+                    this.game.changeDragonCave(); 
                     this.game.removeEntityByName("Dragon");
 
                     setTimeout(function () {
@@ -1025,8 +1026,20 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
     if (!is_multi_attack && !game.fiendBattleOver(game) && !game.heroBattleOver(game)) {
         game.animation_queue.push(new Event(null, null, 500, game.setNextFighter, game));
     }
+}
 
+GameEngine.prototype.changeDragonCave = function () {
+    this.environment["dragon_cave"].map[1][4][29] = 34;
+    this.environment["dragon_cave"].map[1][5][29] = 34;
+    this.environment["dragon_cave"].map[1][5][28] = 34;
+    this.environment["dragon_cave"].map[1][6][28] = 34;
+    this.environment["dragon_cave"].map[1][7][28] = 34;
+    this.environment["dragon_cave"].map[1][7][27] = 34;
+    this.environment["dragon_cave"].map[1][8][29] = 34;
+    this.environment["dragon_cave"].map[1][7][27] = 34;
+    this.environment["dragon_cave"].map[1][8][28] = 34;
 
+    //window.setTimeout(game.alertHero("The crystals blocking the secret treasure room have been destroyed!"), 5000);
 }
 
 Entity.prototype.draw = function (context) {
@@ -1669,7 +1682,8 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
-    this.x = 220;
+
+    this.x = 180;
     this.y = 208;
 
     this.quests = [];
@@ -2218,6 +2232,10 @@ NPC.prototype.updateDialogue = function () {
             } else {
                 if (this.part === 0) {
                     this.part++;
+                }
+                if (this.game.environment[this.game.current_environment] === "dragon_cave" && this.part === 1) {
+                    var mage_hero = new Mage(gameEngine, new Statistics(200, 160, 25, 1, 1, 5));
+                    this.game.heroes.push(mage_hero);
                 }
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
@@ -2810,7 +2828,11 @@ Chest.prototype.startInteraction = function () {
 
         }
         if (!this.closed) {
-            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
+            if (this.game.environment[this.game.current_environment] === "dragon_cave") {
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 29;
+            } else if (this.game.environment[this.game.current_environment] === "level1") {
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
+            }
         }
     }
 }
