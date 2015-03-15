@@ -33,6 +33,7 @@ ASSET_MANAGER.queueDownload("./imgs/equipment/main_hand.png");
 ASSET_MANAGER.queueDownload("./imgs/mountain_man.png");
 ASSET_MANAGER.queueDownload("./imgs/mountain_woman.png");
 ASSET_MANAGER.queueDownload("./imgs/items/potion_int.png");
+ASSET_MANAGER.queueDownload("./imgs/items/potion_str.png");
 ASSET_MANAGER.queueDownload("./imgs/items/staff1.png");
 ASSET_MANAGER.queueDownload("./imgs/items/staff2.png");
 ASSET_MANAGER.queueDownload("./imgs/items/robe1.png");
@@ -307,13 +308,14 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_woman_spritesheet, 0, 3, 24, 32, 0.05, 1, true, false),
                                                 new Animation(mountain_woman_spritesheet, 0, 1, 24, 32, 0.05, 1, true, false), null, null, null);
     var mountain_woman = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
-                                                "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."]],
+                                                "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
+                                                ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
                                            mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5);
 
-    var mountain_villager_sprites = new SpriteSet(new Animation(mountain_villager_spritesheet, 0, 0, 32, 32, 0.05, 1, true, false),
-                                                new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 1, true, false),
-                                                new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 1, true, false),
-                                                new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 1, true, false), null, null, null);
+    var mountain_villager_sprites = new SpriteSet(new Animation(mountain_villager_spritesheet, 0, 0, 32, 32, 0.05, 3, true, false),
+                                                new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 3, true, false),
+                                                new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 3, true, false),
+                                                new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 3, true, false), null, null, null);
     var mountain_villager_quest = new KILL_QUEST(gameEngine, "Shelly", "Dire Wolf", 5);
     var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
                                                                   "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
@@ -323,8 +325,8 @@ ASSET_MANAGER.downloadAll(function () {
                                                                      "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
                                                                      "They come into town looking to loot our store every few months or so, it's an ongoing battle."],
                                                                   ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
-                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(384, 64), new Point(384, 160)], .75, false, [4, 5],
-                                                                    mountain_villager_quest, "level2", 1, [function () {
+                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(224, 64), new Point(224, 220)], .05, false, [4, 5],
+                                                                    mountain_villager_quest, "level2", 1.25, [function () {
                                                                         if (this.part === 1 && this.quest.complete) {
                                                                             this.part++;
                                                                         }
@@ -519,13 +521,16 @@ ASSET_MANAGER.downloadAll(function () {
                 [275,276,277,278,279,280,281,282,283,284,285,164,165,168,169,144,0,0,0,168,169,164,165,0,110,111,112,113,114,0,55,56,57,58,59,0,60,61,62,63,64,0],
                 [297,298,299,300,301,302,303,304,305,306,307,142,143,144,0,166,146,147,0,146,147,142,143,0,132,133,134,135,136,0,77,78,79,80,81,0,82,83,84,85,86,0],
                 [319,320,321,322,323,324,325,326,327,328,329,164,165,166,146,147,168,169,0,168,169,164,165,21,154,155,156,157,158,21,99,100,101,102,103,21,104,105,106,107,108,21],
-                [341,342,343,344,345,346,347,348,349,350,351,142,143,144,168,169,144,144,0,144,144,142,143,43,176,177,178,179,180,43,121,122,123,124,125,43,126,127,128,129,130,43],
-                [363,364,365,366,367,368,369,370,371,372,373,164,165,166,0,0,166,166,0,166,166,164,165,65,0,0,87,0,0,65,0,0,87,0,0,65,0,0,87,0,0,65],
+                [341,342,343,344,345,346,347,348,349,350,351,142,143,144,168,169,0,0,0,144,144,142,143,43,176,177,178,179,180,43,121,122,123,124,125,43,126,127,128,129,130,43],
+                [363,364,365,366,367,368,369,370,371,372,373,164,165,166,0,0,0,0,0,166,166,164,165,65,0,0,87,0,0,65,0,0,87,0,0,65,0,0,87,0,0,65],
                 [385,386,387,388,389,390,391,392,393,394,395,462,463,464,465,466,467,468,0,146,147,142,143,0,0,0,87,0,0,0,0,0,87,0,0,0,0,0,87,0,0,0],
                 [407,408,409,410,411,412,413,414,415,416,417,484,485,486,487,488,489,490,0,168,169,164,165,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,0,0,0],
                 [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
                 [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
-                [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0,1,2,3,4,5], [], ["Dire Wolf"], "level2", "./imgs/woods.png", 3);
+                [], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
+                [new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
+                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!")], true)],
+                ["Dire Wolf"], "level2", "./imgs/woods.png", 3);
 
     gameEngine.addEnvironment(level1.name, level1);
     gameEngine.addEnvironment(level2.name, level2);
