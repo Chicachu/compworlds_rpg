@@ -516,11 +516,11 @@ GameEngine.prototype.setBossBattle = function(game)
 {
     game.entities[0].y = 230;
     if (game.current_environment === "dragon_cave") {
-        game.fiends.push(new Dragon1(game, new Statistics(250, 40, 60, 5, 10, 3)));
+        game.fiends.push(new Dragon1(game, new Statistics(150, 40, 60, 5, 10, 3)));
     }
     else if (game.current_environment === "level2")
     {
-        game.fiends.push(new Siren(game, new Statistics(325, 50, 50, 0, 0, 0)));
+        game.fiends.push(new Siren(game, new Statistics(225, 50, 50, 0, 0, 0)));
     }
     game.fiends[0].y = (game.height / 3) - 140;
     game.fiends[0].x = game.fiends[0].x - 30
@@ -1302,9 +1302,9 @@ Hero.prototype.levelUp = function()
         this.stats.xp = xp_diff;
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
-        this.stats.attack = .3 * (this.level * this.level) + 15;
-        this.stats.defense = .3 * (this.level * this.level) + 25;
-        this.stats.total_health = 2 * (this.level * this.level) + 300;
+        this.stats.attack = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.defense = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.total_health = this.stats.total_health + ( 2 * (this.level * this.level) );
         this.drawLevelUp();
         this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
         this.levelUp();
@@ -2920,16 +2920,16 @@ Environment.prototype.initNewFiend = function (fiend) {
             return (new Skeleton(this.game, new Statistics(30, 10, 15), false));
             break;
         case "Malboro":
-            return (new Malboro(this.game, new Statistics(45, 15, 5), false));
+            return (new Malboro(this.game, new Statistics(40, 15, 5), false));
             break;
         case "Ogre":
-            return (new Ogre(this.game, new Statistics(60, 15, 15), false));
+            return (new Ogre(this.game, new Statistics(50, 15, 15), false));
             break;
         case "Dire Wolf":
-            return (new DireWolf(this.game, new Statistics(50, 15, 5), true));
+            return (new DireWolf(this.game, new Statistics(60, 15, 5), true));
             break;
         case "Wolf Rider":
-            return (new WolfRider(this.game, new Statistics(80, 20, 15), true));
+            return (new WolfRider(this.game, new Statistics(70, 20, 15), true));
             break;
         default:
             return null;
