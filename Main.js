@@ -741,6 +741,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(mountain_villager);
 	gameEngine.addEntity(mage_npc);
 	gameEngine.addEntity(bishop);
+		gameEngine.addEntity(aladdin);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
