@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level3";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1282,7 +1282,7 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3990;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 8000;
     }
 }
 

@@ -508,14 +508,14 @@ ASSET_MANAGER.downloadAll(function () {
                                                                         }
                                                                     }], 20);
 																	
-	var jasmine_sprites = new SpriteSet(new Animation(jasmine_spritesheet, 0, 2, 37.5, 50, 0.05, 1, true, false),
-                                                new Animation(jasmine_spritesheet, 0, 0,37.5, 50, 0.05, 1, true, false),
-                                                new Animation(jasmine_spritesheet, 0, 3, 37.5, 50, 0.05, 1, true, false),
-                                                new Animation(jasmine_spritesheet, 0, 1, 37.5, 50, 0.05, 1, true, false), null, null, null);
+	var jasmine_sprites = new SpriteSet(new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0,37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false), null, null, null);
     var jasmine = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
                                                 "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
                                                 ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
-                                           jasmine_sprites, [new Point(576, 352)], .06, false, [5], "level3", 1.5, 15);
+                                           jasmine_sprites, [new Point(535, 340)], .06, false, [5], "level3", 1.5, 15);
 	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
