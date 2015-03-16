@@ -118,6 +118,7 @@ GameEngine.prototype.init = function (context) {
     
     this.current_stage = this.stage[0];
     this.loot_dispenser = new LootDispenser(this);
+    this.action_listener = null;
 }
 
 GameEngine.prototype.addEnvironment = function (name, environment_object) {
@@ -126,6 +127,9 @@ GameEngine.prototype.addEnvironment = function (name, environment_object) {
 
 GameEngine.prototype.startInput = function () {
     var that = this;
+    if (this.action_listener) {
+        this.context.canvas.removeEventListener(this.action_listener);
+    }
     this.context.canvas.addEventListener("keyup", function (e) {
         if (e.which === 13 && that.game_over) {
             that.restartGame();
@@ -134,8 +138,8 @@ GameEngine.prototype.startInput = function () {
         }
         e.preventDefault();
     });
-
-    this.context.canvas.addEventListener('keydown', function (e) {
+    this.context.canvas.addEventListener('keydown', function startinput(e) {
+        that.action_listener = startinput;
         if (that.canControl) {
             if (String.fromCharCode(e.which) === ' ') {
                 that.space = true;
@@ -150,19 +154,20 @@ GameEngine.prototype.startInput = function () {
                 e.stopImmediatePropagation();
             } else if (e.which === 73) {
                 //that.key_i = true;
-                window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
+                //window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
                 //that.entities[0].inventory.showInventory();
+                that.entities[0].update(true); 
                 e.stopImmediatePropagation();
             }
         }
         e.preventDefault();
+        
     }, false);
 
     this.context.canvas.addEventListener('keyup', function (e) {
         that.key = 0;
         that.space = 0;
         that.esc = 0;
-        that.key_i = false;
         e.preventDefault();
     }, false);
 
@@ -1722,8 +1727,12 @@ Warrior.prototype.draw = function (context) {
     Hero.prototype.draw.call(this, context);
 }
 
-Warrior.prototype.update = function () {
+Warrior.prototype.update = function (called) {
     Hero.prototype.update.call(this);
+    var that = this;
+    if (called) {
+        window.setTimeout(that.inventory.showInventory(that.inventory), 0);
+    }
 }
 
 
@@ -4299,6 +4308,7 @@ Inventory.prototype.hasItem = function (item_name) {
 
 Inventory.prototype.showInventory = function (flag) {
     if (!this.open) {
+        //this.draw();
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
@@ -4323,7 +4333,7 @@ HTML_Item.prototype.updateShowItemMenu = function () {
     var that = this;
     this.element.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ') {
-            that.showItemMenu(true, that.game.entities[0].inventory);
+            window.setTimeout(that.showItemMenu(true, that.game.entities[0].inventory), 0);
         }
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -4344,8 +4354,13 @@ Inventory.prototype.draw = function (ctx) {
             // set items html spot
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
-            this.html_items[i].actionInput.bind(this.html_items[i]);
-            this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
+            var that = this;
+            //window.setTimeout(that.html_items[i].actionInput.bind(that.html_items[i]), 0);
+            //window.setTimeout(that.html_items[i].updateShowItemMenu.bind(that.html_items[i]), 0);
+            //this.html_items[i].actionInput.bind(this.html_items[i]);
+            //this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
+            //this.html_items[i].actionInput();
+            //this.html_items[i].updateShowItemMenu.call(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
@@ -4353,7 +4368,9 @@ Inventory.prototype.draw = function (ctx) {
     }
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
-    this.selectInput();
+    //this.selectInput();
+    var that = this;
+    window.setTimeout(that.game.startInput.bind(that.game),0);
 }
 
 Inventory.prototype.addItem = function (item) {
@@ -4381,8 +4398,8 @@ Inventory.prototype.addItem = function (item) {
     //this.draw.bind(this);
     //var that = this;
     //window.setTimeout(that.draw.bind(that), 0);
-    //this.draw();
-    this.draw.call(this);
+    this.draw();
+    //this.draw.call(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
@@ -4408,8 +4425,8 @@ Inventory.prototype.removeItem = function (item, qty) {
     //this.draw.bind(this);
     //var that = this;
     //window.setTimeout(that.draw.bind(that), 0);
-    //this.draw();
-    this.draw.call(this);
+    this.draw();
+    //this.draw.call(this);
     return item;
 }
 
@@ -4768,7 +4785,7 @@ ShoppingCart.prototype.removeItem = function (html) {
     this.inventory.total_price.innerHTML = "Total: " + this.total * this.sale_back;
     var that = this;
     //window.setTimeout(that.inventory.draw.bind(that.inventory), 0);
-    that.inventory.draw.bind(that.inventory);
+    //that.inventory.draw.bind(that.inventory);
     that.inventory.draw();
 }
 
