@@ -156,9 +156,10 @@ GameEngine.prototype.startInput = function () {
                 e.stopImmediatePropagation();
             } else if (e.which === 73) {
                 //that.key_i = true;
-                //window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
+                window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory, gameEngine), 0);
                 //that.entities[0].inventory.showInventory();
-                gameEngine.entities[0].update(true); 
+                //that.entities[0].inventory.showInventory.call(gameEngine.entities[0].inventory);
+                //gameEngine.entities[0].update(true); 
                 e.stopImmediatePropagation();
             }
         }
@@ -170,6 +171,7 @@ GameEngine.prototype.startInput = function () {
         that.key = 0;
         that.space = 0;
         that.esc = 0;
+        that.key_i = 0;
         e.preventDefault();
     }, false);
 
@@ -735,11 +737,13 @@ LootDispenser.prototype.toString = function()
 LootDispenser.prototype.dispenseLoot = function (hero) {
     
     if (this.encounters % 6 === 0) {
-        window.setTimeout(hero.recieveItem.bind(hero, new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!")) , 0);
+        window.setTimeout(hero.recieveItem.bind(hero, new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!")), 0);
+        //hero.recieveItem.bind(hero, new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!"));
     }
     for(var i = 0; i < this.accumulated_loot.length; i ++)
     {
         window.setTimeout(hero.recieveItem.bind(hero, this.accumulated_loot[i]), 0);
+        //hero.recieveItem.bind(hero, this.accumulated_loot[i]);
     }
 
     var total_xp_weight = 0;
@@ -791,7 +795,7 @@ LootDispenser.prototype.generateItem = function(item)
                 var amu_amount = (parseInt(amu_string.substr(amu_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + amu_amount.toString());
             }
-            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0), "Increase defense by 2"));
+            return (new Armor(this.game, "Amulet of Thick Skin", 20, ASSET_MANAGER.getAsset("./imgs/items/amulet1.png"), "armor", new Statistics(0, 0, 2, 0, 0, 0), "An amulet that emanates a red aura."));
             break;
         case "heal berry":
             if (!this.string["heal berry"]) {
@@ -802,7 +806,7 @@ LootDispenser.prototype.generateItem = function(item)
                 var berry_amount = (parseInt(berry_string.substr(berry_string.length - 1)) + 1);
                 this.string["amulet of thick skin"] = (" + Amulet of Thick Skin" + " x " + berry_amount.toString());
             }
-            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP"));
+            return (new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."));
             break;
         default:
             break;
@@ -1733,9 +1737,6 @@ Warrior.prototype.draw = function (context) {
 Warrior.prototype.update = function (called) {
     Hero.prototype.update.call(this);
     var that = this;
-    if (called) {
-        window.setTimeout(that.inventory.showInventory(that.inventory), 0);
-    }
 }
 
 
@@ -3654,7 +3655,7 @@ GeneralMenu.prototype.init = function () {
             window.setTimeout(that.save.focus(), 0);
         } else if (String.fromCharCode(e.which) === ' ') {
             that.showMenu(false);
-            window.setTimeout(that.hero.inventory.showInventory.call(that.hero.inventory), 0);
+            window.setTimeout(that.hero.inventory.showInventory.call(that.hero.inventory, gameEngine), 0);
         }
         e.stopImmediatePropagation();
         e.preventDefault();
@@ -4367,9 +4368,14 @@ Inventory.prototype.hasItem = function (item_name) {
     return found;
 }
 
-Inventory.prototype.showInventory = function (flag) {
+Inventory.prototype.showInventory = function (game) {
+    if (this.items.length !== gameEngine.entities[0].inventory.items.length) {
+        this.items = gameEngine.entities[0].inventory.items; 
+    }
+    
     if (!this.open) {
-        //this.draw();
+        //window.setTimeout(that.draw.bind(that), 0);
+        this.draw();
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
@@ -4416,8 +4422,8 @@ Inventory.prototype.draw = function (ctx) {
             this.items[i].html = this.html_items[i];
             this.html_items[i].item = this.items[i];
             var that = this;
-            //window.setTimeout(that.html_items[i].actionInput.bind(that.html_items[i]), 0);
-            //window.setTimeout(that.html_items[i].updateShowItemMenu.bind(that.html_items[i]), 0);
+            window.setTimeout(that.html_items[i].actionInput.bind(that.html_items[i]), 0);
+            window.setTimeout(that.html_items[i].updateShowItemMenu.bind(that.html_items[i]), 0);
             //this.html_items[i].actionInput.bind(this.html_items[i]);
             //this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
             //this.html_items[i].actionInput();
@@ -4429,8 +4435,9 @@ Inventory.prototype.draw = function (ctx) {
     }
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
-    //this.selectInput();
     var that = this;
+    //window.setTimeout(that.selectInput.bind(that), 0);
+    //this.selectInput();
     //window.setTimeout(that.game.startInput.bind(that.game),0);
     this.game.startInput.call(this.game);
 }
@@ -4460,22 +4467,22 @@ Inventory.prototype.addItem = function (item) {
     //this.draw.bind(this);
     //var that = this;
     //window.setTimeout(that.draw.bind(that), 0);
-    this.draw();
+    //this.draw();
     //this.draw.call(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
 // otherwise it will return the item 
-Inventory.prototype.removeItem = function (item, qty) {
+Inventory.prototype.removeItem = function (item_to_remove, qty) {
     var item = false;
     for (var i = 0; i < this.items.length; i++) {
-        if (this.items[i] === item) {
+        if (this.items[i] === item_to_remove) {
             if (this.items[i].qty > qty) {
                 //split stack
-                item = this.splitStack(item_name, qty)
+                item = this.splitStack(item_to_remove.name, qty)
             } else if (this.items[i].qty === qty) {
                 item = this.items[i];
-                if (item.type) {
+                if (item_to_remove.type) {
                     item.unequipOldArmor(true);
                 }
                 this.items.splice(i, 1);
@@ -4512,11 +4519,14 @@ Inventory.prototype.selectInput = function () {
         var html = that.html_items[i];
         item.index = i;
         item.pressed = false;
+        if (that.actionListener) {
+            item.removeEventListener("keydown", that.actionListener);
+        }
         item.addEventListener("keydown", function ItemMenu(e) {
             var new_index = null;
             var index = this.index;
             if (!this.pressed) {
-                this.actionListener = ItemMenu;
+                that.actionListener = ItemMenu;
                 if (e.which === 37) { // left 
                     // if at the beginning of a row, send focus to the end of row. 
                     if ((index % 5) < 1) {
@@ -4560,7 +4570,7 @@ Inventory.prototype.selectInput = function () {
                         that.html_items[index].showItemMenu(true, that);
                     }
                 } else if (e.which === 27 || e.which === 73) {
-                    window.setTimeout(that.showInventory.bind(that), 0);
+                    window.setTimeout(that.showInventory.bind(that, gameEngine), 0);
                 } else if (e.which === 13) {
                     that.changeHero(); 
                 }
