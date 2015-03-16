@@ -30,6 +30,8 @@ ASSET_MANAGER.queueDownload("./imgs/equipment/accessory.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/armor.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/offhand.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/main_hand.png");
+ASSET_MANAGER.queueDownload("./imgs/mountain.png");
+ASSET_MANAGER.queueDownload("./imgs/desert.png");
 
 // level 2 stuffs. 
 ASSET_MANAGER.queueDownload("./imgs/mountain_man.png");
@@ -628,7 +630,7 @@ ASSET_MANAGER.downloadAll(function () {
 				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,156,157,158,0,240,0,0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,260,200,202,204,0,0,0,0,0,0,0,0]],
                  [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
-                [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/woods.png", 0, [1, 2, 4, 5]);
+                [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
                 [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 0, 109, 175, 175, 175, 175, 175],
@@ -659,7 +661,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
                 new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
                 new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch)],
-                ["Dire Wolf"], "level2", "./imgs/woods.png", 3, [0, 1, 2, 3, 4, 5]);
+                ["Dire Wolf", "Wolf Rider"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
 
 
 

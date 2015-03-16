@@ -83,7 +83,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level3";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -2381,7 +2381,9 @@ NPC.prototype.reposition = function () {
 
 Boss = function (game, dialogue, anims, path, speed, pause, quad, map_name, name)
 {
-    this.spriteSheet = anims.right.spriteSheet;
+    if (anims) {
+        this.spriteSheet = anims.right.spriteSheet;
+    }
     this.name = name;
     NPC.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
 }
@@ -2417,11 +2419,53 @@ Boss.prototype.updateDialogue = function () {
 SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
     this.spriteSheet = anims.right.spriteSheet;
     this.name = "SirenNPC";
-    NPC.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
+    this.faded_in = false;
+    this.fading_in = false;
+    this.fade_timer = 0;
+    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
 }
 
-SirenNPC.prototype = new NPC();
+SirenNPC.prototype = new Boss();
 SirenNPC.prototype.constructor = SirenNPC;
+
+SirenNPC.prototype.draw = function (context) {
+    // only draw if NPC is in the current quadrant on the map
+    var found = false;
+    for (var i = 0; i < this.quad.length; i++) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
+            found = true;
+        }
+    }
+    if (found) {
+        var distance = Math.sqrt(Math.pow(this.game.heroes[0].x - this.x, 2) + Math.pow(this.game.heroes[0].y - this.y, 2));
+        if (distance < 100) {
+           // this.spriteSheet.style.opacity = "0";
+            //if (!this.faded_in && !this.fading_in) {
+            //    var that = this;
+            //    //var image = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
+            //    var alpha = 0.05;
+            //    this.fade_timer = setInterval(function () {
+            //        if (alpha >= 1) {
+            //            clearInterval(that.fade_timer);
+            //            that.faded_in = true;
+            //            that.fading_in = false;
+            //        }
+            //        alpha += .05
+            //        //image.style.opacity = alpha;
+            //        //alpha_string = alpha_string.toString();
+            //        context.canvas.globalAlpha = alpha;
+            //        that.curr_anim.drawFrame(that.game.clockTick, context, that.x, that.y, that.scale);
+            //        context.canvas.globalAlpha = 1;
+            //    }, 500);
+            //    this.fading_in = true;
+                
+            //}
+            //if (this.faded_in) {
+                this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
+            //}
+        }
+    }
+}
 
 SirenNPC.prototype.updateDialogue = function () {
     if (this.game) {
@@ -4029,7 +4073,7 @@ Potion.prototype.doAction = function (game, target) {
     }
     switch (this.potion_type) {
         case "health":
-            var max_heal = this.target.stats.total_health - this_target.stats.health;
+            var max_heal = this_target.stats.total_health - this_target.stats.health;
             if (max_heal > this.level * 75) {
                 this_target.stats.health += this.level * 75;
             }
