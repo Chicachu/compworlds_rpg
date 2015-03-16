@@ -4334,6 +4334,7 @@ Inventory.prototype.hasItem = function (item_name) {
 
 Inventory.prototype.showInventory = function (flag) {
     if (!this.open) {
+        this.draw();
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
