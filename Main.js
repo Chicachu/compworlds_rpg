@@ -395,7 +395,8 @@ ASSET_MANAGER.downloadAll(function () {
 
     var mage_npc = new NPC(gameEngine, [["Thank you for saving me, hero! I was captured by the dragon and have been stuck here for days!! I am forever in your debt.",
                                      "In fact, I think I'll follow you around everywhere you go! I will never leave your side. *swoon*",
-                                        "Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
+                                        "Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!",
+                                         "I've overheard people talking about some ancient temple, too! I want to visit! LET'S GO!!!!"]],
                                            mage_npc_sprites, [new Point(475, 115)], .06, false, [2], "dragon_cave", 1);
     
     var bishop_sprites = new SpriteSet(new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
