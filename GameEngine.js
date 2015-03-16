@@ -84,7 +84,9 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
+
     this.current_environment = "level1";
+
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -115,6 +117,7 @@ GameEngine.prototype.init = function (context) {
     this.sound_manager = new SoundManager(this);
     // part0 = beginning until dragon is dead
     // part1 = after dragon is dead and until mountain level is complete. 
+    // part2 = after mountain level is complete and hero on his way to desert.
     this.stage = ["part0", "part1", "part2", "part3"]; 
     
     this.current_stage = this.stage[0];
@@ -441,6 +444,7 @@ setting the battle background, saving coordinates, and also generating a list or
 GameEngine.prototype.setBattle = function (args) {
     var game = args.game;
     var battle_type = args.battle_type;
+    var boss = args.boss;
     var player = game.entities[0];
     var heroes = game.heroes;
     game.sound_manager.playSong("battle");
@@ -487,7 +491,7 @@ GameEngine.prototype.setBattle = function (args) {
 
     if (battle_type === "boss")
     {
-        game.setBossBattle(game);
+        game.setBossBattle(game, boss);
     }
     else if (battle_type === "normal" || !battle_type)
     {
@@ -528,17 +532,23 @@ GameEngine.prototype.setNormalBattle = function(game)
     game.decideFighters();
 }
 
-GameEngine.prototype.setBossBattle = function(game)
+GameEngine.prototype.setBossBattle = function(game, boss)
 {
     game.entities[0].y = 230;
-    if (game.current_environment === "dragon_cave") {
+    if (boss === "Dragon") {
         game.fiends.push(new Dragon1(game, new Statistics(150, 40, 60, 5, 10, 3)));
         game.fiends[0].y = (game.height / 3) - 140;
         game.fiends[0].x = game.fiends[0].x - 30
     }
-    else if (game.current_environment === "level2")
+    else if (boss === "Siren")
     {
         game.fiends.push(new Siren(game, new Statistics(225, 50, 50, 0, 0, 0)));
+        game.fiends[0].y = (game.height / 3);
+        game.fiends[0].x = game.fiends[0].x - 30
+    }
+    else if(boss === "Troll")
+    {
+        game.fiends.push(new Troll(game, new Statistics(225, 50, 50, 0, 0, 0)));
         game.fiends[0].y = (game.height / 3);
         game.fiends[0].x = game.fiends[0].x - 30
     }
@@ -1017,16 +1027,11 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                     this.game.current_stage = this.game.stage[1];
                     this.game.changeDragonCave(); 
                     this.game.removeEntityByName("Dragon");
-
-                    setTimeout(function () {
-                        var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
-                        var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), null, null, null);
-
-                        var siren_NPC = new Boss(game, [["Whaddup nigga.", "think youre hard bitch ass nigga?", "ima fuck you up nigga."]],
-                            siren_NPC_sprites, [new Point(450, 120)], .1, false, [2], "level2", "Siren");
-                        siren_NPC.setScale(.3);
-                    }, 10000);
-                    
+                }
+                else if(foes.name === "Siren")
+                {
+                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                    this.game.removeEntityByName("SirenNPC");
                 }
                 else {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -1280,7 +1285,9 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3990;
+
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3998;
+
     }
 }
 
@@ -1324,7 +1331,7 @@ Hero.prototype.levelUp = function()
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
         this.stats.attack = this.stats.attack + (.3 * (this.level * this.level) );
-        this.stats.defense = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.defense = this.stats.defense + (.3 * (this.level * this.level) );
         this.stats.total_health = this.stats.total_health + ( 2 * (this.level * this.level) );
         this.drawLevelUp();
         this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
@@ -1562,6 +1569,11 @@ Hero.prototype.isPassable = function (tile, index) {
         if (tile === 0 || (tile >= 8 && tile <= 14) || tile === 28 || tile === 29 || tile === 48 || tile === 49 || tile === 30) {
             return true; 
         }
+    } else if (this.game.current_environment === "level3") {
+        if (tile === 0 || tile === 97 || tile === 98 || (tile >= 116 && tile <= 118) || (tile >= 136 && tile <= 138)|| (tile >= 156 && tile <= 158)
+            || (tile >= 174 && tile <= 177) || (tile >= 194 && tile <= 197) || (tile >= 214 && tile <= 217)) {
+
+        }
     } else {
         return true;
     }
@@ -1717,7 +1729,9 @@ Warrior = function (game, stats) {
     };
 
 
+
     this.x = 10;
+
     this.y = 208;
         
     this.quests = [];
@@ -1915,9 +1929,58 @@ Troll = function (game, stats, loop_while_standing)
             up: null,
             left: null,
             right: new Animation(this.spriteSheet, 7, 1, 256, 256, .1, 1, true, false),
-            //destroy: new Animation();
+            destroy: new Animation(this.spriteSheet, 0, 1, 256, 256, .08, 8, true, false),
+            hit: new Animation(this.spriteSheet, 8, 1, 256, 256, .1, 5, true, false),
+            death: new Animation(this.spriteSheet, 12, 1, 256, 256, .1, 1, true, false)
         }
+    this.loot_table =
+        [({string: "gold", weight: 100})];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Troll", false, this.loot_table);
+    this.scale_factor = .7;
 }
+
+Troll.prototype = new Enemy();
+Troll.prototype.constructor = Troll;
+
+Troll.prototype.draw = function (context) {
+    this.drawHealthBar(context);
+    if (this.is_targeted) {
+        this.drawSelector(context, 'yellow');
+    }
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale_factor);
+}
+
+Troll.prototype.drawHealthBar = function (context) {
+    if (this.stats.health < 0) {
+        green = 0;
+    }
+    else {
+        var green = this.stats.health / this.stats.total_health;
+    }
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 - 30, this.y / this.scale_factor - 60, this.curr_anim.frameWidth * this.scale_factor - 40, 5);
+    context.fillStyle = 'red';
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.rect((this.x + this.curr_anim.frameWidth / 3) - 30, this.y / this.scale_factor - 60, (this.curr_anim.frameWidth * green) * this.scale_factor - 40, 5);
+    context.fillStyle = 'green';
+    context.fill();
+    context.closePath();
+}
+
+Troll.prototype.drawSelector = function (context, color) {
+    context.beginPath();
+    context.moveTo((this.x + this.curr_anim.frameWidth) * this.scale_factor - 50, this.y / this.scale_factor - 70);
+    context.lineTo(((this.x + this.curr_anim.frameWidth) - 10) * this.scale_factor - 50, this.y / this.scale_factor - 80);
+    context.lineTo(((this.x + this.curr_anim.frameWidth) + 10) * this.scale_factor - 50, this.y / this.scale_factor - 80);
+    context.lineTo((this.x + this.curr_anim.frameWidth) * this.scale_factor - 50, this.y / this.scale_factor - 70);
+    context.fillStyle = color;
+    context.fill();
+    context.closePath();
+}
+
+
 Siren = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
@@ -2438,11 +2501,31 @@ Boss.prototype.updateDialogue = function () {
                 this.game.context.canvas.focus();
                 //this.game.canControl = true;
                 this.interacting = false;
-                this.game.fadeOut(this.game, { game: this.game, battle_type: "boss" }, this.game.setBattle);
+                this.setBattle();
             }
             this.game.next = false;
         }
     }
+}
+
+Boss.prototype.setBattle = function()
+{
+    this.game.fadeOut(this.game, { game: this.game, battle_type: "boss", boss: "Dragon" }, this.game.setBattle);
+}
+
+TrollNPC = function(game, dialogue, anims, path, speed, pause, quad, map_name)
+{
+    this.spriteSheet = anims.right.spriteSheet;
+    this.name = "TrollNPC";
+    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name);
+}
+
+TrollNPC.prototype = new Boss();
+TrollNPC.prototype.constructor = TrollNPC;
+
+TrollNPC.prototype.setBattle = function()
+{
+    this.game.fadeOut(this.game, { game: this.game, battle_type: "boss", boss: "Troll" }, this.game.setBattle);
 }
 
 SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
@@ -2451,7 +2534,7 @@ SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) 
     this.faded_in = false;
     this.fading_in = false;
     this.fade_timer = 0;
-    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
+    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name);
 }
 
 SirenNPC.prototype = new Boss();
@@ -2467,7 +2550,7 @@ SirenNPC.prototype.draw = function (context) {
     }
     if (found) {
         var distance = Math.sqrt(Math.pow(this.game.heroes[0].x - this.x, 2) + Math.pow(this.game.heroes[0].y - this.y, 2));
-        if (distance < 100) {
+        if (distance < 75) {
            // this.spriteSheet.style.opacity = "0";
             //if (!this.faded_in && !this.fading_in) {
             //    var that = this;
@@ -2618,7 +2701,6 @@ NPC_QUEST.prototype.changeCoordsForQuad = function (quad) {
             this.y -= 11 * 32;
         }
     }
-
 }
 /* QUEST OBJECT abstract class
  Parameters: giverName (who gave the quest), 
@@ -2901,6 +2983,25 @@ EnterLevel2 = function () {
     this.game.entities[0].y = 208;
 }
 
+Level3 = function () {
+    if (this.game.current_stage === this.game.stage[2]) {
+        this.game.current_environment = "level3";
+        this.game.environment[this.game.current_environment].setQuadrant(3);
+        this.game.entities[0].x = 10;
+        this.game.entities[0].y = 224;
+        this.game.alertHero("You have been travelling for many days and have finally made it to the desert.");
+    } else {
+        this.game.alertHero("The road that leaves this village looks long, it may be wise to help the village before you leave.");
+    }
+}
+
+Level2 = function () {
+    this.game.current_environemt = "level2";
+    this.game.environment[this.game.current_environment].setQuadrant(4);
+    this.game.entities[0].x = 320;
+    this.game.entities[0].y = 352;
+}
+
 // used to change maps or to initiate special battles. 
 Portal = function (x, y, quad, game, func, stage) {
     this.func = func;
@@ -3001,13 +3102,13 @@ Chest.prototype.startInteraction = function () {
         }
         if (!this.closed) {
             if (this.game.current_environment === "dragon_cave") {
-                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 29;
+                this.game.environment[this.game.current_environment].map[1][loc_point.y][loc_point.x] = 29;
             } else if (this.game.current_environment === "level1") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
             } else if (this.game.current_environment === "level2") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 2;
             } else if (this.game.current_environment === "church") {
-                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 64;
+                this.game.environment[this.game.current_environment].map[1][loc_point.y][loc_point.x] = 64;
             }
         }
     }
@@ -4146,7 +4247,19 @@ Potion.prototype.doAction = function (game, target) {
             this_target.intelligence += this.level * 1;
             break;
     }
-    this.game.entities[0].inventory.removeItem(this.name, 1);
+    this.game.entities[0].inventory.removeItem(this, 1);
+}
+
+GameEngine.prototype.getEntity = function (entity_name) {
+    var found = false; 
+    for (var i = 0; i < this.entities.length; i++) {
+        if (this.entities[i].name) {
+            if (this.entities[i].name === entity_name) {
+                found = this.entities[i];
+            }
+        }
+    }
+    return found; 
 }
 
 HTML_Item = function (element, game) {
