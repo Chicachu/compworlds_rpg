@@ -22,11 +22,13 @@ Animation = function (spriteSheet, startX, startY, frameWidth, frameHeight, fram
     this.loop = loop;
     this.reverse = reverse;
     this.looped = false;
+    this.scaleBy = 1;
 }
 
 Animation.prototype.drawFrame = function (tick, context, x, y, scaleBy) {
     this.elapsedTime += tick;
     var scaleBy = scaleBy || 1;
+    this.scaleBy = scaleBy;
     if (this.loop) {
         if (this.isDone()) {
             this.elapsedTime = 0;
@@ -80,8 +82,8 @@ GameEngine = function () {
     this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
-    this.environment = ["level1", "level2"];
-    this.current_environment = "level2";
+    this.environment = ["level1", "level2","level3"];
+    this.current_environment = "level3";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -96,6 +98,7 @@ GameEngine = function () {
     this.game_over = false;
     this.heroes = [];
     this.do_not_interrupt = false;
+    this.is_boss_battle = false;
 }
 
 GameEngine.prototype.init = function (context) {
@@ -273,7 +276,9 @@ GameEngine.prototype.draw = function (drawCallBack) {
         this.environment[this.current_environment].draw();
     }
     var hero_drawn = false;
-    this.queueActions();
+    if (this.animation_queue.length >= 1) {
+        this.queueActions();
+    }
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
@@ -517,13 +522,16 @@ GameEngine.prototype.setBossBattle = function(game)
     game.entities[0].y = 230;
     if (game.current_environment === "dragon_cave") {
         game.fiends.push(new Dragon1(game, new Statistics(150, 40, 60, 5, 10, 3)));
+        game.fiends[0].y = (game.height / 3) - 140;
+        game.fiends[0].x = game.fiends[0].x - 30
     }
     else if (game.current_environment === "level2")
     {
         game.fiends.push(new Siren(game, new Statistics(225, 50, 50, 0, 0, 0)));
+        game.fiends[0].y = (game.height / 3);
+        game.fiends[0].x = game.fiends[0].x - 30
     }
-    game.fiends[0].y = (game.height / 3) - 140;
-    game.fiends[0].x = game.fiends[0].x - 30
+    game.is_boss_battle = true;
     game.fiends[0].init();
     game.addEntity(game.fiends[0]);
     game.decideFighters();
@@ -543,6 +551,7 @@ GameEngine.prototype.endBattle = function (game)
         this.kill_quest_complete = false; 
     }
     game.is_battle = false;
+    game.is_boss_battle = false;
     window.setTimeout(game.menu.showMenu.bind(game.menu, false, game), 0);
     window.setTimeout(game.esc_menu.showMenu(false), 5000);
     game.context.canvas.focus();
@@ -557,9 +566,9 @@ GameEngine.prototype.endBattle = function (game)
     //game.sound_manager.playSong("world1");
     if (game.current_environment === "level1" || game.current_environment === "dragon_cave") {
         game.sound_manager.playSong("world1");
-    } else if (game.current_environment === "level2") {
+    } else if (game.current_environment === "level2" || game.current_environment === "level3") {
         game.sound_manager.playSong("world2");
-    }
+    } 
     game.loot_dispenser.increment();
     setTimeout(function () {
         if (game.loot_dispenser.string.length > 0) {
@@ -583,6 +592,7 @@ GameEngine.prototype.gameOver = function (args) {
     var game = args.game;
     var background = args.background;
     game.game_over = true;
+    game.is_boss_battle = false;
     game.setBackground(background);
     game.context.canvas.focus();
     game.canControl = false;
@@ -853,7 +863,7 @@ Entity = function (game, x, y, spriteSheet, animations, stats) {
     this.is_targeted = false;
     this.level = 1;
     this.is_dead = false;
-    
+    this.scale_factor = 1;
     this.kill_quest_complete = false;
     this.id = Math.random() * Math.random();
     if (animations) {
@@ -928,13 +938,11 @@ Entity.prototype.drawHealthBar = function (context) {
         var green = this.stats.health / this.stats.total_health;
     }
     context.beginPath();
-    if (this.name === "dragon1")
-    {
+    if (this.name === "dragon1") {
 
         context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y + 67, this.curr_anim.frameWidth, 5);
     }
-    else
-    {
+    else {
 
         context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y - 7, this.curr_anim.frameWidth, 5);
     }
@@ -1894,13 +1902,14 @@ Siren = function (game, stats, loop_while_standing) {
             right: new Animation(this.spriteSheet, 7, 1, 256, 256, .1, 4, true, false),
             destroy: new Animation(this.spriteSheet, 5, 1, 256, 256, .1, 6, true, false),
             hit: new Animation(this.spriteSheet, 3, 5, 256, 256, .1, 6, true, false),
-            death: new Animation(this.spriteSheet, 8, 5, 256, 256, .1, 1, true, false)
+            death: new Animation(this.spriteSheet, 5, 5, 256, 256, .1, 1, true, false)
         };
     this.loot_table =
         [
             ({ string: "gold", weight: 100 })
         ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Siren", false, this.loot_table);
+    this.scale_factor = .7;
 }
 
 Siren.prototype = new Enemy();
@@ -1908,9 +1917,43 @@ Siren.prototype.constructor = Siren;
 
 Siren.prototype.draw = function(context)
 {
-    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, .4);
+    this.drawHealthBar(context);
+    if (this.is_targeted) {
+        this.drawSelector(context, 'yellow');
+    }
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale_factor);
 }
 
+Siren.prototype.drawHealthBar = function(context)
+{
+    if (this.stats.health < 0) {
+        green = 0;
+    }
+    else {
+        var green = this.stats.health / this.stats.total_health;
+    }
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 - 30, this.y / this.scale_factor - 60, this.curr_anim.frameWidth * this.scale_factor - 40, 5);
+    context.fillStyle = 'red';
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.rect((this.x + this.curr_anim.frameWidth / 3) - 30, this.y / this.scale_factor - 60, (this.curr_anim.frameWidth * green) * this.scale_factor - 40, 5);
+    context.fillStyle = 'green';
+    context.fill();
+    context.closePath();
+}
+
+Siren.prototype.drawSelector = function (context, color) {
+    context.beginPath();
+    context.moveTo((this.x + this.curr_anim.frameWidth) * this.scale_factor - 50, this.y / this.scale_factor - 70);
+    context.lineTo(((this.x + this.curr_anim.frameWidth) - 10) * this.scale_factor - 50, this.y / this.scale_factor - 80);
+    context.lineTo(((this.x + this.curr_anim.frameWidth) + 10) * this.scale_factor - 50, this.y / this.scale_factor - 80);
+    context.lineTo((this.x + this.curr_anim.frameWidth) * this.scale_factor - 50, this.y / this.scale_factor - 70);
+    context.fillStyle = color;
+    context.fill();
+    context.closePath();
+}
 WolfRider = function(game, stats, loop_while_standing)
 {
     this.game = game;
@@ -1945,8 +1988,8 @@ DireWolf = function(game, stats, loop_while_standing)
         down: null,
         up: null,
         left: null,
-        right: new Animation(this.spriteSheet, 0, 5, 104, 104, 0.07, 6, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 1, 120, 104, 0.08, 5, true, false),
+        right: new Animation(this.spriteSheet, 0, 5, 103, 104, 0.07, 6, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 1, 117, 104, 0.08, 5, true, false),
         hit: new Animation(this.spriteSheet, 0, 6, 104, 104, 0.08, 7, true, false),
         death: new Animation(this.spriteSheet, 6, 6, 104, 104, 0.1, 1, true, false)
     };
@@ -2026,9 +2069,9 @@ Ogre = function (game, stats, loop_while_standing) {
         death: new Animation(this.spriteSheet, 0, 2, 100, 100, 0.1, 1, true, false)
     };
     this.loot_table = [
-        ({ string: "gold", weight: 60 }),
+        ({ string: "gold", weight: 80 }),
         ({ string: "heal berry", weight: 10 }),
-        ({ string: "amulet of thick skin", weight: 30 })
+        ({ string: "amulet of thick skin", weight: 10 })
     ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "ogre", false, this.loot_table);
 }
@@ -2054,8 +2097,8 @@ Dragon1 = function(game, stats, loop_while_standing)
     };
 
     this.loot_table = [
-        ({ string: "gold", weight: 20 }),
-        ({ string: "heal berry", weight: 80 })
+        ({ string: "gold", weight: 100 }),
+        ({ string: "heal berry", weight: 0 })
     ];
 
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "dragon1", true);
@@ -2070,6 +2113,26 @@ Dragon1.prototype.draw = function (context) {
         this.drawSelector(context, 'yellow');
     }
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, 3);
+}
+
+Dragon1.prototype.drawHealthBar = function(context)
+{
+    if (this.stats.health < 0) {
+        green = 0;
+    }
+    else {
+        var green = this.stats.health / this.stats.total_health;
+    }
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y + 67, this.curr_anim.frameWidth, 5);
+    context.fillStyle = 'red';
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 + 15, this.y + 67, this.curr_anim.frameWidth * green, 5);
+    context.fillStyle = 'green';
+    context.fill();
+    context.closePath();
 }
 /* NPC 
 game : the game engine
@@ -3280,12 +3343,17 @@ BattleMenu.prototype.init = function (game) {
             if (e.which === 38) {
                 window.setTimeout(that.use_item.focus(), 0);
             } else if (String.fromCharCode(e.which) === ' ') {
-                that.game.fight_queue[0].is_turn = false;
-                for (var i = 0; i < that.game.heroes.length; i++)
-                {
-                    that.game.heroes[i].flee(true);
+                if (!that.game.is_boss_battle) {
+                    that.game.fight_queue[0].is_turn = false;
+                    var total_dexterity = 0;
+                    for (var i = 0; i < that.game.heroes.length; i++)
+                    {
+                        total_dexterity += that.game.heroes.length
+                    }
+                    for (var i = 0; i < that.game.heroes.length; i++) {
+                        that.game.heroes[i].flee(true);
+                    }
                 }
-                   
                 // characters flee
             }
         }
@@ -3961,7 +4029,13 @@ Potion.prototype.doAction = function (game, target) {
     }
     switch (this.potion_type) {
         case "health":
-            this_target.stats.health += this.level * 75;
+            var max_heal = this.target.stats.total_health - this_target.stats.health;
+            if (max_heal > this.level * 75) {
+                this_target.stats.health += this.level * 75;
+            }
+            else {
+                this_target.stats.health += max_heal;
+            }
             break;
         case "stam":
 

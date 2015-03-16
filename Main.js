@@ -46,6 +46,9 @@ ASSET_MANAGER.queueDownload("./imgs/mage.png");
 ASSET_MANAGER.queueDownload("./imgs/churchInterior.png");
 ASSET_MANAGER.queueDownload("./imgs/bishop.png");
 
+//level3 stuff
+ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
+
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
@@ -222,13 +225,17 @@ ASSET_MANAGER.downloadAll(function () {
 	
     var dragon1_NPC_sprites = new SpriteSet(new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), new Animation(dragon_spritesheet, 0, 0, 64, 36, .1, 1, true, false), null, null, null);
 
-    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you.",
-        "Your journey ends here.", "And you'll never make it to my super secret treasure room.",
-        "That's secret.", "The one that's behind me.", "That no one knows about.", "Did I mention that it's a secret?",
-        "And also the secret passageway leading to the mountains.", "Which is also behind me.", "And is also secret."]],
+    var dragon1_NPC = new Boss(gameEngine, [["I have been waiting for you warrior. We have been waiting for you."
+        , "You'll never find make it to the desert to fight our leader.", "Your journey ends here, just like the mage before you."]],
         dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave", "Dragon");
     dragon1_NPC.setScale(1.5);
 
+    //var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
+    //var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), null, null, null);
+
+    //var siren_NPC = new Boss(gameEngine, [["Whaddup nigga.", "think youre hard bitch ass nigga?", "ima fuck you up nigga."]],
+    //    siren_NPC_sprites, [new Point(350, 120)], .1, false, [2], "level2", "Siren");
+    //siren_NPC.setScale(.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
@@ -594,6 +601,34 @@ ASSET_MANAGER.downloadAll(function () {
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1),
                 new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 				
+				
+	 var level3 = new OutdoorEnvironment(gameEngine, 
+				[[0,0,0,0,0,0,0,0,0,0,0,206,207,208,209,210,0,0,0,0,0,0,0,50,50,50,50,86,87,88,89,50,50,160,142,161,50,50,50,50,50,50],
+				[0,0,0,0,0,0,206,207,208,209,210,226,227,228,229,230,0,0,0,0,0,0,0,70,70,70,70,106,107,108,109,70,70,180,162,181,70,70,70,70,70,70],
+				[0,206,207,208,209,210,226,227,228,229,230,246,247,248,249,250,0,0,0,0,0,0,0,0,0,0,0,126,127,128,129,0,0,0,0,0,0,120,110,111,112,113],
+				[0,226,227,228,229,230,246,247,248,249,250,266,267,268,269,270,0,0,6,7,7,7,7,7,7,8,0,146,147,148,149,0,0,0,0,0,0,140,130,131,132,133],
+				[0,246,247,248,249,250,266,267,268,269,270,286,287,288,289,290,0,0,9,11,27,27,27,27,12,30,0,166,167,168,169,0,6,8,0,0,0,121,150,151,152,153],
+				[0,266,267,268,269,270,286,287,288,289,290,306,307,308,309,310,0,0,9,30,46,47,0,0,9,30,0,186,187,188,189,0,9,30,0,0,0,120,190,191,192,193],
+				[0, 286,287,288,289,290,306,307,308,309,310,326,327,328,329,330,0,0,9,30,66,67,48,49,9,30,0,0,0,0,0,0,9,30,0,0,0,120,190,191,192,193],
+				[0, 306,307,308,309,310,326,327,328,329,330,0,0,0,0,0,0,0,9,30,50,0,68,69,9,31,7,7,7,7,7,7,32,30,0,0,0,140,0,211,212,213],
+				[0,326,327,328,329,330,346,0,0,0,0,0,0,0,0,0,0,0,9,30,70,0,0,0,26,27,27,27,27,27,27,27,27,28,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,366,0,0,0,0,0,0,0,0,0,0,0,9,30,50,50,50,0,0,50,0,50,0,50,0,50,0,50,0,0,0,143,144,161,143,144],
+				[0,97,98,0,6,7,7,7,7,7,7,7,7,7,174,175,176,177,32,30,70,70,70,52,0,70,50,70,50,70,50,70,50,70,0,0,0,163,164,120,163,164],
+				[116,117,118,0,9,11,27,27,27,27,27,27,27,27,194,195,196,197,27,28,52,51,50,72,0,0,70,0,70,0,70,0,70,0,0,0,0,183,184,180,183,184],
+				[136,137,138,0,9,30,20,20,0,0,0,0,0,0,214,215,216,217,0,0,72,71,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,242,0,0,0,0],
+				[156,157,158,0,9,30,9,9,9,9,37,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,242,224,244,243,262,241,240,240,0],
+				[0,0,0,0,9,30,0,0,0,0,57,58,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,240,244,262,241,264,263,203,261,260,260,222],
+				[0,0,0,0,9,30,0,0,40,0,0,0,13,14,15,16,18,0,0,40,0,0,0,0,201,0,0,240,0,202,242,260,264,242,261,0,2,3,4,5,0,242],
+				[7,7,7,7,32,30,0,40,40,40,0,0,33,34,35,36,17,0,40,40,40,0,0,0,0,0,244,260,201,204,262,241,0,262,220,21,22,23,24,25,202,263],
+				[27,27,27,27,27,28,0,0,40,0,0,19,53,54,55,56,37,38,0,40,0,0,0,0,241,203,264,0,200,240,223,261,244,240,0,41,42,43,44,45,0,241],
+				[0,0,0,0,0,0,0,0,40,0,17,17,73,74,75,76,57,58,0,40,0,0,0,204,261,0,202,200,0,260,0,202,264,260,0,61,62,63,64,65,201,261],
+				[0,0,0,0,0,0,0,0,0,0,0,18,93,94,95,96,0,18,0,0,0,0,200,0,0,0,0,97,98,0,0,201,242,201,200,81,82,83,84,85,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,116,117,118,0,0,0,252,241,0,101,102,103,104,105,221,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,136,137,138,0,0,0,0,261,0,0,122,123,124,125,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,156,157,158,0,240,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,260,200,202,204,0,0,0,0,0,0,0,0]],
+                 [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
+                [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
                 [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 0, 109, 175, 175, 175, 175, 175],
@@ -630,6 +665,7 @@ ASSET_MANAGER.downloadAll(function () {
 
     gameEngine.addEnvironment(level1.name, level1);
     gameEngine.addEnvironment(level2.name, level2);
+	gameEngine.addEnvironment(level3.name, level3);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
