@@ -54,6 +54,7 @@ ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/aladdin.png");
 ASSET_MANAGER.queueDownload("./imgs/jasmine.png");
+ASSET_MANAGER.queueDownload("./imgs/sultan.png");
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
@@ -83,6 +84,7 @@ ASSET_MANAGER.downloadAll(function () {
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
 	var aladdin_spritesheet = ASSET_MANAGER.getAsset("./imgs/aladdin.png");
 	var jasmine_spritesheet = ASSET_MANAGER.getAsset("./imgs/jasmine.png");
+	var sultan_spritesheet = ASSET_MANAGER.getAsset("./imgs/sultan.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
@@ -519,6 +521,58 @@ ASSET_MANAGER.downloadAll(function () {
                                                 "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
                                                 ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
                                            jasmine_sprites, [new Point(535, 340)], .06, false, [5], "level3", 1.5, 15);
+										   
+	var sultan_sprites = new SpriteSet(new Animation(sultan_spritesheet, 0, 3, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 1, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 2, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 1, 36, 51, 0.1, 1, true, true), null, null, null);
+    var sultan_quest_sword = new SpecialItem(gameEngine, "Aladdin Sword", ASSET_MANAGER.getAsset("./imgs/items/sword.gif"), 1, function () { }, "The sword that strikes the Demon!");
+    var sultan_reward = ghost_quest_potion;
+    var sultan_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Aladdin", sultan_reward, sultan_quest_sword);
+
+    var sultan = new NPC_QUEST(gameEngine, "Sultan", [["Oh Dear God! Finally there is someone alive in the Death Valley! ",
+                                                                  "The Demon has been killing all the cattle in Agrabah and my people are staving now.I am here to fight the Demon and save town!",
+                                                                  "But for that I need a sword, since no one in their right mind will fight against Demon with their bare hands", 
+																  "All I can give you back is Jasmine's pendant and my friendship! "],
+                                                                  ["People in Agrabah are starving to death, bring me the sword and let me save and be a hero like you!"],
+                                                                  ["You are officially my bro now! Thank you for help and email me if you will need some help! "],
+                                                                  ["You must have brought it with you! Haha!"]], sultan_sprites, [new Point(434, 220)], .05, false, [2],
+                                                                    sultan_quest, "level3", 1.25, [function () {
+                                                                        if (this.part === 0 && this.quest.complete) {
+                                                                            this.part++;
+                                                                        }
+                                                                       this.showDialog();       
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        this.game.entities[0].addQuest(this.quest);
+                                                                                        this.quest.complete = true;
+                                                                                    } if (this.part === 2) {
+                                                                                        this.part++;
+                                                                                    }
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }], 20);
 	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -765,6 +819,7 @@ ASSET_MANAGER.downloadAll(function () {
 
 		gameEngine.addEntity(aladdin);
 		gameEngine.addEntity(jasmine);
+		gameEngine.addEntity(sultan);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
