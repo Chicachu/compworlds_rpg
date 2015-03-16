@@ -4414,7 +4414,8 @@ Inventory.prototype.draw = function (ctx) {
     this.html_coin.innerHTML = this.coin;
     //this.selectInput();
     var that = this;
-    window.setTimeout(that.game.startInput.bind(that.game),0);
+    //window.setTimeout(that.game.startInput.bind(that.game),0);
+    this.game.startInput.call(this.game);
 }
 
 Inventory.prototype.addItem = function (item) {
