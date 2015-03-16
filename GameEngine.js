@@ -1,3 +1,4 @@
+var gameEngine = null;
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -125,6 +126,7 @@ GameEngine.prototype.addEnvironment = function (name, environment_object) {
     this.environment[name] = environment_object;
 }
 
+
 GameEngine.prototype.startInput = function () {
     var that = this;
     if (this.action_listener) {
@@ -156,7 +158,7 @@ GameEngine.prototype.startInput = function () {
                 //that.key_i = true;
                 //window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
                 //that.entities[0].inventory.showInventory();
-                that.entities[0].update(true); 
+                gameEngine.entities[0].update(true); 
                 e.stopImmediatePropagation();
             }
         }
@@ -384,6 +386,7 @@ GameEngine.prototype.update = function () {
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].update();
     }
+    gameEngine = this;
 }
 
 GameEngine.prototype.loop = function () {
@@ -1900,6 +1903,20 @@ Enemy.prototype.setAction = function (action, target) {
     }
 }
 
+Troll = function (game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/troll.png");
+    this.xp_base = 80;
+    this.animations =
+        {
+            down: null,
+            up: null,
+            left: null,
+            right: new Animation(this.spriteSheet, 7, 1, 256, 256, .1, 1, true, false),
+            //destroy: new Animation();
+        }
+}
 Siren = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
