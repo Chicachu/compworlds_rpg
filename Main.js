@@ -44,6 +44,10 @@ ASSET_MANAGER.queueDownload("./imgs/items/amulet3.png");
 ASSET_MANAGER.queueDownload("./imgs/mountainVillager.png");
 ASSET_MANAGER.queueDownload("./imgs/mage.png");
 ASSET_MANAGER.queueDownload("./imgs/churchInterior.png");
+ASSET_MANAGER.queueDownload("./imgs/bishop.png");
+
+//level3 stuff
+ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -81,6 +85,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 	var mage_spritesheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
+	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
 
 	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(225, 32, 28, 4, 3, 1));
@@ -301,6 +306,13 @@ ASSET_MANAGER.downloadAll(function () {
                                                             if (this.part === 0) {
                                                                 this.part++;
                                                                 this.game.entities[0].addQuest(this.quest);
+                                                                var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
+                                                                var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), null, null, null);
+
+                                                                var siren_NPC = new Boss(gameEngine, [["I heard someone speak of me!?", "What is this, a puny human come to confront me? Well bring it on, little one!"]],
+                                                                    siren_NPC_sprites, [new Point(350, 120)], .1, false, [2], "level2", "Siren");
+                                                                siren_NPC.setScale(.5);
+                                                                this.game.addEntity(siren_NPC);
                                                                 this.quest.complete = true;
                                                             } if (this.part === 2) {
                                                                 this.part++;
@@ -318,7 +330,7 @@ ASSET_MANAGER.downloadAll(function () {
     var mountain_woman = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
                                                 "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
                                                 ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
-                                           mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5);
+                                           mountain_woman_sprites, [new Point(224, 274), new Point(288, 274)], .06, false, [2], "level2", 1.5, 15);
 
     var mountain_villager_sprites = new SpriteSet(new Animation(mountain_villager_spritesheet, 0, 0, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 3, true, false),
@@ -369,17 +381,62 @@ ASSET_MANAGER.downloadAll(function () {
                                                                                 this.game.next = false;
                                                                             }
                                                                         }
-                                                                    }]);
+                                                                    }], 20);
 
     var mage_npc_sprites = new SpriteSet(new Animation(mage_spritesheet, 0, 10, 64, 64, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 11, 64, 64, 0.05, 1, true, false), null, null, null);
+                                        new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
+                                        new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
+                                        new Animation(mage_spritesheet, 0, 11, 64, 64, 0.05, 1, true, false), null, null, null);
 
     var mage_npc = new NPC(gameEngine, [["Thank you for saving me, hero! I was captured by the dragon and have been stuck here for days!! I am forever in your debt.",
-                                     "In fact, I think I'll follow you around everywhere you go! I will never leave your side. *swoon*"],
-                                        ["Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
-                                           mage_npc_sprites, [new Point(475,115)], .06, false, [2], "dragon_cave", 1);
+                                     "In fact, I think I'll follow you around everywhere you go! I will never leave your side. *swoon*",
+                                        "Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
+                                           mage_npc_sprites, [new Point(475, 115)], .06, false, [2], "dragon_cave", 1);
+    
+    var bishop_sprites = new SpriteSet(new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false), null,
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 14, false, false), null);
+    var bishop = new NPC_QUEST(gameEngine, "Celesto", [["Ah, our young hero, Theon, and his new friend the mage, Acele. I have been expecting you.", 
+                                                        "I have been watching you as your story unfolds. You are very important, young hero. You will change this world.", 
+                                                        "I am a man of the Gods, and it is not noramlly acceptable for me to alter the threads of fate,",
+                                                        "but your work here in Arkesia is so important, that I will make this one exception.", 
+                                                        "I now bestow upon you a new magical ability, Acele!"],
+                                                       ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], bishop_sprites,
+                                                            [new Point(384, 64)], .05, false, [0, 1], null, "church", 1.8, [function () {
+                                                                        this.showDialog();
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        // give acele a new ability
+                                                                                        // play hit animation
+                                                                                        this.game.animation_queue.push(new Event(this, this.animations.hit, 500, null, null));
+                                                                                        this.game.animation_queue.push(new Event(this, this.animations.down, 0, null, null));
+                                                                                    } 
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }], -82);
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -452,24 +509,27 @@ ASSET_MANAGER.downloadAll(function () {
                          [30,30,30,30,48,9,9,9,9,9,9,9,14,8,8,8,13,9,9,9,9,9,9,9,49,30,30,30,30,30],
                          [30,30,30,30,30,30,30,30,30,30,30,30,11,8,8,8,10,30,30,30,30,30,30,30,30,30,30,30,30,30],
 						 [30,30,30,30,30,30,30,30,30,30,30,30,48,9,9,9,49,30,30,30,30,30,30,30,30,30,30,30,30,30]],
-                          [[0,80,81,82,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,83,84,85,0],
-                            [0,100,101,102,0,0,15,16,17,0,4,5,0,21,22,23,0,6,7,0,15,16,17,0,0,103,104,105,0],
-                            [0,120,121,122,0,0,35,36,37,0,24,25,0,41,42,43,0,26,27,0,35,36,37,0,0,123,124,125,0],
-                            [0,0,0,0,0,0,0,0,0,0,44,45,0,61,62,63,0,46,47,0,0,0,0,0,0,0,0,0,0],
-                            [0,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0],
-                            [0,38,0,0,28,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,29,0,0,38,0],
-                            [0,58,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,58,0],
-                            [0,0,0,0,11,0,50,51,52,53,54,0,0,0,0,0,0,0,50,51,52,53,54,,0,0,0,0,0,0],
-                            [0,18,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,38,0],
-                            [0,38,0,0,11,0,50,51,52,53,54,0,0,0,0,0,0,0,50,51,52,53,54,0,10,0,0,38,0],
-                            [0,58,0,0,48,9,9,9,9,9,9,9,14,0,0,0,13,9,9,9,9,9,9,9,49,0,0,58,0],
-                            [0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
-                           [0,0,0,0,0,0,0,0,0,0,0,0,48,9,9,9,49,0,0,0,0,0,0,0,0,0,0,0,0]]],
-                            null, new Tilesheet("./imgs/churchInterior.png", 32, 20), [0], [new Portal(15,13, 0, gameEngine, ExitChurch)], "church", null, null, 0, []);
+                          [[0,80,81,82,0,0,0,0,0,0,0,0,0,1,2,3,0,0,0,0,0,0,0,0,0,83,84,85,0,0],
+                            [0,100,101,102,0,0,15,16,17,0,4,5,0,21,22,23,0,6,7,0,15,16,17,0,0,103,104,105,0,0],
+                            [0,120,121,122,0,0,35,36,37,0,24,25,0,41,42,43,0,26,27,0,35,36,37,0,0,123,124,125,0,0],
+                            [0,0,0,0,0,0,0,0,0,0,44,45,0,61,62,63,0,46,47,0,0,0,0,0,0,0,0,0,0,0],
+                            [0,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0],
+                            [0,38,0,0,28,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,29,0,0,38,0,0],
+                            [0,58,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,58,0,0],
+                            [0,0,0,0,11,0,50,51,52,53,54,0,0,0,0,0,0,0,50,51,52,53,54,,0,0,0,0,0,0,0],
+                            [0,18,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,38,0,0],
+                            [0,38,0,0,11,0,50,51,52,53,54,0,0,0,0,0,0,0,50,51,52,53,54,0,10,0,0,38,0,0],
+                            [0,58,0,0,48,9,9,9,9,9,9,9,14,0,0,0,13,9,9,9,9,9,9,9,49,0,0,58,0,0],
+                            [0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,48,9,9,9,49,0,0,0,0,0,0,0,0,0,0,0,0,0]]],
+                            null, new Tilesheet("./imgs/churchInterior.png", 32, 20), [0], [new Portal(14,12, 0, gameEngine, ExitChurch), new Portal(3,12, 1, gameEngine, ExitChurch)], "church", null, null, 0, []);
+
 
     
 
-    var dragonCave = new IndoorEnvironment(gameEngine,
+
+    var dragonCave = new IndoorEnvironment(gameEngine,  
+
 					  [[[0,   0,  0,  0, 0,  0,   0,  0,  0, 28, 28, 28, 33, 33, 33, 28, 28, 33, 28, 28,  0, 28, 28,  28,  28,  28, 33, 33, 28, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [0,   0,  0,  0, 28, 28,  0,  0, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 33, 28, 28, 28, 33, 33, 33, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [28, 28, 28, 28, 28, 28, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
@@ -483,8 +543,6 @@ ASSET_MANAGER.downloadAll(function () {
                         [35, 35, 35, 35, 35, 35, 33, 33, 33, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 33, 33, 33, 0, 0, 33, 33, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35],
                         [0, 0, 0, 0, 0, 0, 33, 33, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 35, 35, 0, 0, 35, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 						[0, 0, 0, 0, 0, 0, 35, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-
-
                         [[34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 11, 34, 34, 13, 17, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 16, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 31, 12, 34, 34, 23, 34, 34, 34, 11, 34, 34, 34, 15, 34, 34, 22, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 12, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 27, 34, 34, 34, 30, 21, 34, 14, 31, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
@@ -500,7 +558,9 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
                         null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave), new Portal(18, 6, 2, gameEngine, EnterLevel2, 1),
                         new Chest(10, 4, 2, gameEngine, [185], false), new Chest(11, 4, 2, gameEngine, [218], false), new Chest(10, 8, 2, gameEngine, [75], false), new Chest(11, 8, 2, gameEngine, [245], false)],
-                        "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0]);
+
+                        "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0, 1]);
+
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4], 0);
@@ -541,9 +601,37 @@ ASSET_MANAGER.downloadAll(function () {
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1),
                 new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 				
+				
+	 var level3 = new OutdoorEnvironment(gameEngine, 
+				[[0,0,0,0,0,0,0,0,0,0,0,206,207,208,209,210,0,0,0,0,0,0,0,50,50,50,50,86,87,88,89,50,50,160,142,161,50,50,50,50,50,50],
+				[0,0,0,0,0,0,206,207,208,209,210,226,227,228,229,230,0,0,0,0,0,0,0,70,70,70,70,106,107,108,109,70,70,180,162,181,70,70,70,70,70,70],
+				[0,206,207,208,209,210,226,227,228,229,230,246,247,248,249,250,0,0,0,0,0,0,0,0,0,0,0,126,127,128,129,0,0,0,0,0,0,120,110,111,112,113],
+				[0,226,227,228,229,230,246,247,248,249,250,266,267,268,269,270,0,0,6,7,7,7,7,7,7,8,0,146,147,148,149,0,0,0,0,0,0,140,130,131,132,133],
+				[0,246,247,248,249,250,266,267,268,269,270,286,287,288,289,290,0,0,9,11,27,27,27,27,12,30,0,166,167,168,169,0,6,8,0,0,0,121,150,151,152,153],
+				[0,266,267,268,269,270,286,287,288,289,290,306,307,308,309,310,0,0,9,30,46,47,0,0,9,30,0,186,187,188,189,0,9,30,0,0,0,120,190,191,192,193],
+				[0, 286,287,288,289,290,306,307,308,309,310,326,327,328,329,330,0,0,9,30,66,67,48,49,9,30,0,0,0,0,0,0,9,30,0,0,0,120,190,191,192,193],
+				[0, 306,307,308,309,310,326,327,328,329,330,0,0,0,0,0,0,0,9,30,50,0,68,69,9,31,7,7,7,7,7,7,32,30,0,0,0,140,0,211,212,213],
+				[0,326,327,328,329,330,346,0,0,0,0,0,0,0,0,0,0,0,9,30,70,0,0,0,26,27,27,27,27,27,27,27,27,28,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,366,0,0,0,0,0,0,0,0,0,0,0,9,30,50,50,50,0,0,50,0,50,0,50,0,50,0,50,0,0,0,143,144,161,143,144],
+				[0,97,98,0,6,7,7,7,7,7,7,7,7,7,174,175,176,177,32,30,70,70,70,52,0,70,50,70,50,70,50,70,50,70,0,0,0,163,164,120,163,164],
+				[116,117,118,0,9,11,27,27,27,27,27,27,27,27,194,195,196,197,27,28,52,51,50,72,0,0,70,0,70,0,70,0,70,0,0,0,0,183,184,180,183,184],
+				[136,137,138,0,9,30,20,20,0,0,0,0,0,0,214,215,216,217,0,0,72,71,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,242,0,0,0,0],
+				[156,157,158,0,9,30,9,9,9,9,37,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,242,224,244,243,262,241,240,240,0],
+				[0,0,0,0,9,30,0,0,0,0,57,58,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,240,244,262,241,264,263,203,261,260,260,222],
+				[0,0,0,0,9,30,0,0,40,0,0,0,13,14,15,16,18,0,0,40,0,0,0,0,201,0,0,240,0,202,242,260,264,242,261,0,2,3,4,5,0,242],
+				[7,7,7,7,32,30,0,40,40,40,0,0,33,34,35,36,17,0,40,40,40,0,0,0,0,0,244,260,201,204,262,241,0,262,220,21,22,23,24,25,202,263],
+				[27,27,27,27,27,28,0,0,40,0,0,19,53,54,55,56,37,38,0,40,0,0,0,0,241,203,264,0,200,240,223,261,244,240,0,41,42,43,44,45,0,241],
+				[0,0,0,0,0,0,0,0,40,0,17,17,73,74,75,76,57,58,0,40,0,0,0,204,261,0,202,200,0,260,0,202,264,260,0,61,62,63,64,65,201,261],
+				[0,0,0,0,0,0,0,0,0,0,0,18,93,94,95,96,0,18,0,0,0,0,200,0,0,0,0,97,98,0,0,201,242,201,200,81,82,83,84,85,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,116,117,118,0,0,0,252,241,0,101,102,103,104,105,221,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,19,0,0,0,0,0,0,0,0,0,0,0,0,0,136,137,138,0,0,0,0,261,0,0,122,123,124,125,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,156,157,158,0,240,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,260,200,202,204,0,0,0,0,0,0,0,0]],
+                 [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
+                [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
-                [220,221,222,223,224,225,226,227,228,229,300,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,168,169,0,109,175,175,175,175,175],
+                [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 0, 109, 175, 175, 175, 175, 175],
                 [242,243,244,245,246,247,248,249,250,251,252,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,0,131,7,7,7,7,7],
                 [264,265,266,267,268,269,270,271,272,273,274,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,0,131,7,7,7,7,7],
                 [286,287,288,289,290,291,292,293,294,295,296,142,143,144,5,0,0,0,0,0,144,146,147,146,147,146,147,22,23,24,25,26,27,142,143,0,131,7,7,7,7,7],
@@ -561,20 +649,23 @@ ASSET_MANAGER.downloadAll(function () {
                 [297,298,299,300,301,302,303,304,305,306,307,142,143,144,0,166,146,147,0,146,147,142,143,0,132,133,134,135,136,0,77,78,79,80,81,0,82,83,84,85,86,0],
                 [319,320,321,322,323,324,325,326,327,328,329,164,165,166,146,147,168,169,0,168,169,164,165,21,154,155,156,157,158,21,99,100,101,102,103,21,104,105,106,107,108,21],
                 [341,342,343,344,345,346,347,348,349,350,351,142,143,144,168,169,0,0,0,144,144,142,143,43,176,177,178,179,180,43,121,122,123,124,125,43,126,127,128,129,130,43],
-                [363,364,365,366,367,368,369,370,371,372,373,164,165,166,0,0,0,0,0,166,166,164,165,65,0,0,87,0,0,65,0,0,87,0,0,65,0,0,87,0,0,65],
+                [363,364,365,366,367,368,369,370,371,372,373,164,165,166,1,0,0,0,0,166,166,164,165,65,0,0,87,0,0,65,0,0,87,0,0,65,0,0,87,0,0,65],
                 [385,386,387,388,389,390,391,392,393,394,395,462,463,464,465,466,467,468,0,146,147,142,143,0,0,0,87,0,0,0,0,0,87,0,0,0,0,0,87,0,0,0],
                 [407,408,409,410,411,412,413,414,415,416,417,484,485,486,487,488,489,490,0,168,169,164,165,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,87,0,0,0],
                 [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
                 [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
 
                 [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
-                [new Chest(5, 10, 2, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
-                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!")], true)],
-                ["Dire Wolf", "Wolf Rider"], "level2", "./imgs/woods.png", 3, [0, 1, 2, 3, 4, 5]);
+                [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
+                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
+                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch)],
+                ["Dire Wolf"], "level2", "./imgs/woods.png", 3, [0, 1, 2, 3, 4, 5]);
+
 
 
     gameEngine.addEnvironment(level1.name, level1);
     gameEngine.addEnvironment(level2.name, level2);
+	gameEngine.addEnvironment(level3.name, level3);
     //gameEngine.addAuxillaryEntity(mal);
     //gameEngine.addAuxillaryEntity(skeleton);
     gameEngine.addEntity(girl_npc);
@@ -586,6 +677,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(mountain_woman);
 	gameEngine.addEntity(mountain_villager);
 	gameEngine.addEntity(mage_npc);
+	gameEngine.addEntity(bishop);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);

@@ -82,8 +82,8 @@ GameEngine = function () {
     this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
-    this.environment = ["level1", "level2"];
-    this.current_environment = "level2";
+    this.environment = ["level1", "level2","level3"];
+    this.current_environment = "level3";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -282,7 +282,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
-            if (Math.abs(this.entities[0].x - (this.entities[i].x - this.entities[i].x_offset)) < 35 && !hero_drawn) {
+            if (Math.abs(this.entities[0].x - (this.entities[i].x - this.entities[i].x_offset)) < 80 && !hero_drawn) {
                 if (this.entities[i].y < (this.entities[0].y + this.entities[i].y_offset)) {
                     this.entities[i].draw(this.context);
                     this.entities[0].draw(this.context);
@@ -566,9 +566,9 @@ GameEngine.prototype.endBattle = function (game)
     //game.sound_manager.playSong("world1");
     if (game.current_environment === "level1" || game.current_environment === "dragon_cave") {
         game.sound_manager.playSong("world1");
-    } else if (game.current_environment === "level2") {
+    } else if (game.current_environment === "level2" || game.current_environment === "level3") {
         game.sound_manager.playSong("world2");
-    }
+    } 
     game.loot_dispenser.increment();
     setTimeout(function () {
         if (game.loot_dispenser.string.length > 0) {
@@ -1463,7 +1463,11 @@ Hero.prototype.boundaryRight = function () {
 }
 
 Hero.prototype.boundaryLeft = function () {
-    return this.x + 20 < 0;
+    if (this.game.current_environment === "church") {
+        return this.x + 15 < 0;
+    } else {
+        return this.x + 20 < 0;
+    }
 }
 
 Hero.prototype.boundaryUp = function () {
@@ -1539,6 +1543,10 @@ Hero.prototype.isPassable = function (tile, index) {
         }
     } else if (this.game.current_environment === "level2") {
         if (tile === 142 || tile === 143 || tile === 164 || tile === 165 || tile === 0 || tile === 87 || tile === 5 || tile === 350 || tile === 351 || tile === 373) {
+            return true; 
+        }
+    } else if (this.game.current_environment === "church") {
+        if (tile === 0 || (tile >= 8 && tile <= 14) || tile === 28 || tile === 29 || tile === 48 || tile === 49 || tile === 30) {
             return true; 
         }
     } else {
@@ -1695,10 +1703,12 @@ Warrior = function (game, stats) {
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
 
-    this.x = 280;
+
+    this.x = 320;
     this.y = 208;
 
     this.quests = [];
+    this.abilities = ["Slash", "Sweep"];
 
     this.inventory = new Inventory(this.game, 100, 20);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
@@ -2130,7 +2140,7 @@ dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale) {
+NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale, yoffset) {
     if (game && dialogue && anims && path) {
         this.game = game;
         this.scale = (scale || 1);
@@ -2157,6 +2167,10 @@ NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale
         this.dialogue_index = 0;
         this.setNextCoords();
         this.quad = quad;
+
+        if (yoffset) {
+            this.y_offset = yoffset; 
+        }
     }
 }
 
@@ -2297,12 +2311,14 @@ NPC.prototype.updateDialogue = function () {
                 text.innerHTML = this.dialogue[this.part][this.dialogue_index];
                 text_box.innerHTML = text.outerHTML;
             } else {
-                if (this.part === 0) {
-                    this.part++;
-                }
-                if (this.game.environment[this.game.current_environment] === "dragon_cave" && this.part === 1) {
-                    var mage_hero = new Mage(gameEngine, new Statistics(200, 160, 25, 1, 1, 5));
+
+                if (this.game.current_environment === "dragon_cave") {
+                    var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));
                     this.game.heroes.push(mage_hero);
+                    this.x = 3098204981238;
+                    this.y = 384923784928374;
+                } else if (this.part === 0) {
+                    this.part++;
                 }
                 this.dialogue_index = 0;
                 text_box.style.visibility = "hidden";
@@ -2312,6 +2328,9 @@ NPC.prototype.updateDialogue = function () {
                 this.game.context.canvas.focus();
                 this.game.canControl = true;
                 this.interacting = false;
+                if (this.game.current_environment === "dragon_cave") {
+                    this.game.alertHero("Acele has joined your party!");
+                }
             }
             this.game.next = false;
         }
@@ -2441,7 +2460,7 @@ pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
 
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale, functions) {
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale, functions, yOffset) {
     this.name = name;
     this.quest = quest; 
     NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name, scale);
@@ -2452,6 +2471,9 @@ NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest,
 
     this.firstQuadx = this.x;
     this.firstQuady = this.y;
+    if (yOffset) {
+        this.y_offset = yOffset;
+    }
 }
 
 NPC_QUEST.prototype = new NPC();
@@ -2732,6 +2754,13 @@ EnterDragonCave = function () {
     }
 }
 
+EnterDragonCaveFromLevel2 = function () {
+    this.game.current_environment = "dragon_cave";
+    this.game.entities[0].x = 560;
+    this.game.entities[0].y = 192;
+    this.game.environment[this.game.current_environment].setQuadrant(2);
+}
+
 ExitDragonCave = function () {
     this.game.current_environment = "level1";
     this.game.environment[this.game.current_environment].setQuadrant(5);
@@ -2762,15 +2791,17 @@ EnterChurch = function () {
     this.game.environment[this.game.current_environment].setQuadrant(0);
     this.game.entities[0].x = 448;
     this.game.sound_manager.playSound("door_open");
-    this.game.entities[0].y = 384;
+    this.game.entities[0].y = 352;
+    this.game.entities[0].sight = 80; 
 }
 
 ExitChurch = function () {
     this.game.current_environment = "level2";
     this.game.environment[this.game.current_environment].setQuadrant(0);
-    this.game.entities[0].x = 554;
+    this.game.entities[0].x = 525;
     this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 300;
+    this.game.entities[0].sight = 35;
 }
 
 EnterHouse2 = function () {
@@ -2882,7 +2913,8 @@ Chest.prototype.startInteraction = function () {
                 if (!this.locked) {
                     this.lootChest();
                 } else if (this.locked && this.game.entities[0].inventory.hasItem("Key", 1)) {
-                    var key = this.game.entities[0].inventory.removeItem("Key", 1);
+                    var key_to_remove = this.game.entities[0].inventory.hasItem("Key", 1); 
+                    var key = this.game.entities[0].inventory.removeItem(key_to_remove, 1);
                     // open chest
                     // give loot
                     this.lootChest()
@@ -2899,6 +2931,8 @@ Chest.prototype.startInteraction = function () {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 29;
             } else if (this.game.environment[this.game.current_environment] === "level1") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
+            } else if (this.game.environment[this.game.current_environment] === "level2") {
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 2;
             }
         }
     }
@@ -4190,9 +4224,9 @@ Warrior.prototype.recieveItem = function (item) {
     this.inventory.addItem(item);
 }
 
-Warrior.prototype.removeItem = function (item_name, qty) {
-    return this.inventory.removeItem(item_name, qty);
-}
+Warrior.prototype.removeItem = function (item, qty) {
+    return this.inventory.removeItem(item, qty);
+}   
 
 Inventory = function (game, coin, max_items) {
     this.game = game;
@@ -4248,7 +4282,7 @@ Inventory.prototype.hasItem = function (item_name) {
     var found = false;
     for (var i = 0; i < this.items.length; i++) {
         if (this.items[i].name === item_name) {
-            found = true;
+            found = this.items[i];
         }
     }
     return found;
@@ -4335,15 +4369,15 @@ Inventory.prototype.addItem = function (item) {
             // wont fit in inventory
         }
     }
-    this.draw.call(this);
+    this.draw.bind(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
 // otherwise it will return the item 
-Inventory.prototype.removeItem = function (item_name, qty) {
+Inventory.prototype.removeItem = function (item, qty) {
     var item = false;
     for (var i = 0; i < this.items.length; i++) {
-        if (this.items[i].name === item_name) {
+        if (this.items[i] === item) {
             if (this.items[i].qty > qty) {
                 //split stack
                 item = this.splitStack(item_name, qty)
@@ -4358,7 +4392,7 @@ Inventory.prototype.removeItem = function (item_name, qty) {
             }
         }
     }
-    this.draw.call(this);
+    this.draw.bind(this);
     return item;    
 }
 
@@ -4513,7 +4547,7 @@ HTML_Item.prototype.actionInput = function () {
                 } else if (e.which === 32) {
                     that.showItemMenu(false);
                     window.setTimeout(that.element.focus(), 0);
-                    that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+                    that.item.game.entities[0].inventory.removeItem(that.item, that.item.qty);
                 }
             }
             this.pressed = true;
@@ -4787,9 +4821,10 @@ StorekeeperInventory.prototype.selectInput = function (index) {
             } else if (String.fromCharCode(e.which) === ' ') {
                 if ((that.sell_mode && that.game.entities[0].inventory.coin >= that.shopping_cart.total)
                      || (that.coin >= that.shopping_cart.total)) {
-                    that.checkOut(index); 
+                    that.checkOut(index);
+                    that.game.sound_manager.playSound("coin");
                 } else {
-                    that.game.sound_manager.playSound("select");
+                    that.game.sound_manager.playSound("nope");
                 }
             } else if (e.which === 13) {
                 that.buyMode();
