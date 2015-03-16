@@ -79,6 +79,7 @@ ASSET_MANAGER.downloadAll(function () {
     var gameEngine = new GameEngine();
     //var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
+	var aladdin_spritesheet = ASSET_MANAGER.getAsset("./imgs/aladdin.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
