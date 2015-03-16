@@ -53,6 +53,7 @@ ASSET_MANAGER.queueDownload("./imgs/bishop.png");
 ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/aladdin.png");
+ASSET_MANAGER.queueDownload("./imgs/jasmine.png");
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
@@ -81,6 +82,7 @@ ASSET_MANAGER.downloadAll(function () {
     //var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
 	var aladdin_spritesheet = ASSET_MANAGER.getAsset("./imgs/aladdin.png");
+	var jasmine_spritesheet = ASSET_MANAGER.getAsset("./imgs/jasmine.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
@@ -241,7 +243,7 @@ ASSET_MANAGER.downloadAll(function () {
     
     var troll_NPC_spriteset = new SpriteSet(new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), null, null, null);
     var troll_NPC = new TrollNPC(gameEngine, [["Why hello there old sport.", "Is it the temple that you would like to go to?", "I'm afraid to inform you I cannot let you do that.",
-        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(76, 226)], .1, false, [1], "level2", "Troll");
+        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(76, 226)], .1, false, [1], "level3", "Troll");
     troll_NPC.setScale(.3);
     //var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
     //var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), null, null, null);
@@ -508,6 +510,15 @@ ASSET_MANAGER.downloadAll(function () {
                                                                             }
                                                                         }
                                                                     }], 20);
+																	
+	var jasmine_sprites = new SpriteSet(new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0,37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false), null, null, null);
+    var jasmine = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
+                                                "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
+                                                ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
+                                           jasmine_sprites, [new Point(535, 340)], .06, false, [5], "level3", 1.5, 15);
 	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -753,6 +764,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(troll_NPC);
 
 		gameEngine.addEntity(aladdin);
+		gameEngine.addEntity(jasmine);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);

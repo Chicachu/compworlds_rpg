@@ -1283,7 +1283,9 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
+
         return Math.ceil(Math.random() * (4000 - 0) - 0) >= 5998;
+
     }
 }
 
@@ -1327,7 +1329,7 @@ Hero.prototype.levelUp = function()
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
         this.stats.attack = this.stats.attack + (.3 * (this.level * this.level) );
-        this.stats.defense = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.defense = this.stats.defense + (.3 * (this.level * this.level) );
         this.stats.total_health = this.stats.total_health + ( 2 * (this.level * this.level) );
         this.drawLevelUp();
         this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
