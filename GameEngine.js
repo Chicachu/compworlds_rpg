@@ -80,8 +80,8 @@ GameEngine = function () {
     this.menu = null;
     this.timerId = null;
     this.timerId2 = null;
-    this.environment = ["level1", "level2"];
-    this.current_environment = "level2";
+    this.environment = ["level1", "level2","level3"];
+    this.current_environment = "level3";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -557,9 +557,9 @@ GameEngine.prototype.endBattle = function (game)
     //game.sound_manager.playSong("world1");
     if (game.current_environment === "level1" || game.current_environment === "dragon_cave") {
         game.sound_manager.playSong("world1");
-    } else if (game.current_environment === "level2") {
+    } else if (game.current_environment === "level2" || game.current_environment === "level3") {
         game.sound_manager.playSong("world2");
-    }
+    } 
     game.loot_dispenser.increment();
     setTimeout(function () {
         if (game.loot_dispenser.string.length > 0) {
