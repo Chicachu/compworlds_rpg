@@ -32,6 +32,7 @@ ASSET_MANAGER.queueDownload("./imgs/equipment/offhand.png");
 ASSET_MANAGER.queueDownload("./imgs/equipment/main_hand.png");
 ASSET_MANAGER.queueDownload("./imgs/mountain.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
+ASSET_MANAGER.queueDownload("./imgs/troll.png");
 
 // level 2 stuffs. 
 ASSET_MANAGER.queueDownload("./imgs/mountain_man.png");
@@ -90,6 +91,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 	var mage_spritesheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
 	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
+	var troll_npc_sprites = ASSET_MANAGER.getAsset("./imgs/troll.png");
 
 	var warrior = new Warrior(gameEngine, new Statistics(250, 22, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(200, 32, 28, 4, 3, 1));
@@ -236,6 +238,11 @@ ASSET_MANAGER.downloadAll(function () {
         dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave", "Dragon");
     dragon1_NPC.setScale(1.5);
 
+    
+    var troll_NPC_spriteset = new SpriteSet(new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), null, null, null);
+    var troll_NPC = new TrollNPC(gameEngine, [["Why hello there old sport.", "Is it the temple that you would like to go to?", "I'm afraid to inform you I cannot let you do that.",
+        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(76, 226)], .1, false, [1], "level2", "Troll");
+    troll_NPC.setScale(.3);
     //var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
     //var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), null, null, null);
 
@@ -315,9 +322,9 @@ ASSET_MANAGER.downloadAll(function () {
                                                                 var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
                                                                 var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), null, null, null);
 
-                                                                var siren_NPC = new Boss(gameEngine, [["I heard someone speak of me!?", "What is this, a puny human come to confront me? Well bring it on, little one!"]],
-                                                                    siren_NPC_sprites, [new Point(350, 120)], .1, false, [2], "level2", "Siren");
-                                                                siren_NPC.setScale(.5);
+                                                                var siren_NPC = new SirenNPC(gameEngine, [["I heard someone speak of me!?", "What is this, a puny human come to confront me? Well bring it on, little one!"]],
+                                                                    siren_NPC_sprites, [new Point(375, 120)], .1, false, [2], "level2", "Siren");
+                                                                siren_NPC.setScale(.4);
                                                                 this.game.addEntity(siren_NPC);
                                                                 this.quest.complete = true;
                                                             } if (this.part === 2) {
@@ -693,7 +700,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
                 new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
                 new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch)],
-                ["Dire Wolf", "Wolf Rider"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
+                ["Dire Wolf", "Wolf Rider", "Skeleton"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
 
 
 	    var level3 = new OutdoorEnvironment(gameEngine,
@@ -741,6 +748,8 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(mountain_villager);
 	gameEngine.addEntity(mage_npc);
 	gameEngine.addEntity(bishop);
+	gameEngine.addEntity(troll_NPC);
+
 		gameEngine.addEntity(aladdin);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
