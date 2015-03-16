@@ -53,6 +53,7 @@ ASSET_MANAGER.queueDownload("./imgs/bishop.png");
 ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/aladdin.png");
+ASSET_MANAGER.queueDownload("./imgs/jasmine.png");
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
