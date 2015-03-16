@@ -93,7 +93,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
 	var troll_npc_sprites = ASSET_MANAGER.getAsset("./imgs/troll.png");
 
-	var warrior = new Warrior(gameEngine, new Statistics(250, 22, 35, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(250, 222, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(200, 32, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     //gameEngine.heroes.push(archer);
@@ -358,10 +358,13 @@ ASSET_MANAGER.downloadAll(function () {
                                                                      "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
                                                                      "They come into town looking to loot our store every few months or so, it's an ongoing battle."],
                                                                   ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
-                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(224, 64), new Point(224, 220)], .05, false, [4, 5],
+                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(370, 64), new Point(370, 220)], .05, false, [4, 5],
                                                                     mountain_villager_quest, "level2", 1.25, [function () {
                                                                         if (this.part === 1 && this.quest.complete) {
                                                                             this.part++;
+                                                                        }
+                                                                        if (this.quest.complete && this.game.getEntity("Hilbert").quest.complete) {
+                                                                            this.game.current_stage = this.game.stage[2];
                                                                         }
                                                                        this.showDialog();       
                                                                     }, function () {
@@ -599,7 +602,6 @@ ASSET_MANAGER.downloadAll(function () {
 
 
     var dragonCave = new IndoorEnvironment(gameEngine,  
-
 					  [[[0,   0,  0,  0, 0,  0,   0,  0,  0, 28, 28, 28, 33, 33, 33, 28, 28, 33, 28, 28,  0, 28, 28,  28,  28,  28, 33, 33, 28, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [0,   0,  0,  0, 28, 28,  0,  0, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 33, 28, 28, 28, 33, 33, 33, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [28, 28, 28, 28, 28, 28, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
@@ -627,7 +629,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
                         null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave), new Portal(18, 6, 2, gameEngine, EnterLevel2, 1),
-                        new Chest(10, 4, 2, gameEngine, [185], false), new Chest(11, 4, 2, gameEngine, [218], false), new Chest(10, 8, 2, gameEngine, [75], false), new Chest(11, 8, 2, gameEngine, [245], false)],
+                        new Chest(10, 4, 2, gameEngine, [185], false), new Chest(11, 4, 2, gameEngine, [218], false), new Chest(10, 9, 2, gameEngine, [75], false), new Chest(11, 9, 2, gameEngine, [245], false)],
 
                         "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0, 1]);
 
@@ -699,7 +701,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
                 [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
                 new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
-                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch)],
+                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch), new Portal(10, 11, 4, gameEngine, Level3)],
                 ["Dire Wolf", "Wolf Rider", "Skeleton"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
 
 
@@ -729,7 +731,7 @@ ASSET_MANAGER.downloadAll(function () {
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 156, 157, 158, 0, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 260, 200, 202, 204, 0, 0, 0, 0, 0, 0, 0, 0]],
                     [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
-                   [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
+                   [new Portal(0,7,3, gameEngine, Level2)], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
 
 
 
