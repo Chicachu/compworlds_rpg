@@ -83,7 +83,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level2";
+    this.current_environment = "level3";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1890,6 +1890,20 @@ Enemy.prototype.setAction = function (action, target) {
     }
 }
 
+Troll = function (game, stats, loop_while_standing)
+{
+    this.game = game;
+    this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/troll.png");
+    this.xp_base = 80;
+    this.animations =
+        {
+            down: null,
+            up: null,
+            left: null,
+            right: new Animation(this.spriteSheet, 7, 1, 256, 256, .1, 1, true, false),
+            //destroy: new Animation();
+        }
+}
 Siren = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
