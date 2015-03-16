@@ -44,6 +44,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/amulet3.png");
 ASSET_MANAGER.queueDownload("./imgs/mountainVillager.png");
 ASSET_MANAGER.queueDownload("./imgs/mage.png");
 ASSET_MANAGER.queueDownload("./imgs/churchInterior.png");
+ASSET_MANAGER.queueDownload("./imgs/bishop.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -81,6 +82,7 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_woman_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountain_woman.png");
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 	var mage_spritesheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
+	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
 
 	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(225, 32, 28, 4, 3, 1));
@@ -227,12 +229,6 @@ ASSET_MANAGER.downloadAll(function () {
         dragon1_NPC_sprites, [new Point(450, 120)], .1, false, [1], "dragon_cave", "Dragon");
     dragon1_NPC.setScale(1.5);
 
-    var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
-    var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), null, null, null);
-
-    var siren_NPC = new Boss(gameEngine, [["Whaddup nigga.", "think youre hard bitch ass nigga?", "ima fuck you up nigga."]],
-        siren_NPC_sprites, [new Point(350, 120)], .1, false, [2], "level2", "Siren");
-    siren_NPC.setScale(.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
@@ -303,6 +299,13 @@ ASSET_MANAGER.downloadAll(function () {
                                                             if (this.part === 0) {
                                                                 this.part++;
                                                                 this.game.entities[0].addQuest(this.quest);
+                                                                var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
+                                                                var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), null, null, null);
+
+                                                                var siren_NPC = new Boss(gameEngine, [["I heard someone speak of me!?", "What is this, a puny human come to confront me? Well bring it on, little one!"]],
+                                                                    siren_NPC_sprites, [new Point(350, 120)], .1, false, [2], "level2", "Siren");
+                                                                siren_NPC.setScale(.5);
+                                                                this.game.addEntity(siren_NPC);
                                                                 this.quest.complete = true;
                                                             } if (this.part === 2) {
                                                                 this.part++;
@@ -374,14 +377,58 @@ ASSET_MANAGER.downloadAll(function () {
                                                                     }], 20);
 
     var mage_npc_sprites = new SpriteSet(new Animation(mage_spritesheet, 0, 10, 64, 64, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
-                                                new Animation(mage_spritesheet, 0, 11, 64, 64, 0.05, 1, true, false), null, null, null);
+                                        new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
+                                        new Animation(mage_spritesheet, 0, 9, 64, 64, 0.05, 1, true, false),
+                                        new Animation(mage_spritesheet, 0, 11, 64, 64, 0.05, 1, true, false), null, null, null);
 
     var mage_npc = new NPC(gameEngine, [["Thank you for saving me, hero! I was captured by the dragon and have been stuck here for days!! I am forever in your debt.",
                                      "In fact, I think I'll follow you around everywhere you go! I will never leave your side. *swoon*",
                                         "Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
-                                           mage_npc_sprites, [new Point(475,115)], .06, false, [2], "dragon_cave", 1);
+                                           mage_npc_sprites, [new Point(475, 115)], .06, false, [2], "dragon_cave", 1);
+    
+    var bishop_sprites = new SpriteSet(new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false), null,
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 14, false, false), null);
+    var bishop = new NPC_QUEST(gameEngine, "Celesto", [["Ah, our young hero, Theon, and his new friend the mage, Acele. I have been expecting you.", 
+                                                        "I have been watching you as your story unfolds. You are very important, young hero. You will change this world.", 
+                                                        "I am a man of the Gods, and it is not noramlly acceptable for me to alter the threads of fate,",
+                                                        "but your work here in Arkesia is so important, that I will make this one exception.", 
+                                                        "I now bestow upon you a new magical ability, Acele!"],
+                                                       ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], null, [], .05, false, [0,1],
+                                                                    null, "church", 1, [function () {
+                                                                        this.showDialog();
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        // give acele a new ability
+                                                                                        // play hit animation
+                                                                                        this.game.animationQueue.push(new Event(this, this.animations.hit, 0, null, null));
+                                                                                    } 
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }], 20);
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -593,7 +640,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(mountain_woman);
 	gameEngine.addEntity(mountain_villager);
 	gameEngine.addEntity(mage_npc);
-	gameEngine.addEntity(siren_NPC);
+	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
     gameEngine.start();

@@ -1700,6 +1700,7 @@ Warrior = function (game, stats) {
     this.y = 208;
 
     this.quests = [];
+    this.abilities = ["Slash", "Sweep"];
 
     this.inventory = new Inventory(this.game, 100, 20);
     Hero.call(this, this.game, this.x, this.y, this.spriteSheet, this.animations, stats);
