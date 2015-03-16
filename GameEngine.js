@@ -2850,7 +2850,8 @@ Chest.prototype.startInteraction = function () {
                 if (!this.locked) {
                     this.lootChest();
                 } else if (this.locked && this.game.entities[0].inventory.hasItem("Key", 1)) {
-                    var key = this.game.entities[0].inventory.removeItem("Key", 1);
+                    var key_to_remove = this.game.entities[0].inventory.hasItem("Key", 1); 
+                    var key = this.game.entities[0].inventory.removeItem(key_to_remove, 1);
                     // open chest
                     // give loot
                     this.lootChest()
@@ -4149,9 +4150,9 @@ Warrior.prototype.recieveItem = function (item) {
     this.inventory.addItem(item);
 }
 
-Warrior.prototype.removeItem = function (item_name, qty) {
-    return this.inventory.removeItem(item_name, qty);
-}
+Warrior.prototype.removeItem = function (item, qty) {
+    return this.inventory.removeItem(item, qty);
+}   
 
 Inventory = function (game, coin, max_items) {
     this.game = game;
@@ -4207,7 +4208,7 @@ Inventory.prototype.hasItem = function (item_name) {
     var found = false;
     for (var i = 0; i < this.items.length; i++) {
         if (this.items[i].name === item_name) {
-            found = true;
+            found = this.items[i];
         }
     }
     return found;
@@ -4294,15 +4295,15 @@ Inventory.prototype.addItem = function (item) {
             // wont fit in inventory
         }
     }
-    this.draw.call(this);
+    this.draw.bind(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
 // otherwise it will return the item 
-Inventory.prototype.removeItem = function (item_name, qty) {
+Inventory.prototype.removeItem = function (item, qty) {
     var item = false;
     for (var i = 0; i < this.items.length; i++) {
-        if (this.items[i].name === item_name) {
+        if (this.items[i] === item) {
             if (this.items[i].qty > qty) {
                 //split stack
                 item = this.splitStack(item_name, qty)
@@ -4317,7 +4318,7 @@ Inventory.prototype.removeItem = function (item_name, qty) {
             }
         }
     }
-    this.draw.call(this);
+    this.draw.bind(this);
     return item;    
 }
 
@@ -4472,7 +4473,7 @@ HTML_Item.prototype.actionInput = function () {
                 } else if (e.which === 32) {
                     that.showItemMenu(false);
                     window.setTimeout(that.element.focus(), 0);
-                    that.item.game.entities[0].inventory.removeItem(that.item.name, that.item.qty);
+                    that.item.game.entities[0].inventory.removeItem(that.item, that.item.qty);
                 }
             }
             this.pressed = true;
