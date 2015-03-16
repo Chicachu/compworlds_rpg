@@ -455,17 +455,15 @@ ASSET_MANAGER.downloadAll(function () {
      var aladdin_reward = ghost_quest_potion;
     var aladdin_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Aladdin", aladdin_reward, aladdin_quest_sword);
 
-    var aladdin = new NPC_QUEST(gameEngine, "Aladdin", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
-                                                                  "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
-                                                                  "This village is counting on you!"],
-                                                                  ["What are you doing just standing around!? Do you want to be dog food!?"],
-                                                                    ["I can breathe again, thank you stranger. My name is Sherry, by the way.",
-                                                                     "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
-                                                                     "They come into townlooking to loot our store every few months or so, it's an ongoing battle."],
-                                                                  ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
-                                                                    "You must have brought it with you! Haha!"]], aladdin_sprites, [new Point(224, 220), new Point(270, 220)], .05, false, [3, 4],
+    var aladdin = new NPC_QUEST(gameEngine, "Aladdin", [["Oh Dear God! Finally there is someone alive in the Death Valley! ",
+                                                                  "The Demon has been killing all the cattle in Agrabah and my people are staving now.I am here to fight the Demon and save town!",
+                                                                  "But for that I need a sword, since no one in their right mind will fight against Demon with their bare hands", 
+																  "All I can give you back is Jasmine's pendant and my friendship! "],
+                                                                  ["People in Agrabah are starving to death, bring me the sword and let me save and be a hero like you!"],
+                                                                  ["You are officially my bro now! Thank you for help and email me if you will need some help! "],
+                                                                  ["You must have brought it with you! Haha!"]], aladdin_sprites, [new Point(224, 220), new Point(270, 220)], .05, false, [3, 4],
                                                                     aladdin_quest, "level3", 1.25, [function () {
-                                                                        if (this.part === 1 && this.quest.complete) {
+                                                                        if (this.part === 0 && this.quest.complete) {
                                                                             this.part++;
                                                                         }
                                                                        this.showDialog();       
