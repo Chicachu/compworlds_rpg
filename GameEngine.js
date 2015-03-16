@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level2";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1717,7 +1717,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 320;
+    this.x = 10;
     this.y = 208;
         
     this.quests = [];
