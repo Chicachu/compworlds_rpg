@@ -90,8 +90,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var mage_spritesheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
 	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
 
-	var warrior = new Warrior(gameEngine, new Statistics(300, 225, 35, 4, 3, 1));
-	var archer = new Archer(gameEngine, new Statistics(225, 32, 28, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(250, 22, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(200, 32, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     //gameEngine.heroes.push(archer);
     //var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));

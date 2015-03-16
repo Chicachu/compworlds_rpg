@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1717,7 +1717,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 280;
+    this.x = 10;
     this.y = 208;
 
     this.quests = [];
@@ -2073,9 +2073,9 @@ Malboro = function(game, stats, loop_while_standing)
         death: new Animation(this.spriteSheet, 0, 3, 82, 91, 0.1, 1, true, false)
     };
     this.loot_table = [
-        ({ string: "gold", weight: 0 }),
-        ({ string: "heal berry", weight: 0 }),
-        ({ string: "amulet of thick skin", weight: 100 })
+        ({ string: "gold", weight: 45 }),
+        ({ string: "heal berry", weight: 25 }),
+        ({ string: "amulet of thick skin", weight: 3 })
     ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Malboro", false, this.loot_table);
 }
@@ -2097,9 +2097,9 @@ Ogre = function (game, stats, loop_while_standing) {
         death: new Animation(this.spriteSheet, 0, 2, 100, 100, 0.1, 1, true, false)
     };
     this.loot_table = [
-        ({ string: "gold", weight: 0 }),
-        ({ string: "heal berry", weight: 0 }),
-        ({ string: "amulet of thick skin", weight: 100 })
+        ({ string: "gold", weight: 65 }),
+        ({ string: "heal berry", weight: 35 }),
+        ({ string: "amulet of thick skin", weight: 5 })
     ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "ogre", false, this.loot_table);
 }
