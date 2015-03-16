@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level1";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1717,7 +1717,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 10;
+    this.x = 320;
     this.y = 208;
         
     this.quests = [];
@@ -4146,7 +4146,7 @@ Potion.prototype.doAction = function (game, target) {
             this_target.intelligence += this.level * 1;
             break;
     }
-    this.game.entities[0].inventory.removeItem(this.name, 1);
+    this.game.entities[0].inventory.removeItem(this, 1);
 }
 
 HTML_Item = function (element, game) {
