@@ -681,7 +681,11 @@ GameEngine.prototype.restartGame = function()
     this.entities[0].x = 15;
     this.entities[0].y = 215;
     this.environment[this.current_environment].curr_quadrant = 0;
-    this.entities[0].stats.health = this.entities[0].stats.total_health;
+    for (var i = 0; i < this.heroes.length; i++)
+    {
+        this.heroes[i].stats.health = this.heroes[i].stats.total_health;
+        this.heroes[i].is_dead = false;
+    }
     this.fiends = [];
     this.fight_queue = [];
     this.animation_queue = [];
@@ -1877,7 +1881,7 @@ Siren = function (game, stats, loop_while_standing) {
             down: null,
             up: null,
             left: null,
-            right: new Animation(this.spriteSheet, 21, 1, 256, 256, .1, 4, true, false),
+            right: new Animation(this.spriteSheet, 7, 1, 256, 256, .1, 4, true, false),
             destroy: new Animation(this.spriteSheet, 5, 1, 256, 256, .1, 6, true, false),
             hit: new Animation(this.spriteSheet, 3, 5, 256, 256, .1, 6, true, false),
             death: new Animation(this.spriteSheet, 8, 5, 256, 256, .1, 1, true, false)
