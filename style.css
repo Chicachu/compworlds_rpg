@@ -79,6 +79,10 @@ hr {
     pointer-events: none;
 }
 
+#battle_menu a, attack_sub a {
+    display: block;
+}
+
 #instructions {
     position: fixed; 
     width: 300px;
