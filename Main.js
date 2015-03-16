@@ -48,6 +48,7 @@ ASSET_MANAGER.queueDownload("./imgs/bishop.png");
 
 //level3 stuff
 ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
+ASSET_MANAGER.queueDownload("./imgs/desert.png");
 
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
@@ -628,7 +629,7 @@ ASSET_MANAGER.downloadAll(function () {
 				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,156,157,158,0,240,0,0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,260,200,202,204,0,0,0,0,0,0,0,0]],
                  [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
-                [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/woods.png", 0, [1, 2, 4, 5]);
+                [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
 	
 	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
                 [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 0, 109, 175, 175, 175, 175, 175],
