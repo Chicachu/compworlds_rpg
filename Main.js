@@ -386,18 +386,18 @@ ASSET_MANAGER.downloadAll(function () {
                                         "Come on! Let's go kill stuff!!! YEA!!! There is a secret exit at the back of this cave, I've seen people use it!!"]],
                                            mage_npc_sprites, [new Point(475, 115)], .06, false, [2], "dragon_cave", 1);
     
-    var bishop_sprites = new SpriteSet(new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false),
-                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false),
-                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false),
-                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 1, true, false), null,
-                                        new Animation(bishop_spritesheet, 0, 0, 80, 65, 0.05, 14, false, false), null);
+    var bishop_sprites = new SpriteSet(new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false),
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 1, true, false), null,
+                                        new Animation(bishop_spritesheet, 0, 0, 80, 80, 0.05, 14, false, false), null);
     var bishop = new NPC_QUEST(gameEngine, "Celesto", [["Ah, our young hero, Theon, and his new friend the mage, Acele. I have been expecting you.", 
                                                         "I have been watching you as your story unfolds. You are very important, young hero. You will change this world.", 
                                                         "I am a man of the Gods, and it is not noramlly acceptable for me to alter the threads of fate,",
                                                         "but your work here in Arkesia is so important, that I will make this one exception.", 
                                                         "I now bestow upon you a new magical ability, Acele!"],
-                                                       ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], null, [], .05, false, [0,1],
-                                                                    null, "church", 1, [function () {
+                                                       ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], bishop_sprites,
+                                                            [new Point(384, 64)], .05, false, [0, 1], null, "church", 1.8, [function () {
                                                                         this.showDialog();
                                                                     }, function () {
                                                                         if (this.game) {
@@ -422,13 +422,14 @@ ASSET_MANAGER.downloadAll(function () {
                                                                                         this.part++;
                                                                                         // give acele a new ability
                                                                                         // play hit animation
-                                                                                        this.game.animationQueue.push(new Event(this, this.animations.hit, 0, null, null));
+                                                                                        this.game.animation_queue.push(new Event(this, this.animations.hit, 500, null, null));
+                                                                                        this.game.animation_queue.push(new Event(this, this.animations.down, 0, null, null));
                                                                                     } 
                                                                                 }
                                                                                 this.game.next = false;
                                                                             }
                                                                         }
-                                                                    }], 20);
+                                                                    }], -82);
     // Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -640,6 +641,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(mountain_woman);
 	gameEngine.addEntity(mountain_villager);
 	gameEngine.addEntity(mage_npc);
+	gameEngine.addEntity(bishop);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);

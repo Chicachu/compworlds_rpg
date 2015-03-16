@@ -277,7 +277,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
     for (var i = 1; i < this.entities.length; i++) {
         if (this.entities[i].map_name === this.current_environment && !this.is_battle
             && includes(this.entities[i].quad, this.environment[this.current_environment].curr_quadrant)) {
-            if (Math.abs(this.entities[0].x - (this.entities[i].x - this.entities[i].x_offset)) < 35 && !hero_drawn) {
+            if (Math.abs(this.entities[0].x - (this.entities[i].x - this.entities[i].x_offset)) < 80 && !hero_drawn) {
                 if (this.entities[i].y < (this.entities[0].y + this.entities[i].y_offset)) {
                     this.entities[i].draw(this.context);
                     this.entities[0].draw(this.context);
@@ -303,7 +303,7 @@ GameEngine.prototype.draw = function (drawCallBack) {
 }
 
 GameEngine.prototype.queueActions = function () {
-    if (this.is_battle) {
+    if (this) {
         //Logic to calculate when to time the next animation event
         var event = this.event;
         //if event is null and there is an animation in the queue, set animation to the first item in the queue
@@ -2729,6 +2729,7 @@ EnterChurch = function () {
     this.game.entities[0].x = 448;
     this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 352;
+    this.game.entities[0].sight = 80; 
 }
 
 ExitChurch = function () {
@@ -2737,6 +2738,7 @@ ExitChurch = function () {
     this.game.entities[0].x = 525;
     this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 300;
+    this.game.entities[0].sight = 35;
 }
 
 EnterHouse2 = function () {
