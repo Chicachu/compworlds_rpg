@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level1";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1280,7 +1280,7 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 100;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3999;
     }
 }
 
@@ -1717,7 +1717,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 320;
+    this.x = 280;
     this.y = 208;
 
     this.quests = [];
@@ -2342,7 +2342,9 @@ NPC.prototype.updateDialogue = function () {
 
                 if (this.game.current_environment === "dragon_cave") {
                     var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));
-                    this.game.heroes.push(mage_hero);
+                    gameEngine.heroes.push(mage_hero);
+                    //this.game.entities[0].inventory.names[1].found = true; 
+                    gameEngine.entities[0].inventory.names[1].found = true;
                     this.x = 3098204981238;
                     this.y = 384923784928374;
                 } else if (this.part === 0) {
@@ -2364,7 +2366,6 @@ NPC.prototype.updateDialogue = function () {
         }
     }
 }
-
 
 // loops through dialogue for the given NPC.
 NPC.prototype.startInteraction = function () {
@@ -4322,7 +4323,7 @@ Inventory = function (game, coin, max_items) {
     this.open = false;
     this.hero_name = document.getElementById("hero_name");
     this.current_name_index = 0; 
-    this.names = [{ name: "Theon", found: true }, { name: "Acele", found: true }, { name: "Efari", found: false }];
+    this.names = [{ name: "Theon", found: true }, { name: "Acele", found: false }, { name: "Efari", found: false }];
     this.itemmenu = document.getElementById("storeitem_menu");
     this.itemName = document.getElementById("item_name");
     this.itemDescription = document.getElementById("item_description");
@@ -4372,9 +4373,18 @@ Inventory.prototype.showInventory = function (game) {
     if (this.items.length !== gameEngine.entities[0].inventory.items.length) {
         this.items = gameEngine.entities[0].inventory.items; 
     }
+    for (var i = 0; i < this.names.length; i++) {
+        if (this.names[i].found !== gameEngine.entities[0].inventory.names[i].found) {
+            this.names[i].found = gameEngine.entities[0].inventory.names[i].found;
+        }
+    }
+    for (var i = 0; i < gameEngine.heroes.length; i++) {
+        if (!this.game.heroes[i]) {
+            this.game.heroes[i] = gameEngine.heroes[i];
+        }
+    }
     
     if (!this.open) {
-        //window.setTimeout(that.draw.bind(that), 0);
         this.draw();
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
@@ -4424,10 +4434,6 @@ Inventory.prototype.draw = function (ctx) {
             var that = this;
             window.setTimeout(that.html_items[i].actionInput.bind(that.html_items[i]), 0);
             window.setTimeout(that.html_items[i].updateShowItemMenu.bind(that.html_items[i]), 0);
-            //this.html_items[i].actionInput.bind(this.html_items[i]);
-            //this.html_items[i].updateShowItemMenu.bind(this.html_items[i]);
-            //this.html_items[i].actionInput();
-            //this.html_items[i].updateShowItemMenu.call(this.html_items[i]);
         } else {
             this.html_items[i].item = null;
             this.html_items[i].element.innerHTML = "";
@@ -4436,9 +4442,6 @@ Inventory.prototype.draw = function (ctx) {
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
     var that = this;
-    //window.setTimeout(that.selectInput.bind(that), 0);
-    //this.selectInput();
-    //window.setTimeout(that.game.startInput.bind(that.game),0);
     this.game.startInput.call(this.game);
 }
 
@@ -4464,11 +4467,6 @@ Inventory.prototype.addItem = function (item) {
             // wont fit in inventory
         }
     } 
-    //this.draw.bind(this);
-    //var that = this;
-    //window.setTimeout(that.draw.bind(that), 0);
-    //this.draw();
-    //this.draw.call(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
@@ -4491,11 +4489,7 @@ Inventory.prototype.removeItem = function (item_to_remove, qty) {
             }
         }
     }
-    //this.draw.bind(this);
-    //var that = this;
-    //window.setTimeout(that.draw.bind(that), 0);
     this.draw();
-    //this.draw.call(this);
     return item;
 }
 
@@ -4601,26 +4595,26 @@ Inventory.prototype.changeHero = function () {
     // change equip slots
  
     if (this.game.heroes[this.current_name_index].equipped.armor) {
-         armor_slot.innerHTML = ""; 
-         armor_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.armor.img;
+         armor_slot.innerHTML = this.game.heroes[this.current_name_index].equipped.armor.img.outerHTML;
+         //armor_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.armor.img;
     } else {
         armor_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/armor.png").outerHTML;
     }
     if (this.game.heroes[this.current_name_index].equipped.accessory) {
-        accessory_slot.innerHTML = "";
-        accessory_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.accessory.img;
+        accessory_slot.innerHTML = this.game.heroes[this.current_name_index].equipped.accessory.img.outerHTML;
+        //accessory_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.accessory.img;
     } else {
         accessory_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/accessory.png").outerHTML;
     }
     if (this.game.heroes[this.current_name_index].equipped.mainhand) {
-        mainhand_slot.innerHTML = ""; 
-        mainhand_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.mainhand.img;
+        mainhand_slot.innerHTML = this.game.heroes[this.current_name_index].equipped.mainhand.img.outerHTML;
+        //mainhand_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.mainhand.img;
     } else {
-        mainhand_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/mainhand.png").outerHTML;
+        mainhand_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/main_hand.png").outerHTML;
     }
     if (this.game.heroes[this.current_name_index].equipped.offhand) {
-        offhand_slot.innerHTML = "";
-        offhand_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.offhand.img;
+        offhand_slot.innerHTML = this.game.heroes[this.current_name_index].equipped.offhand.img.outerHTML;
+        //offhand_slot.style.backgroundImage = this.game.heroes[this.current_name_index].equipped.offhand.img;
     } else {
         offhand_slot.innerHTML = ASSET_MANAGER.getAsset("./imgs/equipment/offhand.png").outerHTML;
     }
