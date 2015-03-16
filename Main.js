@@ -70,7 +70,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/stone.png");
 ASSET_MANAGER.queueDownload("./imgs/items/book.png");
 ASSET_MANAGER.queueDownload("./imgs/items/key.png");
 ASSET_MANAGER.queueDownload("./imgs/level_up_icon.png");
-
+ASSET_MANAGER.getAsset("./imgs/items/sword.gif");
 
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
