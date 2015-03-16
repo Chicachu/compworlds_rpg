@@ -243,7 +243,7 @@ ASSET_MANAGER.downloadAll(function () {
     
     var troll_NPC_spriteset = new SpriteSet(new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), null, null, null);
     var troll_NPC = new TrollNPC(gameEngine, [["Why hello there old sport.", "Is it the temple that you would like to go to?", "I'm afraid to inform you I cannot let you do that.",
-        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(76, 226)], .1, false, [1], "level2", "Troll");
+        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(76, 226)], .1, false, [1], "level3", "Troll");
     troll_NPC.setScale(.3);
     //var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
     //var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), null, null, null);
