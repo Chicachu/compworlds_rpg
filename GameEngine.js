@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level1";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1280,7 +1280,7 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3950;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3990;
     }
 }
 
@@ -1717,7 +1717,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 10;
+    this.x = 320;
     this.y = 208;
         
     this.quests = [];
@@ -2575,8 +2575,6 @@ NPC_QUEST.prototype.showDialog = function () {
 NPC_QUEST.prototype.update = function () {
     if (!this.interacting) {
         NPC.prototype.update.call(this);
-        this.firstQuadx = this.x;
-        this.firstQuady = this.y;
     } else {
         this.curr_anim = this.stopAnimation(this.curr_anim);
         this.updateDialogue();
@@ -2588,6 +2586,8 @@ NPC_QUEST.prototype.updateDialogue = function () {
 }
 
 NPC_QUEST.prototype.draw = function (context) {
+    this.x = this.firstQuadx;
+    this.y = this.firstQuady;
     this.changeCoordsForQuad(this.game.environment[this.game.current_environment].curr_quadrant);
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
 
@@ -3000,12 +3000,14 @@ Chest.prototype.startInteraction = function () {
 
         }
         if (!this.closed) {
-            if (this.game.environment[this.game.current_environment] === "dragon_cave") {
+            if (this.game.current_environment === "dragon_cave") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 29;
-            } else if (this.game.environment[this.game.current_environment] === "level1") {
+            } else if (this.game.current_environment === "level1") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
-            } else if (this.game.environment[this.game.current_environment] === "level2") {
+            } else if (this.game.current_environment === "level2") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 2;
+            } else if (this.game.current_environment === "church") {
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 64;
             }
         }
     }
