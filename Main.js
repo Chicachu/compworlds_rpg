@@ -443,7 +443,16 @@ ASSET_MANAGER.downloadAll(function () {
                                                                             }
                                                                         }
                                                                     }], -82);
-    // Environments 
+																	
+																	
+	//LEVEL 3 STUFF
+	 var aladdin_sprites = new SpriteSet(new Animation(aladdin_spritesheet, 0, 0, 56, 73.75, 0.1, 3, true, true),
+                                            new Animation(aladdin_spritesheet, 0,2, 56, 73.75, 0.1, 3, true, true),
+                                            new Animation(aladdin_spritesheet, 0, 1, 56, 73.75, 0.1, 3, true, true),
+                                            new Animation(aladdin_spritesheet, 0, 3, 56, 73.75, 0.1, 3, true, true), null, null, null);
+    var aladdin_quest_sword = new SpecialItem(gameEngine, "Aladdin Sword", ASSET_MANAGER.getAsset("./imgs/items/sword.gif"), 1, function () { }, "The sword that strikes the Demon!");
+    
+	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
                         [2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
