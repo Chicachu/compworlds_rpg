@@ -4164,7 +4164,8 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
         inventory.interface.tabIndex = 0;
         this.menu.style.visibility = "visible";
         this.menu.style.display = "block";
-        this.itemmenu.style.visibility = "hidden";
+        this.original_location = this.itemmenu.style.top;
+        this.itemmenu.style.top = "-593px";
         this.menu.tabIndex = 1;
         this.setActionText();
         this.insertATags();
@@ -4187,12 +4188,11 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
     } else {
         this.menu.style.visibility = "hidden";
         this.menu.style.display = "none";
-
-        this.itemmenu.style.visibility = "visible";
         this.menu.tabIndex = 0;
         this.action.tabIndex = 0;
         this.destroy.tabIndex = 0;
         this.return.tabIndex = 0;
+        this.itemmenu.style.top = this.original_location;
     }
 }
 
