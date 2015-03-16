@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level1";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -441,6 +441,7 @@ setting the battle background, saving coordinates, and also generating a list or
 GameEngine.prototype.setBattle = function (args) {
     var game = args.game;
     var battle_type = args.battle_type;
+    var boss = args.boss;
     var player = game.entities[0];
     var heroes = game.heroes;
     game.sound_manager.playSong("battle");
@@ -487,7 +488,7 @@ GameEngine.prototype.setBattle = function (args) {
 
     if (battle_type === "boss")
     {
-        game.setBossBattle(game);
+        game.setBossBattle(game, boss);
     }
     else if (battle_type === "normal" || !battle_type)
     {
@@ -528,17 +529,23 @@ GameEngine.prototype.setNormalBattle = function(game)
     game.decideFighters();
 }
 
-GameEngine.prototype.setBossBattle = function(game)
+GameEngine.prototype.setBossBattle = function(game, boss)
 {
     game.entities[0].y = 230;
-    if (game.current_environment === "dragon_cave") {
+    if (boss === "Dragon") {
         game.fiends.push(new Dragon1(game, new Statistics(150, 40, 60, 5, 10, 3)));
         game.fiends[0].y = (game.height / 3) - 140;
         game.fiends[0].x = game.fiends[0].x - 30
     }
-    else if (game.current_environment === "level2")
+    else if (boss === "Siren")
     {
         game.fiends.push(new Siren(game, new Statistics(225, 50, 50, 0, 0, 0)));
+        game.fiends[0].y = (game.height / 3);
+        game.fiends[0].x = game.fiends[0].x - 30
+    }
+    else if(boss === "Troll")
+    {
+        game.fiends.push(new Troll(game, new Statistics(225, 50, 50, 0, 0, 0)));
         game.fiends[0].y = (game.height / 3);
         game.fiends[0].x = game.fiends[0].x - 30
     }
@@ -1017,16 +1024,11 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
                     this.game.current_stage = this.game.stage[1];
                     this.game.changeDragonCave(); 
                     this.game.removeEntityByName("Dragon");
-
-                    setTimeout(function () {
-                        var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
-                        var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), null, null, null);
-
-                        var siren_NPC = new Boss(game, [["Whaddup nigga.", "think youre hard bitch ass nigga?", "ima fuck you up nigga."]],
-                            siren_NPC_sprites, [new Point(450, 120)], .1, false, [2], "level2", "Siren");
-                        siren_NPC.setScale(.3);
-                    }, 10000);
-                    
+                }
+                else if(foes.name === "Siren")
+                {
+                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+                    this.game.removeEntityByName("SirenNPC");
                 }
                 else {
                     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
@@ -1717,7 +1719,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 10;
+    this.x = 320;
     this.y = 208;
 
     this.quests = [];
@@ -1915,9 +1917,58 @@ Troll = function (game, stats, loop_while_standing)
             up: null,
             left: null,
             right: new Animation(this.spriteSheet, 7, 1, 256, 256, .1, 1, true, false),
-            //destroy: new Animation();
+            destroy: new Animation(this.spriteSheet, 0, 1, 256, 256, .08, 8, true, false),
+            hit: new Animation(this.spriteSheet, 8, 1, 256, 256, .1, 5, true, false),
+            death: new Animation(this.spriteSheet, 12, 1, 256, 256, .1, 1, true, false)
         }
+    this.loot_table =
+        [({string: "gold", weight: 100})];
+    Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Troll", false, this.loot_table);
+    this.scale_factor = .7;
 }
+
+Troll.prototype = new Enemy();
+Troll.prototype.constructor = Troll;
+
+Troll.prototype.draw = function (context) {
+    this.drawHealthBar(context);
+    if (this.is_targeted) {
+        this.drawSelector(context, 'yellow');
+    }
+    this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale_factor);
+}
+
+Troll.prototype.drawHealthBar = function (context) {
+    if (this.stats.health < 0) {
+        green = 0;
+    }
+    else {
+        var green = this.stats.health / this.stats.total_health;
+    }
+    context.beginPath();
+    context.rect(this.x + this.curr_anim.frameWidth / 3 - 30, this.y / this.scale_factor - 60, this.curr_anim.frameWidth * this.scale_factor - 40, 5);
+    context.fillStyle = 'red';
+    context.fill();
+    context.closePath();
+    context.beginPath();
+    context.rect((this.x + this.curr_anim.frameWidth / 3) - 30, this.y / this.scale_factor - 60, (this.curr_anim.frameWidth * green) * this.scale_factor - 40, 5);
+    context.fillStyle = 'green';
+    context.fill();
+    context.closePath();
+}
+
+Troll.prototype.drawSelector = function (context, color) {
+    context.beginPath();
+    context.moveTo((this.x + this.curr_anim.frameWidth) * this.scale_factor - 50, this.y / this.scale_factor - 70);
+    context.lineTo(((this.x + this.curr_anim.frameWidth) - 10) * this.scale_factor - 50, this.y / this.scale_factor - 80);
+    context.lineTo(((this.x + this.curr_anim.frameWidth) + 10) * this.scale_factor - 50, this.y / this.scale_factor - 80);
+    context.lineTo((this.x + this.curr_anim.frameWidth) * this.scale_factor - 50, this.y / this.scale_factor - 70);
+    context.fillStyle = color;
+    context.fill();
+    context.closePath();
+}
+
+
 Siren = function (game, stats, loop_while_standing) {
     this.game = game;
     this.spriteSheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
@@ -2438,11 +2489,31 @@ Boss.prototype.updateDialogue = function () {
                 this.game.context.canvas.focus();
                 //this.game.canControl = true;
                 this.interacting = false;
-                this.game.fadeOut(this.game, { game: this.game, battle_type: "boss" }, this.game.setBattle);
+                this.setBattle();
             }
             this.game.next = false;
         }
     }
+}
+
+Boss.prototype.setBattle = function()
+{
+    this.game.fadeOut(this.game, { game: this.game, battle_type: "boss", boss: "Dragon" }, this.game.setBattle);
+}
+
+TrollNPC = function(game, dialogue, anims, path, speed, pause, quad, map_name)
+{
+    this.spriteSheet = anims.right.spriteSheet;
+    this.name = "TrollNPC";
+    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name);
+}
+
+TrollNPC.prototype = new Boss();
+TrollNPC.prototype.constructor = TrollNPC;
+
+TrollNPC.prototype.setBattle = function()
+{
+    this.game.fadeOut(this.game, { game: this.game, battle_type: "boss", boss: "Troll" }, this.game.setBattle);
 }
 
 SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
@@ -2451,7 +2522,7 @@ SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) 
     this.faded_in = false;
     this.fading_in = false;
     this.fade_timer = 0;
-    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name)
+    Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name);
 }
 
 SirenNPC.prototype = new Boss();
@@ -2467,7 +2538,7 @@ SirenNPC.prototype.draw = function (context) {
     }
     if (found) {
         var distance = Math.sqrt(Math.pow(this.game.heroes[0].x - this.x, 2) + Math.pow(this.game.heroes[0].y - this.y, 2));
-        if (distance < 100) {
+        if (distance < 75) {
            // this.spriteSheet.style.opacity = "0";
             //if (!this.faded_in && !this.fading_in) {
             //    var that = this;
