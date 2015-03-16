@@ -83,7 +83,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level3";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -151,6 +151,7 @@ GameEngine.prototype.startInput = function () {
             } else if (e.which === 73) {
                 //that.key_i = true;
                 window.setTimeout(that.entities[0].inventory.showInventory.bind(that.entities[0].inventory), 0);
+                //that.entities[0].inventory.showInventory();
                 e.stopImmediatePropagation();
             }
         }
@@ -726,11 +727,11 @@ LootDispenser.prototype.toString = function()
 LootDispenser.prototype.dispenseLoot = function (hero) {
     
     if (this.encounters % 6 === 0) {
-        hero.recieveItem(new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!"));
+        window.setTimeout(hero.recieveItem.bind(hero, new SpecialItem(this.game, "Key", ASSET_MANAGER.getAsset("./imgs/items/key.png"), 1, function () { }, "You can open chest with this!")) , 0);
     }
     for(var i = 0; i < this.accumulated_loot.length; i ++)
     {
-        hero.recieveItem(this.accumulated_loot[i]);
+        window.setTimeout(hero.recieveItem.bind(hero, this.accumulated_loot[i]), 0);
     }
 
     var total_xp_weight = 0;
@@ -1267,7 +1268,7 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3999;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 100;
     }
 }
 
@@ -2045,9 +2046,9 @@ Malboro = function(game, stats, loop_while_standing)
         death: new Animation(this.spriteSheet, 0, 3, 82, 91, 0.1, 1, true, false)
     };
     this.loot_table = [
-        ({ string: "gold", weight: 5 }),
-        ({ string: "heal berry", weight: 90 }),
-        ({ string: "amulet of thick skin", weight: 5 })
+        ({ string: "gold", weight: 0 }),
+        ({ string: "heal berry", weight: 0 }),
+        ({ string: "amulet of thick skin", weight: 100 })
     ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "Malboro", false, this.loot_table);
 }
@@ -2069,9 +2070,9 @@ Ogre = function (game, stats, loop_while_standing) {
         death: new Animation(this.spriteSheet, 0, 2, 100, 100, 0.1, 1, true, false)
     };
     this.loot_table = [
-        ({ string: "gold", weight: 80 }),
-        ({ string: "heal berry", weight: 10 }),
-        ({ string: "amulet of thick skin", weight: 10 })
+        ({ string: "gold", weight: 0 }),
+        ({ string: "heal berry", weight: 0 }),
+        ({ string: "amulet of thick skin", weight: 100 })
     ];
     Enemy.call(this, this.game, stats, this.animations, this.spriteSheet, "ogre", false, this.loot_table);
 }
@@ -3178,6 +3179,7 @@ UseItemMenu = function (game, parent) {
     this.parent = parent;
     this.menu = document.getElementById("useitem_menu");
     this.list = this.menu.children[0];
+    
     this.open = false;
     if (this.game) {
         this.items = this.game.entities[0].inventory.items;
@@ -3191,6 +3193,7 @@ UseItemMenu.prototype.showMenu = function (game) {
         this.menu.tabIndex = 1;
         this.menu.style.display = "block";
         this.menu.style.visibility = "visible";
+
 
         this.parent.menu.tabIndex = 0;
         this.parent.attack.tabIndex = 0;
@@ -4070,7 +4073,8 @@ HTML_Item = function (element, game) {
     this.return.setAttribute("id", "return2");
     this.return.innerHTML = "Return";
 
-    
+
+    this.itemmenu = document.getElementById("storeitem_menu");
     this.og_children = this.menu.children[0].children;
 }
 
@@ -4088,6 +4092,8 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
         inventory.interface.tabIndex = 0;
         this.menu.style.visibility = "visible";
         this.menu.style.display = "block";
+        this.original_location = this.itemmenu.style.top;
+        this.itemmenu.style.top = "-593px";
         this.menu.tabIndex = 1;
         this.setActionText();
         this.insertATags();
@@ -4114,6 +4120,7 @@ HTML_Item.prototype.showItemMenu = function (flag, inventory, index) {
         this.action.tabIndex = 0;
         this.destroy.tabIndex = 0;
         this.return.tabIndex = 0;
+        this.itemmenu.style.top = this.original_location;
     }
 }
 
@@ -4221,7 +4228,9 @@ Armor.prototype.setActionText = function () {
 }
 
 Warrior.prototype.recieveItem = function (item) {
-    this.inventory.addItem(item);
+    var that = this; 
+    //this.inventory.addItem(item);
+    window.setTimeout(that.inventory.addItem.bind(that.inventory, item), 0);
 }
 
 Warrior.prototype.removeItem = function (item, qty) {
@@ -4290,7 +4299,6 @@ Inventory.prototype.hasItem = function (item_name) {
 
 Inventory.prototype.showInventory = function (flag) {
     if (!this.open) {
-        this.draw();
         this.game.context.canvas.tabIndex = 0;
         this.interface.tabIndex = 2;
         this.interface.style.visibility = "visible";
@@ -4345,7 +4353,7 @@ Inventory.prototype.draw = function (ctx) {
     }
     // draw coin amount
     this.html_coin.innerHTML = this.coin;
-
+    this.selectInput();
 }
 
 Inventory.prototype.addItem = function (item) {
@@ -4369,8 +4377,12 @@ Inventory.prototype.addItem = function (item) {
         } else {
             // wont fit in inventory
         }
-    }
-    this.draw.bind(this);
+    } 
+    //this.draw.bind(this);
+    //var that = this;
+    //window.setTimeout(that.draw.bind(that), 0);
+    //this.draw();
+    this.draw.call(this);
 }
 
 // will return false if item can't be removed either because it doesn't exist in inventory or there aren't enough of the item to remove (qty too low) 
@@ -4393,8 +4405,12 @@ Inventory.prototype.removeItem = function (item, qty) {
             }
         }
     }
-    this.draw.bind(this);
-    return item;    
+    //this.draw.bind(this);
+    //var that = this;
+    //window.setTimeout(that.draw.bind(that), 0);
+    //this.draw();
+    this.draw.call(this);
+    return item;
 }
 
 // returns new item object of the qty requested while keeping the remaining in the inventory
@@ -4465,7 +4481,7 @@ Inventory.prototype.selectInput = function () {
                         that.html_items[index].showItemMenu(true, that);
                     }
                 } else if (e.which === 27 || e.which === 73) {
-                    that.showInventory();
+                    window.setTimeout(that.showInventory.bind(that), 0);
                 } else if (e.which === 13) {
                     that.changeHero(); 
                 }
@@ -4588,37 +4604,39 @@ Inventory.prototype.changeFocus = function (index) {
 }
 
 Inventory.prototype.setItemDescription = function (index) {
-    this.itemName.innerHTML = this.html_items[index].item.name + "<br><hr>";
-    this.itemDescription.innerHTML = this.html_items[index].item.description + "<br>";
-    if (this.html_items[index].item.type) {
-        if (this.html_items[index].item.stats.health !== 0) {
-            this.itemDescription.innerHTML += "<br>Health: ";
-            this.itemDescription.innerHTML += this.html_items[index].item.stats.health;
-        }
+    if (this.html_items[index].item) {
+        this.itemName.innerHTML = this.html_items[index].item.name + "<br><hr>";
+        this.itemDescription.innerHTML = this.html_items[index].item.description + "<br>";
+        if (this.html_items[index].item.type) {
+            if (this.html_items[index].item.stats.health !== 0) {
+                this.itemDescription.innerHTML += "<br>Health: ";
+                this.itemDescription.innerHTML += this.html_items[index].item.stats.health;
+            }
 
-        if (this.html_items[index].item.stats.attack !== 0) {
-            this.itemDescription.innerHTML += "<br>Attack: ";
-            this.itemDescription.innerHTML += this.html_items[index].item.stats.attack;
-        }
+            if (this.html_items[index].item.stats.attack !== 0) {
+                this.itemDescription.innerHTML += "<br>Attack: ";
+                this.itemDescription.innerHTML += this.html_items[index].item.stats.attack;
+            }
 
-        if (this.html_items[index].item.stats.defense !== 0) {
-            this.itemDescription.innerHTML += "<br>Defense: ";
-            this.itemDescription.innerHTML += this.html_items[index].item.stats.defense;
-        }
+            if (this.html_items[index].item.stats.defense !== 0) {
+                this.itemDescription.innerHTML += "<br>Defense: ";
+                this.itemDescription.innerHTML += this.html_items[index].item.stats.defense;
+            }
 
-        if (this.html_items[index].item.stats.strength !== 0) {
-            this.itemDescription.innerHTML += "<br>STR: ";
-            this.itemDescription.innerHTML += this.html_items[index].item.stats.strength;
-        }
+            if (this.html_items[index].item.stats.strength !== 0) {
+                this.itemDescription.innerHTML += "<br>STR: ";
+                this.itemDescription.innerHTML += this.html_items[index].item.stats.strength;
+            }
 
-        if (this.html_items[index].item.stats.dexterity !== 0) {
-            this.itemDescription.innerHTML += "<br>DEX: ";
-            this.itemDescription.innerHTML += this.html_items[index].item.stats.dexterity;
-        }
+            if (this.html_items[index].item.stats.dexterity !== 0) {
+                this.itemDescription.innerHTML += "<br>DEX: ";
+                this.itemDescription.innerHTML += this.html_items[index].item.stats.dexterity;
+            }
 
-        if (this.html_items[index].item.stats.intelligence !== 0) {
-            this.itemDescription.innerHTML += "<br>INT: ";
-            this.itemDescription.innerHTML += this.html_items[index].item.stats.intelligence;
+            if (this.html_items[index].item.stats.intelligence !== 0) {
+                this.itemDescription.innerHTML += "<br>INT: ";
+                this.itemDescription.innerHTML += this.html_items[index].item.stats.intelligence;
+            }
         }
     }
 }
