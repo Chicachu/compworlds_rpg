@@ -1451,7 +1451,11 @@ Hero.prototype.boundaryRight = function () {
 }
 
 Hero.prototype.boundaryLeft = function () {
-    return this.x + 20 < 0;
+    if (this.game.current_environment === "church") {
+        return this.x + 15 < 0;
+    } else {
+        return this.x + 20 < 0;
+    }
 }
 
 Hero.prototype.boundaryUp = function () {
@@ -1530,7 +1534,7 @@ Hero.prototype.isPassable = function (tile, index) {
             return true; 
         }
     } else if (this.game.current_environment === "church") {
-        if (tile === 0 || (tile >= 8 && tile <= 12) || tile === 28 || tile === 29 || tile === 48 || tile === 49 || tile === 30) {
+        if (tile === 0 || (tile >= 8 && tile <= 14) || tile === 28 || tile === 29 || tile === 48 || tile === 49 || tile === 30) {
             return true; 
         }
     } else {
@@ -1686,6 +1690,7 @@ Warrior = function (game, stats) {
         special: new Animation(this.spriteSheet, 0, 17, 64, 64, 0.05, 12, true, false),
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
+
 
     this.x = 320;
     this.y = 208;
@@ -1911,7 +1916,7 @@ WolfRider = function(game, stats, loop_while_standing)
         up: null,
         left: null,
         right: new Animation(this.spriteSheet, 0, 0, 138.75, 128.15, .1, 1, true, false),
-        destroy: new Animation(this.spriteSheet, 0, 3, 138.75, 128.15, .1, 1, true, false),
+        destroy: new Animation(this.spriteSheet, 0, 3, 138.75, 128.15, .1, 6, true, false),
         hit: new Animation(this.spriteSheet, 0, 7, 138.75, 128.15, .07, 6, true, false),
         death: new Animation(this.spriteSheet, 5, 7, 138.75, 128.15, .1, 1, true, false)
     }
@@ -2067,7 +2072,7 @@ dialogue : array of strings which will be used as the NPC's dialogue
 anims : a SpriteSet object with the characters full set of animations
 path : an array of Points which will determine the path that the NPC will take. pass in one point for the NPC to stand still
 pause : whether the NPC will rest for 1 second once it reaches one of its points*/
-NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale) {
+NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale, yoffset) {
     if (game && dialogue && anims && path) {
         this.game = game;
         this.scale = (scale || 1);
@@ -2094,6 +2099,10 @@ NPC = function (game, dialogue, anims, path, speed, pause, quad, map_name, scale
         this.dialogue_index = 0;
         this.setNextCoords();
         this.quad = quad;
+
+        if (yoffset) {
+            this.y_offset = yoffset; 
+        }
     }
 }
 
@@ -2383,7 +2392,7 @@ pause: whether the NPC will rest for 1 second once it reaches one of its points
 */
 
 
-NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale, functions) {
+NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest, map_name, scale, functions, yOffset) {
     this.name = name;
     this.quest = quest; 
     NPC.call(this, game, dialog, anims, path, speed, pause, quad, map_name, scale);
@@ -2394,6 +2403,9 @@ NPC_QUEST = function(game, name, dialog, anims, path, speed, pause, quad, quest,
 
     this.firstQuadx = this.x;
     this.firstQuady = this.y;
+    if (yOffset) {
+        this.y_offset = yOffset;
+    }
 }
 
 NPC_QUEST.prototype = new NPC();
@@ -2716,8 +2728,8 @@ EnterChurch = function () {
 
 ExitChurch = function () {
     this.game.current_environment = "level2";
-    this.game.environment[this.game.current_environment].setQuadrant(1);
-    this.game.entities[0].x = 554;
+    this.game.environment[this.game.current_environment].setQuadrant(0);
+    this.game.entities[0].x = 525;
     this.game.sound_manager.playSound("door_open");
     this.game.entities[0].y = 300;
 }
@@ -2848,6 +2860,8 @@ Chest.prototype.startInteraction = function () {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 29;
             } else if (this.game.environment[this.game.current_environment] === "level1") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
+            } else if (this.game.environment[this.game.current_environment] === "level2") {
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 2;
             }
         }
     }
