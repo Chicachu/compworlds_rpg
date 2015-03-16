@@ -82,8 +82,8 @@ ASSET_MANAGER.downloadAll(function () {
 	var mountain_villager_spritesheet = ASSET_MANAGER.getAsset("./imgs/mountainVillager.png");
 	var mage_spritesheet = ASSET_MANAGER.getAsset("./imgs/mage.png");
 
-	var warrior = new Warrior(gameEngine, new Statistics(300, 120, 35, 4, 3, 1));
-	var archer = new Archer(gameEngine, new Statistics(225, 25, 28, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(300, 22, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(225, 32, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     //gameEngine.heroes.push(archer);
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
@@ -228,11 +228,11 @@ ASSET_MANAGER.downloadAll(function () {
     dragon1_NPC.setScale(1.5);
 
     var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
-    var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 10, 5, 256, 256, .1, 1, true, false), null, null, null);
+    var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 7, 1, 256, 256, .1, 1, true, false), null, null, null);
 
     var siren_NPC = new Boss(gameEngine, [["Whaddup nigga.", "think youre hard bitch ass nigga?", "ima fuck you up nigga."]],
         siren_NPC_sprites, [new Point(350, 120)], .1, false, [2], "level2", "Siren");
-    siren_NPC.setScale(.2);
+    siren_NPC.setScale(.5);
     // WHEN ADDING THE OTHER TWO HEROS (the mage and archer) ADD THEM TO SPOTS 1 and 2
     // the 3 heroes should only be in slots 0-2 in this array. Other code depends on it. 
     gameEngine.addEntity(warrior);
@@ -593,6 +593,7 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(mountain_woman);
 	gameEngine.addEntity(mountain_villager);
 	gameEngine.addEntity(mage_npc);
+	gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
     gameEngine.start();
