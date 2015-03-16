@@ -451,7 +451,54 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(aladdin_spritesheet, 0, 1, 56, 73.75, 0.1, 3, true, true),
                                             new Animation(aladdin_spritesheet, 0, 3, 56, 73.75, 0.1, 3, true, true), null, null, null);
     var aladdin_quest_sword = new SpecialItem(gameEngine, "Aladdin Sword", ASSET_MANAGER.getAsset("./imgs/items/sword.gif"), 1, function () { }, "The sword that strikes the Demon!");
-    
+     var aladdin_reward = ghost_quest_potion;
+    var aladdin_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Aladdin", aladdin_reward, aladdin_quest_sword);
+
+    var aladdin = new NPC_QUEST(gameEngine, "Aladdin", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
+                                                                  "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
+                                                                  "This village is counting on you!"],
+                                                                  ["What are you doing just standing around!? Do you want to be dog food!?"],
+                                                                    ["I can breathe again, thank you stranger. My name is Sherry, by the way.",
+                                                                     "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
+                                                                     "They come into townlooking to loot our store every few months or so, it's an ongoing battle."],
+                                                                  ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
+                                                                    "You must have brought it with you! Haha!"]], aladdin_sprites, [new Point(224, 220), new Point(270, 220)], .05, false, [3, 4],
+                                                                    aladdin_quest, "level3", 1.25, [function () {
+                                                                        if (this.part === 1 && this.quest.complete) {
+                                                                            this.part++;
+                                                                        }
+                                                                       this.showDialog();       
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        this.game.entities[0].addQuest(this.quest);
+                                                                                        this.quest.complete = true;
+                                                                                    } if (this.part === 2) {
+                                                                                        this.part++;
+                                                                                    }
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }], 20);
 	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
