@@ -103,8 +103,6 @@ ASSET_MANAGER.downloadAll(function () {
     //gameEngine.heroes.push(archer);
     //var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));
     //gameEngine.heroes.push(mage_hero);
-    var mage_hero = new Mage(gameEngine, new Statistics(200, 160, 25, 1, 1, 5));
-    gameEngine.heroes.push(mage_hero);
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
