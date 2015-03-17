@@ -78,6 +78,7 @@ ASSET_MANAGER.queueDownload("./imgs/items/sword.gif");
 ASSET_MANAGER.queueDownload("./imgs/items/cactus_flower.png");
 ASSET_MANAGER.queueDownload("./imgs/items/staff3.png");
 ASSET_MANAGER.queueDownload("./imgs/items/armor3.png");
+ASSET_MANAGER.queueDownload("./imgs/plus_sign.png");
 
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
@@ -101,12 +102,17 @@ ASSET_MANAGER.downloadAll(function () {
 	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
 	var troll_npc_sprites = ASSET_MANAGER.getAsset("./imgs/troll.png");
 
-	var warrior = new Warrior(gameEngine, new Statistics(250, 220, 35, 4, 3, 1));
-	var archer = new Archer(gameEngine, new Statistics(200, 32, 28, 4, 3, 1));
+	var warrior = new Warrior(gameEngine, new Statistics(250, 25, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(200, 35, 28, 4, 3, 1));
     gameEngine.heroes.push(warrior);
     //gameEngine.heroes.push(archer);
     //var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));
     //gameEngine.heroes.push(mage_hero);
+
+    //var mage_hero = new Mage(gameEngine, new Statistics(200, 160, 25, 1, 1, 5));
+    //gameEngine.heroes.push(mage_hero);
+
+
 
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
@@ -358,7 +364,7 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 3, true, false), null, null, null);
-    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Sherry", null, "Dire Wolf", 5);
+    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Sherry", null, "DireWolf", 5);
     var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
                                                                   "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
                                                                   "This village is counting on you!"],
