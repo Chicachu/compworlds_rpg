@@ -48,6 +48,7 @@ ASSET_MANAGER.queueDownload("./imgs/mountainVillager.png");
 ASSET_MANAGER.queueDownload("./imgs/mage.png");
 ASSET_MANAGER.queueDownload("./imgs/churchInterior.png");
 ASSET_MANAGER.queueDownload("./imgs/bishop.png");
+ASSET_MANAGER.queueDownload("./imgs/lagoon.png");
 
 //level3 stuff
 ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
@@ -371,9 +372,9 @@ ASSET_MANAGER.downloadAll(function () {
                                                                         if (this.part === 1 && this.quest.complete) {
                                                                             this.part++;
                                                                         }
-                                                                        if (this.quest.complete && this.game.getEntity("Hilbert").quest.complete) {
-                                                                            this.game.current_stage = this.game.stage[2];
-                                                                        }
+                                                                        //if (this.quest.complete && this.game.getEntity("Hilbert").quest.complete) {
+                                                                        //    this.game.current_stage = this.game.stage[2];
+                                                                        //}
                                                                        this.showDialog();       
                                                                     }, function () {
                                                                         if (this.game) {
@@ -706,6 +707,38 @@ ASSET_MANAGER.downloadAll(function () {
 
                         "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0, 1]);
 
+    var lagoon = new IndoorEnvironment(gameEngine, [[
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 13, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 13],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 13, 13, 13, 13],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 13, 13, 13, 13, 13]],
+
+                                                    [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                    [0, 0, 8, 9, 0, 0, 0, 0, 0, 8, 6, 6, 6, 6, 6, 6, 6, 9, 0],
+                                                    [0, 0, 18, 19, 0, 0, 0, 0, 0, 14, 0, 15, 16, 0, 15, 0, 0, 12, 0],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 16, 12, 0],
+                                                    [0, 0, 0, 0, 0, 0, 8, 9, 0, 14, 0, 0, 0, 0, 0, 0, 15, 5, 9],
+                                                    [0, 0, 0, 0, 0, 0, 18, 19, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 12],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 0, 0, 0, 0, 0, 0, 12],
+                                                    [6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 16, 15, 0, 0, 0, 0, 0, 0, 12],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 15, 16, 15, 0, 0, 0, 0, 0, 0, 2, 19],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 15, 2, 3, 3, 19, 0],
+                                                    [0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 15, 2, 19, 0, 0, 0, 0],
+                                                    [0, 0, 0, 15, 16, 15, 0, 0, 0, 11, 10, 2, 3, 19, 0, 0, 0, 0, 0],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                        ]], null, new Tilesheet("./imgs/lagoon.png", 32, 10), [0], [new Portal(0, 10, 0, gameEngine, ExitLagoon)],
+                                                    "lagoon", "./imgs/mountain.png", [], 0, []);
+
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4], 0);
@@ -746,8 +779,8 @@ ASSET_MANAGER.downloadAll(function () {
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1),
                 new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 	
-	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
-                [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 0, 109, 175, 175, 175, 175, 175],
+	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,144,0,0,0,0,0,0],
+                [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 166, 109, 175, 175, 175, 175, 175],
                 [242,243,244,245,246,247,248,249,250,251,252,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,0,131,7,7,7,7,7],
                 [264,265,266,267,268,269,270,271,272,273,274,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,0,131,7,7,7,7,7],
                 [286,287,288,289,290,291,292,293,294,295,296,142,143,144,5,0,0,0,0,0,144,146,147,146,147,146,147,22,23,24,25,26,27,142,143,0,131,7,7,7,7,7],
@@ -771,10 +804,11 @@ ASSET_MANAGER.downloadAll(function () {
                 [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
                 [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
 
-                [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
+                [church, lagoon], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
                 [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
                 new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!") ], true),
-                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch), new Portal(10, 11, 4, gameEngine, Level3)],
+                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch), new Portal(10, 11, 4, gameEngine, Level3),
+                new Portal(18, 11, 2, gameEngine, EnterLagoon)],
                 ["Dire Wolf", "Wolf Rider", "Skeleton"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
 
 

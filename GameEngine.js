@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level3";
+    this.current_environment = "level1";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -118,7 +118,7 @@ GameEngine.prototype.init = function (context) {
     // part2 = after mountain level is complete and hero on his way to desert.
     this.stage = ["part0", "part1", "part2", "part3"]; 
     
-    this.current_stage = this.stage[2];
+    this.current_stage = this.stage[0];
     this.loot_dispenser = new LootDispenser(this);
     this.action_listener = null;
 }
@@ -1563,6 +1563,10 @@ Hero.prototype.isPassable = function (tile, index) {
             || (tile >= 174 && tile <= 177) || (tile >= 194 && tile <= 197) || (tile >= 214 && tile <= 217)) {
             return true; 
         }
+    } else if (this.game.current_environment === "lagoon") {
+        if (tile === 0 || tile === 15 || tile === 1 || tile === 6 || tile === 7 || tile === 14 || tile === 12 || tile === 2 || tile === 3 || tile === 9 || tile === 8 || tile === 19) {
+            return true;
+        }
     } else {
         return true;
     }
@@ -1718,7 +1722,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 280;
+    this.x = 320;
     this.y = 208;
         
     this.quests = [];
@@ -2959,6 +2963,24 @@ EnterDragonCaveFromLevel2 = function () {
     this.game.current_environment = "dragon_cave";
     this.game.entities[0].x = 560;
     this.game.entities[0].y = 192;
+    this.game.environment[this.game.current_environment].setQuadrant(2);
+}
+
+EnterLagoon = function () {
+    if (this.game.getEntity("Hilbert").quest.complete) {
+        this.game.current_environment = "lagoon";
+        this.game.entities[0].x = 10;
+        this.game.entities[0].y = 320;
+        this.game.environment[this.game.current_environment].setQuadrant(0);
+    } else {
+        this.game.alertHero("You run into a magical barrier. It seems as if something is blocking the way into the lagoon.");
+    }
+}
+
+ExitLagoon = function () {
+    this.game.current_environment = "level2";
+    this.game.entities[0].x = 560;
+    this.game.entities[0].y = 352;
     this.game.environment[this.game.current_environment].setQuadrant(2);
 }
 
