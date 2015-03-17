@@ -84,13 +84,9 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-<<<<<<< HEAD
 
     this.current_environment = "level1";
 
-=======
-    this.current_environment = "level1";
->>>>>>> origin/origin
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1338,13 +1334,9 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-<<<<<<< HEAD
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3998;
-=======
 
         return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3998;
 
->>>>>>> origin/origin
     }
 }
 
@@ -1792,16 +1784,8 @@ Warrior = function (game, stats) {
         death: new Animation(this.spriteSheet, 0, 21, 64, 64, 0.5, 1, true, false)
     };
 
-
-<<<<<<< HEAD
-
-    this.x = 10;
-
-    this.y = 208;
-=======
     this.x = 10;
     this.y = 200;
->>>>>>> origin/origin
         
     this.quests = [];
     this.abilities = ["Slash", "Sweep"];
