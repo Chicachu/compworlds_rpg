@@ -1812,6 +1812,7 @@ Warrior.prototype.addQuest = function (quest) {
 Warrior.prototype.checkKillQuest = function (enemy) {
     var complete = false; 
     for (var i = 0; i < this.quests.length; i++) {
+        //console.log("Quest type is " + this.quests[i].type + " && enemy to kill is " + this.quests[i].enemy_to_kill + " === " + enemy.name);
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
             if (this.quests[i].enemies_killed >= this.quests[i].number_enemies && !this.quests[i].complete) {
@@ -2492,6 +2493,7 @@ NPC.prototype.updateDialogue = function () {
                     gameEngine.heroes.push(mage_hero);
                     //this.game.entities[0].inventory.names[1].found = true; 
                     gameEngine.entities[0].inventory.names[1].found = true;
+                    this.game.entities[0].inventory.draw();
                     this.x = 3098204981238;
                     this.y = 384923784928374;
                 } else if (this.part === 0) {
@@ -3226,6 +3228,8 @@ Chest.prototype.startInteraction = function () {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 2;
             } else if (this.game.current_environment === "church") {
                 this.game.environment[this.game.current_environment].map[1][loc_point.y][loc_point.x] = 64;
+            } else if (this.game.current_environment === "level3") {
+                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 282;
             }
         }
     }
@@ -3264,7 +3268,7 @@ Chest.prototype.lootChest = function () {
 
 HealBerry = function (x, y, quad, game) {
     this.picked = false;
-    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "Heals your HP");
+    this.berry = new Potion(this.game, "Heal Berry", 10, 1, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed.");
 
     Interactable.call(this, x, y, quad, game);
 }
@@ -3284,6 +3288,32 @@ HealBerry.prototype.startInteraction = function () {
             this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 134;
         } else {
             this.game.alertHero("You've already picked the berries off of this plant.");
+        }
+    }
+}
+
+CactusFlower = function (x, y, quad, game) {
+    this.picked = false;
+    this.flower = new Potion(this.game, "Cactus Flower", 50, 1, ASSET_MANAGER.getAsset("./imgs/items/cactus_flower.png"), "attack", 1, "A sweet smelling flower that makes you feel invigorated.");
+
+    Interactable.call(this, x, y, quad, game);
+}
+
+CactusFlower.prototype = new Interactable();
+CactusFlower.prototype.constructor = CactusFlower;
+
+CactusFlower.prototype.startInteraction = function () {
+    if (Interactable.prototype.startInteraction.call(this)) {
+        var x = this.x / 32;
+        var y = this.y / 32;
+        var loc_point = this.game.changeXYForQuad(new Point(x, y), this.game.environment[this.game.current_environment].curr_quadrant);
+
+        if (!this.picked) {
+            this.game.entities[0].recieveItem(this.flower);
+            this.picked = true;
+            this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 280;
+        } else {
+            this.game.alertHero("You've already picked the flower off of this cactus.");
         }
     }
 }
