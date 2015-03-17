@@ -951,7 +951,7 @@ Entity.prototype.drawSelector = function (context, color) {
 
 }
 Entity.prototype.drawHealthBar = function (context) {
-    if (this.stats.health < 0) {
+    if (this.stats.health <= 0) {
         green = 0;
     }
     else {
@@ -1018,21 +1018,9 @@ Entity.prototype.doDamage = function (player, foes, game, is_multi_attack) {
             game.animation_queue.push(new Event(foes, foes.animations.death, 1000));
             if (game.fiendBattleOver(game)) {
                 game.canControl = false;
-                if(foes.name === "dragon1")
-                {
-                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                    this.game.current_stage = this.game.stage[1];
-                    this.game.changeDragonCave(); 
-                    this.game.removeEntityByName("Dragon");
-                }
-                else if(foes.name === "Siren")
-                {
-                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                    this.game.removeEntityByName("SirenNPC");
-                }
-                else {
-                    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
-                }
+                foes.onDeath();
+                
+                    //setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
             }
             else if(game.heroBattleOver(game))
             {
@@ -1329,7 +1317,7 @@ Hero.prototype.levelUp = function()
         this.stats.defense = this.stats.attack + (.3 * (this.level * this.level) );
         this.stats.total_health = this.stats.total_health + ( 2 * (this.level * this.level) );
         this.drawLevelUp();
-        this.game.alertHero("Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
+        this.game.alertHero(this.name + " Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
         this.levelUp();
         this.draw_level_up = true;
     }
@@ -1357,7 +1345,7 @@ Hero.prototype.preBattle = function () {
 }
 
 Hero.prototype.changeCoordinates = function (down, up, left, right) {
-    if (this.canMove(this.direction)) {
+    if (this.game.canControl && this.canMove(this.direction)) {
         switch (this.direction) {
             case Direction.DOWN:
                 if (!this.boundaryDown()) {
@@ -1822,6 +1810,11 @@ Enemy = function (game, stats, anims, spriteSheet, name, loop_while_standing, lo
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
+Enemy.prototype.onDeath = function()
+{
+    var game = this.game;
+    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+}
 Enemy.prototype.init = function () {
     if (!this.loop_while_standing) {
         this.stop_move_animation = this.stopAnimation(this.animations.right);
@@ -1930,6 +1923,14 @@ Troll = function (game, stats, loop_while_standing)
 Troll.prototype = new Enemy();
 Troll.prototype.constructor = Troll;
 
+Troll.prototype.onDeath = function()
+{
+    var game = this.game;
+    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+    this.game.removeEntityByName("TrollNPC");
+}
+
+
 Troll.prototype.draw = function (context) {
     this.drawHealthBar(context);
     if (this.is_targeted) {
@@ -1939,7 +1940,7 @@ Troll.prototype.draw = function (context) {
 }
 
 Troll.prototype.drawHealthBar = function (context) {
-    if (this.stats.health < 0) {
+    if (this.stats.health <= 0) {
         green = 0;
     }
     else {
@@ -1994,6 +1995,11 @@ Siren = function (game, stats, loop_while_standing) {
 Siren.prototype = new Enemy();
 Siren.prototype.constructor = Siren;
 
+Siren.prototype.onDeath = function()
+{
+    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+    this.game.removeEntityByName("SirenNPC");
+}
 Siren.prototype.draw = function(context)
 {
     this.drawHealthBar(context);
@@ -2005,7 +2011,7 @@ Siren.prototype.draw = function(context)
 
 Siren.prototype.drawHealthBar = function(context)
 {
-    if (this.stats.health < 0) {
+    if (this.stats.health <= 0) {
         green = 0;
     }
     else {
@@ -2186,6 +2192,13 @@ Dragon1 = function(game, stats, loop_while_standing)
 Dragon1.prototype = new Enemy();
 Dragon1.prototype.constructor = Dragon1;
 
+Dragon1.prototype.onDeath = function()
+{
+    setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
+    this.game.current_stage = this.game.stage[1];
+    this.game.changeDragonCave(); 
+    this.game.removeEntityByName("Dragon");
+}
 Dragon1.prototype.draw = function (context) {
     this.drawHealthBar(context);
     if (this.is_targeted) {
@@ -2196,7 +2209,7 @@ Dragon1.prototype.draw = function (context) {
 
 Dragon1.prototype.drawHealthBar = function(context)
 {
-    if (this.stats.health < 0) {
+    if (this.stats.health <= 0) {
         green = 0;
     }
     else {
@@ -2504,8 +2517,14 @@ Boss.prototype.setBattle = function()
 TrollNPC = function(game, dialogue, anims, path, speed, pause, quad, map_name)
 {
     this.spriteSheet = anims.right.spriteSheet;
-    this.name = "TrollNPC";
+    
+    this.talking = false;
     Boss.call(this, game, dialogue, anims, path, speed, pause, quad, map_name);
+    this.x = path[0].x;
+    this.y = path[0].y;
+    this.firstQuadx = this.x;
+    this.firstQuady = this.y;
+    this.name = "TrollNPC";
 }
 
 TrollNPC.prototype = new Boss();
@@ -2514,6 +2533,32 @@ TrollNPC.prototype.constructor = TrollNPC;
 TrollNPC.prototype.setBattle = function()
 {
     this.game.fadeOut(this.game, { game: this.game, battle_type: "boss", boss: "Troll" }, this.game.setBattle);
+}
+
+
+TrollNPC.prototype.draw = function(context)
+{
+    var found = false;
+    for (var i = 0; i < this.quad.length; i++) {
+        if (this.game.environment[this.game.current_environment].curr_quadrant === this.quad[i]) {
+            found = true;
+        }
+    }
+    if(this.game.entities[0] && !this.talking)
+    {
+        
+        if(Math.sqrt(Math.pow(this.game.heroes[0].x - this.x, 2) + Math.pow(this.game.heroes[0].y - this.y, 2)) <= 25 && Math.abs(this.y - this.game.entities[0].y) <= 25)
+        {
+            this.talking = true;
+            //this.game.entities[0].curr_anim = this.game.entities[0].stopAnimation(this.game.entities[0].curr_anim);
+            this.game.entities[0].curr_anim = this.game.entities[0].stop_move_animation;
+            this.startInteraction();
+        }
+    }
+    if (found) {
+        this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
+    }
+    NPC_QUEST.prototype.changeCoordsForQuad.call(this, this.game.environment[this.game.current_environment].curr_quadrant);
 }
 
 SirenNPC = function (game, dialogue, anims, path, speed, pause, quad, map_name) {
@@ -2689,7 +2734,6 @@ NPC_QUEST.prototype.changeCoordsForQuad = function (quad) {
             this.y -= 11 * 32;
         }
     }
-
 }
 /* QUEST OBJECT abstract class
  Parameters: giverName (who gave the quest), 
