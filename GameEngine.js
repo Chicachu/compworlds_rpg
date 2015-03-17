@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "dragon_cave";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -118,7 +118,7 @@ GameEngine.prototype.init = function (context) {
     // part2 = after mountain level is complete and hero on his way to desert.
     this.stage = ["part0", "part1", "part2", "part3"]; 
     
-    this.current_stage = this.stage[0];
+    this.current_stage = this.stage[2];
     this.loot_dispenser = new LootDispenser(this);
     this.action_listener = null;
 }
@@ -1570,7 +1570,7 @@ Hero.prototype.isPassable = function (tile, index) {
     } else if (this.game.current_environment === "level3") {
         if (tile === 0 || tile === 97 || tile === 98 || (tile >= 116 && tile <= 118) || (tile >= 136 && tile <= 138)|| (tile >= 156 && tile <= 158)
             || (tile >= 174 && tile <= 177) || (tile >= 194 && tile <= 197) || (tile >= 214 && tile <= 217)) {
-
+            return true; 
         }
     } else {
         return true;
@@ -2984,7 +2984,7 @@ Level3 = function () {
         this.game.current_environment = "level3";
         this.game.environment[this.game.current_environment].setQuadrant(3);
         this.game.entities[0].x = 10;
-        this.game.entities[0].y = 224;
+        this.game.entities[0].y = 288;
         this.game.alertHero("You have been travelling for many days and have finally made it to the desert.");
     } else {
         this.game.alertHero("The road that leaves this village looks long, it may be wise to help the village before you leave.");
