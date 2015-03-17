@@ -426,6 +426,9 @@ ASSET_MANAGER.downloadAll(function () {
                                                         "I now bestow upon you a new magical ability, Acele!"],
                                                        ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], bishop_sprites,
                                                             [new Point(384, 64)], .05, false, [0, 1], null, "church", 1.8, [function () {
+                                                                if (this.part === 0 && this.game.heroes[1]) {
+                                                                    this.part++;
+                                                                }
                                                                         this.showDialog();
                                                                     }, function () {
                                                                         if (this.game) {
@@ -446,9 +449,10 @@ ASSET_MANAGER.downloadAll(function () {
                                                                                     this.game.context.canvas.focus();
                                                                                     this.game.canControl = true;
                                                                                     this.interacting = false;
-                                                                                    if (this.part === 0 && this.game.heroes[1]) {
+                                                                                    if (this.part === 1) {
                                                                                         this.part++;
                                                                                         // give acele a new ability
+                                                                                        this.game.heroes[1].abilities.push("Blast");
                                                                                         // play hit animation
                                                                                         this.game.animation_queue.push(new Event(this, this.animations.hit, 500, null, null));
                                                                                         this.game.animation_queue.push(new Event(this, this.animations.down, 0, null, null));
