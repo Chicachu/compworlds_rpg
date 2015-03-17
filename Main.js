@@ -357,7 +357,7 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 3, true, false), null, null, null);
-    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Sherry", null, "Dire Wolf", 5);
+    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Sherry", null, "DireWolf", 5);
     var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
                                                                   "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
                                                                   "This village is counting on you!"],

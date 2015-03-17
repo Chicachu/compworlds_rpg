@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level3";
+    this.current_environment = "level2";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1750,6 +1750,7 @@ Warrior.prototype.addQuest = function (quest) {
 Warrior.prototype.checkKillQuest = function (enemy) {
     var complete = false; 
     for (var i = 0; i < this.quests.length; i++) {
+        //console.log("Quest type is " + this.quests[i].type + " && enemy to kill is " + this.quests[i].enemy_to_kill + " === " + enemy.name);
         if (this.quests[i].type === "kill" && this.quests[i].enemy_to_kill === enemy.name) {
             this.quests[i].enemies_killed++;
             if (this.quests[i].enemies_killed >= this.quests[i].number_enemies && !this.quests[i].complete) {
