@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level2";
+    this.current_environment = "level3";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -1559,7 +1559,7 @@ Hero.prototype.isPassable = function (tile, index) {
             return true; 
         }
     } else if (this.game.current_environment === "level3") {
-        if (tile === 0 || tile === 97 || tile === 98 || (tile >= 116 && tile <= 118) || (tile >= 136 && tile <= 138)|| (tile >= 156 && tile <= 158)
+        if (tile === 0 || tile === 97 || tile === 98 || (tile >= 116 && tile <= 118) || tile === 330 || (tile >= 136 && tile <= 138)|| (tile >= 156 && tile <= 158)
             || (tile >= 174 && tile <= 177) || (tile >= 194 && tile <= 197) || (tile >= 214 && tile <= 217)) {
             return true; 
         }
@@ -2008,6 +2008,7 @@ Siren.prototype.constructor = Siren;
 
 Siren.prototype.onDeath = function()
 {
+    var game = this.game; 
     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
     this.game.removeEntityByName("SirenNPC");
 }
@@ -2205,6 +2206,7 @@ Dragon1.prototype.constructor = Dragon1;
 
 Dragon1.prototype.onDeath = function()
 {
+    var game = this.game;
     setTimeout(function () { game.fadeOut(game, game, game.endBattle); }, 5000);
     this.game.current_stage = this.game.stage[1];
     this.game.changeDragonCave(); 

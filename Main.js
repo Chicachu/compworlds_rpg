@@ -356,7 +356,7 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 3, true, false), null, null, null);
-    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Shelly", "Dire Wolf", 5);
+    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Sherry", "Dire Wolf", 5);
     var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
                                                                   "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
                                                                   "This village is counting on you!"],
@@ -429,6 +429,9 @@ ASSET_MANAGER.downloadAll(function () {
                                                         "I now bestow upon you a new magical ability, Acele!"],
                                                        ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], bishop_sprites,
                                                             [new Point(384, 64)], .05, false, [0, 1], null, "church", 1.8, [function () {
+                                                                if (this.part === 0 && this.game.heroes[1]) {
+                                                                    this.part++;
+                                                                }
                                                                         this.showDialog();
                                                                     }, function () {
                                                                         if (this.game) {
@@ -449,9 +452,10 @@ ASSET_MANAGER.downloadAll(function () {
                                                                                     this.game.context.canvas.focus();
                                                                                     this.game.canControl = true;
                                                                                     this.interacting = false;
-                                                                                    if (this.part === 0 && this.game.heroes[1]) {
+                                                                                    if (this.part === 1) {
                                                                                         this.part++;
                                                                                         // give acele a new ability
+                                                                                        this.game.heroes[1].abilities.push("Blast");
                                                                                         // play hit animation
                                                                                         this.game.animation_queue.push(new Event(this, this.animations.hit, 500, null, null));
                                                                                         this.game.animation_queue.push(new Event(this, this.animations.down, 0, null, null));
@@ -783,7 +787,7 @@ ASSET_MANAGER.downloadAll(function () {
                    [0, 286, 287, 288, 289, 290, 306, 307, 308, 309, 310, 326, 327, 328, 329, 330, 0, 0, 9, 30, 66, 67, 48, 49, 9, 30, 0, 0, 0, 0, 0, 0, 0, 9, 30, 0, 0, 0, 190, 191, 192, 193],
                    [0, 306, 307, 308, 309, 310, 326, 327, 328, 329, 330, 0, 0, 0, 0, 0, 0, 0, 9, 30, 50, 0, 68, 69, 9, 31, 7, 7, 174, 175, 176, 177, 7, 32, 30, 0, 0, 0, 0, 211, 212, 213],
                    [0, 326, 327, 328, 329, 330, 346, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 30, 70, 0, 0, 0, 26, 27, 27, 27, 194, 195, 196, 197, 27, 27, 28, 0, 0, 0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0, 0, 366, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 30, 50, 50, 50, 0, 0, 50, 0, 50, 214, 215, 216, 217, 50, 0, 50, 0, 0, 143, 144, 161, 143, 144],
+                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 30, 50, 50, 50, 0, 0, 50, 0, 50, 214, 215, 216, 217, 50, 0, 50, 0, 0, 143, 144, 161, 143, 144],
                    [0, 97, 98, 0, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 174, 175, 176, 177, 32, 30, 70, 70, 70, 52, 0, 70, 50, 70, 0, 0, 0, 0, 70, 50, 70, 0, 0, 163, 164, 120, 163, 164],
                    [116, 117, 118, 0, 9, 11, 27, 27, 27, 27, 27, 27, 27, 27, 194, 195, 196, 197, 27, 28, 52, 51, 50, 72, 0, 0, 70, 0, 0, 0, 0, 0, 0, 70, 0, 0, 0, 183, 184, 180, 183, 184],
                    [136, 137, 138, 0, 9, 30, 20, 20, 0, 0, 0, 0, 0, 0, 214, 215, 216, 217, 0, 0, 72, 71, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 242, 0, 0, 0, 0],
