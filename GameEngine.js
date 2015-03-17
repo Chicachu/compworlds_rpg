@@ -1246,9 +1246,12 @@ Hero.prototype.draw = function (context) {
                 this.changeCoordinates(0, 0, 0, .3);
             }
             else {
-                this.fleeing = false;
                 var that = this;
                 if (this.game.is_battle && !this.game.do_not_interrupt) {
+                    for (var i = 0; i < this.game.heroes.length; i++)
+                    {
+                        this.game.heroes[i].fleeing = false;
+                    }
                     this.game.fadeOut(this.game, this.game, this.game.endBattle);
                 }
             }
@@ -1272,7 +1275,7 @@ Hero.prototype.checkSurroundings = function () {
 
     if (Math.abs(distance_traveled) > 125) {
 
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 5998;
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3998;
 
     }
 }
@@ -2345,9 +2348,9 @@ NPC.prototype.update = function () {
             else if (this.next_point.getY() < this.y) {
                 this.curr_anim = this.animations.up;
                 this.direction = Direction.UP;
-                //if (this.y - this.next_point.getY() < this.speed) {
+                if (this.y - this.next_point.getY() < this.speed) {
                     this.changeCoordinates(0, this.speed, 0, 0);
-                //}
+                }
             }
             else {
                 if (this.pause) {
@@ -2717,7 +2720,6 @@ NPC_QUEST.prototype.draw = function (context) {
     this.y = this.firstQuady;
     this.changeCoordsForQuad(this.game.environment[this.game.current_environment].curr_quadrant);
     this.curr_anim.drawFrame(this.game.clockTick, context, this.x, this.y, this.scale);
-
 }
 
 NPC_QUEST.prototype.changeCoordsForQuad = function (quad) {
@@ -3611,11 +3613,11 @@ BattleMenu.prototype.init = function (game) {
             } else if (String.fromCharCode(e.which) === ' ') {
                 if (!that.game.is_boss_battle) {
                     that.game.fight_queue[0].is_turn = false;
-                    var total_dexterity = 0;
-                    for (var i = 0; i < that.game.heroes.length; i++)
-                    {
-                        total_dexterity += that.game.heroes.length
-                    }
+                    //var total_dexterity = 0;
+                    //for (var i = 0; i < that.game.heroes.length; i++)
+                    //{
+                    //    total_dexterity += that.game.heroes.length;
+                    //}
                     for (var i = 0; i < that.game.heroes.length; i++) {
                         that.game.heroes[i].flee(true);
                     }
