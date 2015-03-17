@@ -84,7 +84,7 @@ GameEngine = function () {
     this.timerId = null;
     this.timerId2 = null;
     this.environment = ["level1", "level2","level3"];
-    this.current_environment = "level2";
+    this.current_environment = "dragon_cave";
     this.canControl = true;
     this.animation_queue = [];
     this.event = null;
@@ -115,6 +115,7 @@ GameEngine.prototype.init = function (context) {
     this.sound_manager = new SoundManager(this);
     // part0 = beginning until dragon is dead
     // part1 = after dragon is dead and until mountain level is complete. 
+    // part2 = after mountain level is complete and hero on his way to desert.
     this.stage = ["part0", "part1", "part2", "part3"]; 
     
     this.current_stage = this.stage[0];
@@ -1270,7 +1271,9 @@ Hero.prototype.checkSurroundings = function () {
 
 
     if (Math.abs(distance_traveled) > 125) {
-        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 3990;
+
+        return Math.ceil(Math.random() * (4000 - 0) - 0) >= 5998;
+
     }
 }
 
@@ -1314,7 +1317,7 @@ Hero.prototype.levelUp = function()
         this.level++;
         this.next_level_up = 2 * (this.level * this.level) + 100;
         this.stats.attack = this.stats.attack + (.3 * (this.level * this.level) );
-        this.stats.defense = this.stats.attack + (.3 * (this.level * this.level) );
+        this.stats.defense = this.stats.defense + (.3 * (this.level * this.level) );
         this.stats.total_health = this.stats.total_health + ( 2 * (this.level * this.level) );
         this.drawLevelUp();
         this.game.alertHero(this.name + " Level up! Atk - " + this.stats.attack.toString() + " " + "Def - " + this.stats.defense.toString() + " " + "HP - " + this.stats.total_health);
@@ -1552,6 +1555,11 @@ Hero.prototype.isPassable = function (tile, index) {
         if (tile === 0 || (tile >= 8 && tile <= 14) || tile === 28 || tile === 29 || tile === 48 || tile === 49 || tile === 30) {
             return true; 
         }
+    } else if (this.game.current_environment === "level3") {
+        if (tile === 0 || tile === 97 || tile === 98 || (tile >= 116 && tile <= 118) || (tile >= 136 && tile <= 138)|| (tile >= 156 && tile <= 158)
+            || (tile >= 174 && tile <= 177) || (tile >= 194 && tile <= 197) || (tile >= 214 && tile <= 217)) {
+
+        }
     } else {
         return true;
     }
@@ -1707,7 +1715,7 @@ Warrior = function (game, stats) {
     };
 
 
-    this.x = 320;
+    this.x = 280;
     this.y = 208;
         
     this.quests = [];
@@ -3016,6 +3024,25 @@ EnterLevel2 = function () {
     this.game.entities[0].y = 208;
 }
 
+Level3 = function () {
+    if (this.game.current_stage === this.game.stage[2]) {
+        this.game.current_environment = "level3";
+        this.game.environment[this.game.current_environment].setQuadrant(3);
+        this.game.entities[0].x = 10;
+        this.game.entities[0].y = 224;
+        this.game.alertHero("You have been travelling for many days and have finally made it to the desert.");
+    } else {
+        this.game.alertHero("The road that leaves this village looks long, it may be wise to help the village before you leave.");
+    }
+}
+
+Level2 = function () {
+    this.game.current_environemt = "level2";
+    this.game.environment[this.game.current_environment].setQuadrant(4);
+    this.game.entities[0].x = 320;
+    this.game.entities[0].y = 352;
+}
+
 // used to change maps or to initiate special battles. 
 Portal = function (x, y, quad, game, func, stage) {
     this.func = func;
@@ -3116,13 +3143,13 @@ Chest.prototype.startInteraction = function () {
         }
         if (!this.closed) {
             if (this.game.current_environment === "dragon_cave") {
-                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 29;
+                this.game.environment[this.game.current_environment].map[1][loc_point.y][loc_point.x] = 29;
             } else if (this.game.current_environment === "level1") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 100;
             } else if (this.game.current_environment === "level2") {
                 this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 2;
             } else if (this.game.current_environment === "church") {
-                this.game.environment[this.game.current_environment].map[loc_point.y][loc_point.x] = 64;
+                this.game.environment[this.game.current_environment].map[1][loc_point.y][loc_point.x] = 64;
             }
         }
     }
@@ -4261,7 +4288,19 @@ Potion.prototype.doAction = function (game, target) {
             this_target.intelligence += this.level * 1;
             break;
     }
-    this.game.entities[0].inventory.removeItem(this.name, 1);
+    this.game.entities[0].inventory.removeItem(this, 1);
+}
+
+GameEngine.prototype.getEntity = function (entity_name) {
+    var found = false; 
+    for (var i = 0; i < this.entities.length; i++) {
+        if (this.entities[i].name) {
+            if (this.entities[i].name === entity_name) {
+                found = this.entities[i];
+            }
+        }
+    }
+    return found; 
 }
 
 HTML_Item = function (element, game) {

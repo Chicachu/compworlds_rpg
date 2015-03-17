@@ -53,6 +53,8 @@ ASSET_MANAGER.queueDownload("./imgs/bishop.png");
 ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/aladdin.png");
+ASSET_MANAGER.queueDownload("./imgs/jasmine.png");
+ASSET_MANAGER.queueDownload("./imgs/sultan.png");
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
@@ -81,6 +83,8 @@ ASSET_MANAGER.downloadAll(function () {
     //var skeleton_sprites = ASSET_MANAGER.getAsset("./imgs/skeleton.png");
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
 	var aladdin_spritesheet = ASSET_MANAGER.getAsset("./imgs/aladdin.png");
+	var jasmine_spritesheet = ASSET_MANAGER.getAsset("./imgs/jasmine.png");
+	var sultan_spritesheet = ASSET_MANAGER.getAsset("./imgs/sultan.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
@@ -358,10 +362,13 @@ ASSET_MANAGER.downloadAll(function () {
                                                                      "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
                                                                      "They come into town looking to loot our store every few months or so, it's an ongoing battle."],
                                                                   ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
-                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(224, 64), new Point(224, 220)], .05, false, [4, 5],
+                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(370, 64), new Point(370, 220)], .05, false, [4, 5],
                                                                     mountain_villager_quest, "level2", 1.25, [function () {
                                                                         if (this.part === 1 && this.quest.complete) {
                                                                             this.part++;
+                                                                        }
+                                                                        if (this.quest.complete && this.game.getEntity("Hilbert").quest.complete) {
+                                                                            this.game.current_stage = this.game.stage[2];
                                                                         }
                                                                        this.showDialog();       
                                                                     }, function () {
@@ -505,6 +512,67 @@ ASSET_MANAGER.downloadAll(function () {
                                                                             }
                                                                         }
                                                                     }], 20);
+																	
+	var jasmine_sprites = new SpriteSet(new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0,37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false),
+                                                new Animation(jasmine_spritesheet, 1, 0, 37.5, 50, 0.05, 1, true, false), null, null, null);
+    var jasmine = new NPC(gameEngine, [["Oh deary me! A visitor! Hilbert!! A VISITOR!!!",
+                                                "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
+                                                ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
+                                           jasmine_sprites, [new Point(535, 340)], .06, false, [5], "level3", 1.5, 15);
+										   
+	var sultan_sprites = new SpriteSet(new Animation(sultan_spritesheet, 0, 3, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 1, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 2, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 1, 36, 51, 0.1, 1, true, true), null, null, null);
+    var sultan_quest_sword = new SpecialItem(gameEngine, "Aladdin Sword", ASSET_MANAGER.getAsset("./imgs/items/sword.gif"), 1, function () { }, "The sword that strikes the Demon!");
+    var sultan_reward = ghost_quest_potion;
+    var sultan_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Aladdin", sultan_reward, sultan_quest_sword);
+
+    var sultan = new NPC_QUEST(gameEngine, "Sultan", [["Oh Dear God! Finally there is someone alive in the Death Valley! ",
+                                                                  "The Demon has been killing all the cattle in Agrabah and my people are staving now.I am here to fight the Demon and save town!",
+                                                                  "But for that I need a sword, since no one in their right mind will fight against Demon with their bare hands", 
+																  "All I can give you back is Jasmine's pendant and my friendship! "],
+                                                                  ["People in Agrabah are starving to death, bring me the sword and let me save and be a hero like you!"],
+                                                                  ["You are officially my bro now! Thank you for help and email me if you will need some help! "],
+                                                                  ["You must have brought it with you! Haha!"]], sultan_sprites, [new Point(434, 220)], .05, false, [2],
+                                                                    sultan_quest, "level3", 1.25, [function () {
+                                                                        if (this.part === 0 && this.quest.complete) {
+                                                                            this.part++;
+                                                                        }
+                                                                       this.showDialog();       
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        this.game.entities[0].addQuest(this.quest);
+                                                                                        this.quest.complete = true;
+                                                                                    } if (this.part === 2) {
+                                                                                        this.part++;
+                                                                                    }
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }], 20);
 	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -599,7 +667,6 @@ ASSET_MANAGER.downloadAll(function () {
 
 
     var dragonCave = new IndoorEnvironment(gameEngine,  
-
 					  [[[0,   0,  0,  0, 0,  0,   0,  0,  0, 28, 28, 28, 33, 33, 33, 28, 28, 33, 28, 28,  0, 28, 28,  28,  28,  28, 33, 33, 28, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [0,   0,  0,  0, 28, 28,  0,  0, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 33, 28, 28, 28, 33, 33, 33, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         [28, 28, 28, 28, 28, 28, 28, 28, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 33, 33, 33, 33, 33, 33, 33, 33, 33, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
@@ -627,7 +694,7 @@ ASSET_MANAGER.downloadAll(function () {
                         [34, 34, 34, 34, 34, 34, 12, 27, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 21, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34],
                         [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]]],
                         null, new Tilesheet("./imgs/dragoncave.png", 32, 6), [0, 1, 2], [new Portal(0, 6, 0, gameEngine, ExitDragonCave), new Portal(18, 6, 2, gameEngine, EnterLevel2, 1),
-                        new Chest(10, 4, 2, gameEngine, [185], false), new Chest(11, 4, 2, gameEngine, [218], false), new Chest(10, 8, 2, gameEngine, [75], false), new Chest(11, 8, 2, gameEngine, [245], false)],
+                        new Chest(10, 4, 2, gameEngine, [185], false), new Chest(11, 4, 2, gameEngine, [218], false), new Chest(10, 9, 2, gameEngine, [75], false), new Chest(11, 9, 2, gameEngine, [245], false)],
 
                         "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0, 1]);
 
@@ -699,7 +766,7 @@ ASSET_MANAGER.downloadAll(function () {
                 [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
                 [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
                 new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
-                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch)],
+                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch), new Portal(10, 11, 4, gameEngine, Level3)],
                 ["Dire Wolf", "Wolf Rider", "Skeleton"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
 
 
@@ -729,7 +796,7 @@ ASSET_MANAGER.downloadAll(function () {
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 156, 157, 158, 0, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 260, 200, 202, 204, 0, 0, 0, 0, 0, 0, 0, 0]],
                     [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
-                   [], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
+                   [new Portal(0,7,3, gameEngine, Level2)], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
 
 
 
@@ -751,6 +818,8 @@ ASSET_MANAGER.downloadAll(function () {
 	gameEngine.addEntity(troll_NPC);
 
 		gameEngine.addEntity(aladdin);
+		gameEngine.addEntity(jasmine);
+		gameEngine.addEntity(sultan);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
