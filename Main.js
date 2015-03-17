@@ -48,12 +48,14 @@ ASSET_MANAGER.queueDownload("./imgs/mountainVillager.png");
 ASSET_MANAGER.queueDownload("./imgs/mage.png");
 ASSET_MANAGER.queueDownload("./imgs/churchInterior.png");
 ASSET_MANAGER.queueDownload("./imgs/bishop.png");
+ASSET_MANAGER.queueDownload("./imgs/lagoon.png");
 
 //level3 stuff
 ASSET_MANAGER.queueDownload("./imgs/maplevel3.png");
 ASSET_MANAGER.queueDownload("./imgs/desert.png");
 ASSET_MANAGER.queueDownload("./imgs/aladdin.png");
 ASSET_MANAGER.queueDownload("./imgs/jasmine.png");
+ASSET_MANAGER.queueDownload("./imgs/sultan.png");
 // items
 ASSET_MANAGER.queueDownload("./imgs/ghost.png");
 ASSET_MANAGER.queueDownload("./imgs/items/heal_berry.png");
@@ -72,7 +74,11 @@ ASSET_MANAGER.queueDownload("./imgs/items/stone.png");
 ASSET_MANAGER.queueDownload("./imgs/items/book.png");
 ASSET_MANAGER.queueDownload("./imgs/items/key.png");
 ASSET_MANAGER.queueDownload("./imgs/level_up_icon.png");
-ASSET_MANAGER.getAsset("./imgs/items/sword.gif");
+ASSET_MANAGER.queueDownload("./imgs/items/sword.gif");
+ASSET_MANAGER.queueDownload("./imgs/items/cactus_flower.png");
+ASSET_MANAGER.queueDownload("./imgs/items/staff3.png");
+ASSET_MANAGER.queueDownload("./imgs/items/armor3.png");
+ASSET_MANAGER.queueDownload("./imgs/plus_sign.png");
 
 ASSET_MANAGER.downloadAll(function () {
     var canvas = document.getElementById("gameworld");
@@ -83,6 +89,7 @@ ASSET_MANAGER.downloadAll(function () {
     //var malboro_sprites = ASSET_MANAGER.getAsset("./imgs/malboro.png");
 	var aladdin_spritesheet = ASSET_MANAGER.getAsset("./imgs/aladdin.png");
 	var jasmine_spritesheet = ASSET_MANAGER.getAsset("./imgs/jasmine.png");
+	var sultan_spritesheet = ASSET_MANAGER.getAsset("./imgs/sultan.png");
     var npc_sprites = ASSET_MANAGER.getAsset("./imgs/npc-female.png");
     var storekeeper_spritesheet = ASSET_MANAGER.getAsset("./imgs/storekeeper.png");
 	var ghost_spritesheet = ASSET_MANAGER.getAsset("./imgs/ghost.png");
@@ -95,12 +102,23 @@ ASSET_MANAGER.downloadAll(function () {
 	var bishop_spritesheet = ASSET_MANAGER.getAsset("./imgs/bishop.png");
 	var troll_npc_sprites = ASSET_MANAGER.getAsset("./imgs/troll.png");
 
+<<<<<<< HEAD
 	var warrior = new Warrior(gameEngine, new Statistics(250, 22, 35, 4, 3, 1));
 	var archer = new Archer(gameEngine, new Statistics(200, 32, 28, 4, 3, 1));
+=======
+	var warrior = new Warrior(gameEngine, new Statistics(250, 25, 35, 4, 3, 1));
+	var archer = new Archer(gameEngine, new Statistics(200, 35, 28, 4, 3, 1));
+>>>>>>> origin/origin
     gameEngine.heroes.push(warrior);
     //gameEngine.heroes.push(archer);
     //var mage_hero = new Mage(this.game, new Statistics(200, 160, 25, 1, 1, 5));
     //gameEngine.heroes.push(mage_hero);
+
+    //var mage_hero = new Mage(gameEngine, new Statistics(200, 160, 25, 1, 1, 5));
+    //gameEngine.heroes.push(mage_hero);
+
+
+
     var girl_sprites = new SpriteSet(new Animation(npc_sprites, 0, 10, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 8, 64, 64, 0.25, 9, true, false),
                                             new Animation(npc_sprites, 0, 9, 64, 64, 0.25, 9, true, false),
@@ -243,7 +261,7 @@ ASSET_MANAGER.downloadAll(function () {
     
     var troll_NPC_spriteset = new SpriteSet(new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), new Animation(troll_npc_sprites, 13, 4, 256, 256, .1, 1, true, false), null, null, null);
     var troll_NPC = new TrollNPC(gameEngine, [["Why hello there old sport.", "Is it the temple that you would like to go to?", "I'm afraid to inform you I cannot let you do that.",
-        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(76, 226)], .1, false, [1], "level3", "Troll");
+        "You fancy a tussle you say?", "Well then, we shall fisticuff good sir."]], troll_NPC_spriteset, [new Point(433, 226)], .1, false, [0, 1], "level2", "Troll");
     troll_NPC.setScale(.3);
     //var siren_spritesheet = ASSET_MANAGER.getAsset("./imgs/water_elemental.png");
     //var siren_NPC_sprites = new SpriteSet(new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), new Animation(siren_spritesheet, 11, 5, 256, 256, .1, 1, true, false), null, null, null);
@@ -275,7 +293,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(mountain_man_spritesheet, 0, 0, 24, 32, 0.05, 1, true, false),
                                             new Animation(mountain_man_spritesheet, 0, 3, 24, 32, 0.05, 1, true, false),
                                             new Animation(mountain_man_spritesheet, 0, 1, 24, 32, 0.05, 1, true, false), null, null, null);
-    var mountain_man_quest =  new KILL_QUEST(gameEngine, "Hilbert",  "Siren", 1);
+    var mountain_man_quest =  new KILL_QUEST(gameEngine, "Hilbert", null, "Siren", 1);
 
     var mountain_man = new Storekeeper(gameEngine, "Hilbert", [["Well, hello there sonny! I haven't seen a newcomer in these remote parts in some time now.",
                                            "My name is Hilbert, and this here beautiful dwarf is my wife, Eliza.",
@@ -351,7 +369,7 @@ ASSET_MANAGER.downloadAll(function () {
                                                 new Animation(mountain_villager_spritesheet, 0, 3, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 1, 32, 32, 0.05, 3, true, false),
                                                 new Animation(mountain_villager_spritesheet, 0, 2, 32, 32, 0.05, 3, true, false), null, null, null);
-    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Shelly", "Dire Wolf", 5);
+    var mountain_villager_quest = new KILL_QUEST(gameEngine, "Sherry", null, "DireWolf", 5);
     var mountain_villager = new NPC_QUEST(gameEngine, "Sherry", [["HELP!!! HELP!! SOMEONE!!!", "YOU! You there! Are you blind!? Don't you see the wolves around here?!",
                                                                   "Please for the love of all that is good, go kill some wolves and a few of their riders!!",
                                                                   "This village is counting on you!"],
@@ -360,14 +378,14 @@ ASSET_MANAGER.downloadAll(function () {
                                                                      "This town is small and cold, but I've lived here all my life and I'm glad you just saved it from the wolf invaders.",
                                                                      "They come into town looking to loot our store every few months or so, it's an ongoing battle."],
                                                                   ["Hello again, Theon! What lovely weather we're having here in Sohm today. I wish it could be this nice every day!",
-                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(370, 64), new Point(370, 220)], .05, false, [4, 5],
+                                                                    "You must have brought it with you! Haha!"]], mountain_villager_sprites, [new Point(370, 220)], .05, false, [4, 5],
                                                                     mountain_villager_quest, "level2", 1.25, [function () {
                                                                         if (this.part === 1 && this.quest.complete) {
                                                                             this.part++;
                                                                         }
-                                                                        if (this.quest.complete && this.game.getEntity("Hilbert").quest.complete) {
-                                                                            this.game.current_stage = this.game.stage[2];
-                                                                        }
+                                                                        //if (this.quest.complete && this.game.getEntity("Hilbert").quest.complete) {
+                                                                        //    this.game.current_stage = this.game.stage[2];
+                                                                        //}
                                                                        this.showDialog();       
                                                                     }, function () {
                                                                         if (this.game) {
@@ -424,6 +442,9 @@ ASSET_MANAGER.downloadAll(function () {
                                                         "I now bestow upon you a new magical ability, Acele!"],
                                                        ["Be blessed, young heroes, and stay strong, for your journey is not yet over and the road is long."]], bishop_sprites,
                                                             [new Point(384, 64)], .05, false, [0, 1], null, "church", 1.8, [function () {
+                                                                if (this.part === 0 && this.game.heroes[1]) {
+                                                                    this.part++;
+                                                                }
                                                                         this.showDialog();
                                                                     }, function () {
                                                                         if (this.game) {
@@ -444,9 +465,10 @@ ASSET_MANAGER.downloadAll(function () {
                                                                                     this.game.context.canvas.focus();
                                                                                     this.game.canControl = true;
                                                                                     this.interacting = false;
-                                                                                    if (this.part === 0 && this.game.heroes[1]) {
+                                                                                    if (this.part === 1) {
                                                                                         this.part++;
                                                                                         // give acele a new ability
+                                                                                        this.game.heroes[1].abilities.push("Blast");
                                                                                         // play hit animation
                                                                                         this.game.animation_queue.push(new Event(this, this.animations.hit, 500, null, null));
                                                                                         this.game.animation_queue.push(new Event(this, this.animations.down, 0, null, null));
@@ -519,6 +541,58 @@ ASSET_MANAGER.downloadAll(function () {
                                                 "If we weren't so concerned about the Lady of the Lake, we would invite you in! But alas, it is not safe, deary."],
                                                 ["The Lady of the Lake? I heard she only comes out when there is magic around."]],
                                            jasmine_sprites, [new Point(535, 340)], .06, false, [5], "level3", 1.5, 15);
+										   
+	var sultan_sprites = new SpriteSet(new Animation(sultan_spritesheet, 0, 3, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 1, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 2, 36, 51, 0.1, 1, true, true),
+                                            new Animation(sultan_spritesheet, 0, 1, 36, 51, 0.1, 1, true, true), null, null, null);
+    var sultan_quest_sword = new SpecialItem(gameEngine, "Aladdin Sword", ASSET_MANAGER.getAsset("./imgs/items/sword.gif"), 1, function () { }, "The sword that strikes the Demon!");
+    var sultan_reward = ghost_quest_potion;
+    var sultan_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Aladdin", sultan_reward, sultan_quest_sword);
+
+    var sultan = new NPC_QUEST(gameEngine, "Sultan", [["Oh Dear God! Finally there is someone alive in the Death Valley! ",
+                                                                  "The Demon has been killing all the cattle in Agrabah and my people are staving now.I am here to fight the Demon and save town!",
+                                                                  "But for that I need a sword, since no one in their right mind will fight against Demon with their bare hands", 
+																  "All I can give you back is Jasmine's pendant and my friendship! "],
+                                                                  ["People in Agrabah are starving to death, bring me the sword and let me save and be a hero like you!"],
+                                                                  ["You are officially my bro now! Thank you for help and email me if you will need some help! "],
+                                                                  ["You must have brought it with you! Haha!"]], sultan_sprites, [new Point(434, 220)], .05, false, [2],
+                                                                    sultan_quest, "level3", 1.25, [function () {
+                                                                        if (this.part === 0 && this.quest.complete) {
+                                                                            this.part++;
+                                                                        }
+                                                                       this.showDialog();       
+                                                                    }, function () {
+                                                                        if (this.game) {
+                                                                            if (this.game.next === true) {
+                                                                                var text_box = document.getElementById("dialogue_box");
+                                                                                var text = document.createElement('p');
+
+                                                                                if (this.dialogue_index < this.dialogue[this.part].length - 1) {
+                                                                                    this.dialogue_index++;
+                                                                                    text.innerHTML = this.dialogue[this.part][this.dialogue_index];
+                                                                                    text_box.innerHTML = text.outerHTML;
+                                                                                } else {
+                                                                                    this.dialogue_index = 0;
+                                                                                    text_box.style.visibility = "hidden";
+                                                                                    text_box.style.display = "none";
+                                                                                    text_box.tabIndex = 2;
+                                                                                    this.game.context.canvas.tabIndex = 1;
+                                                                                    this.game.context.canvas.focus();
+                                                                                    this.game.canControl = true;
+                                                                                    this.interacting = false;
+                                                                                    if (this.part === 0) {
+                                                                                        this.part++;
+                                                                                        this.game.entities[0].addQuest(this.quest);
+                                                                                        this.quest.complete = true;
+                                                                                    } if (this.part === 2) {
+                                                                                        this.part++;
+                                                                                    }
+                                                                                }
+                                                                                this.game.next = false;
+                                                                            }
+                                                                        }
+                                                                    }], 20);
 	// Environments 
     // indoor game, map (array, floor then interior, animations, tilesheet, quads, interactables. 
     var house1 = new IndoorEnvironment(gameEngine, [[[1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3],
@@ -644,6 +718,38 @@ ASSET_MANAGER.downloadAll(function () {
 
                         "dragon_cave", "./imgs/ice_cave.png", ["Skeleton", "Malboro", "Ogre", "Dire Wolf"], 0, [0, 1]);
 
+    var lagoon = new IndoorEnvironment(gameEngine, [[
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 13, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [13, 13, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 13],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 13, 13, 13, 13],
+                                                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 13, 13, 13, 13, 13, 13]],
+
+                                                    [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                    [0, 0, 8, 9, 0, 0, 0, 0, 0, 8, 6, 6, 6, 6, 6, 6, 6, 9, 0],
+                                                    [0, 0, 18, 19, 0, 0, 0, 0, 0, 14, 0, 15, 16, 0, 15, 0, 0, 12, 0],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 16, 12, 0],
+                                                    [0, 0, 0, 0, 0, 0, 8, 9, 0, 14, 0, 0, 0, 0, 0, 0, 15, 5, 9],
+                                                    [0, 0, 0, 0, 0, 0, 18, 19, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 12],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 15, 0, 0, 0, 0, 0, 0, 0, 12],
+                                                    [6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 16, 15, 0, 0, 0, 0, 0, 0, 12],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 15, 16, 15, 0, 0, 0, 0, 0, 0, 2, 19],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 15, 2, 3, 3, 19, 0],
+                                                    [0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 15, 2, 19, 0, 0, 0, 0],
+                                                    [0, 0, 0, 15, 16, 15, 0, 0, 0, 11, 10, 2, 3, 19, 0, 0, 0, 0, 0],
+                                                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                        ]], null, new Tilesheet("./imgs/lagoon.png", 32, 10), [0], [new Portal(0, 10, 0, gameEngine, ExitLagoon)],
+                                                    "lagoon", "./imgs/mountain.png", [], 0, []);
+
 
     var level1_animation1 = new EnvironmentAnimation(new Animation(ASSET_MANAGER.getAsset("./imgs/fire.png"), 0, 0, 32, 64, 0.5, 9, true, false), 
                             [[0, 3], [1, 3], [7, 3], [14, 3], [16, 3]], [0, 1, 3, 4], 0);
@@ -684,8 +790,8 @@ ASSET_MANAGER.downloadAll(function () {
                 new HealBerry(11, 8, 5, gameEngine), new Log(11, 10, 4, gameEngine), new Log(16, 9, 2, gameEngine), new Portal(16, 6, 5, gameEngine, EnterDragonCave), new Portal(8, 5, 0, gameEngine, EnterHouse1, 1),
                 new Portal(2, 5, 0, gameEngine, EnterHouse2, 1)], ["Skeleton", "Malboro", "Ogre"], "level1", "./imgs/woods.png", 0, [1, 2, 4, 5]);
 	
-	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,0,0,0,0,0,0,0],
-                [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 0, 109, 175, 175, 175, 175, 175],
+	    var level2 = new OutdoorEnvironment(gameEngine, [[198,199,200,201,202,203,204,205,206,207,208,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,146,147,144,0,0,0,0,0,0],
+                [220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 511, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 168, 169, 166, 109, 175, 175, 175, 175, 175],
                 [242,243,244,245,246,247,248,249,250,251,252,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,142,143,0,131,7,7,7,7,7],
                 [264,265,266,267,268,269,270,271,272,273,274,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,164,165,0,131,7,7,7,7,7],
                 [286,287,288,289,290,291,292,293,294,295,296,142,143,144,5,0,0,0,0,0,144,146,147,146,147,146,147,22,23,24,25,26,27,142,143,0,131,7,7,7,7,7],
@@ -709,40 +815,47 @@ ASSET_MANAGER.downloadAll(function () {
                 [429,430,431,432,433,434,435,436,437,438,439,506,507,508,509,510,511,512,0,0,0,142,143,137,138,6,0,0,0,137,138,0,0,0,137,138,0,0,0,10,137,138],
                 [451,452,453,454,455,456,457,458,459,460,461,528,529,530,531,532,533,534,0,0,0,164,165,159,160,28,139,140,141,159,160,139,140,141,159,160,139,140,141,32,159,160]],
 
-                [church], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
+                [church, lagoon], [], new Tilesheet("./imgs/tileslevel2.png", 32, 22), [0, 1, 2, 3, 4, 5],
                 [new Chest(3, 8, 4, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 400,
-                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), ], true),
-                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch), new Portal(10, 11, 4, gameEngine, Level3)],
+                new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!") ], true),
+                new Portal(9, 7, 3, gameEngine, EnterDragonCaveFromLevel2), new Portal(6, 10, 1, gameEngine, EnterChurch), new Portal(17, 10, 0, gameEngine, EnterChurch), new Portal(10, 11, 4, gameEngine, Level3),
+                new Portal(18, 11, 2, gameEngine, EnterLagoon)],
                 ["Dire Wolf", "Wolf Rider", "Skeleton"], "level2", "./imgs/mountain.png", 3, [0, 1, 2, 3, 4, 5]);
 
 
 	    var level3 = new OutdoorEnvironment(gameEngine,
                    [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 206, 207, 208, 209, 210, 0, 0, 0, 0, 0, 0, 0, 50, 50, 50, 50, 86, 87, 88, 89, 50, 50, 160, 142, 161, 50, 50, 50, 50, 50, 50],
-                   [0, 0, 0, 0, 0, 0, 206, 207, 208, 209, 210, 226, 227, 228, 229, 230, 0, 0, 0, 0, 0, 0, 0, 70, 70, 70, 70, 106, 107, 108, 109, 70, 70, 180, 162, 181, 70, 70, 70, 70, 70, 70],
-                   [0, 206, 207, 208, 209, 210, 226, 227, 228, 229, 230, 246, 247, 248, 249, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 127, 128, 129, 0, 0, 0, 0, 0, 0, 120, 110, 111, 112, 113],
+                   [0, 0, 0, 0, 0, 283, 206, 207, 208, 209, 210, 226, 227, 228, 229, 230, 0, 0, 0, 0, 0, 0, 0, 70, 70, 70, 70, 106, 107, 108, 109, 70, 70, 180, 162, 181, 70, 70, 70, 70, 70, 70],
+                   [0, 206, 207, 208, 209, 210, 226, 227, 228, 229, 230, 246, 247, 248, 249, 250, 0, 0, 0, 0, 281, 281, 0, 0, 0, 0, 0, 126, 127, 128, 129, 0, 0, 0, 0, 0, 0, 120, 110, 111, 112, 113],
                    [0, 226, 227, 228, 229, 230, 246, 247, 248, 249, 250, 266, 267, 268, 269, 270, 0, 0, 6, 7, 7, 7, 7, 7, 7, 8, 0, 146, 147, 148, 149, 0, 0, 0, 0, 0, 0, 140, 130, 131, 132, 133],
                    [0, 246, 247, 248, 249, 250, 266, 267, 268, 269, 270, 286, 287, 288, 289, 290, 0, 0, 9, 11, 27, 27, 27, 27, 12, 30, 0, 166, 167, 168, 169, 0, 0, 6, 8, 0, 0, 121, 150, 151, 152, 153],
                    [0, 266, 267, 268, 269, 270, 286, 287, 288, 289, 290, 306, 307, 308, 309, 310, 0, 0, 9, 30, 46, 47, 0, 0, 9, 30, 0, 186, 187, 188, 189, 0, 0, 9, 30, 0, 0, 120, 190, 191, 192, 193],
                    [0, 286, 287, 288, 289, 290, 306, 307, 308, 309, 310, 326, 327, 328, 329, 330, 0, 0, 9, 30, 66, 67, 48, 49, 9, 30, 0, 0, 0, 0, 0, 0, 0, 9, 30, 0, 0, 0, 190, 191, 192, 193],
                    [0, 306, 307, 308, 309, 310, 326, 327, 328, 329, 330, 0, 0, 0, 0, 0, 0, 0, 9, 30, 50, 0, 68, 69, 9, 31, 7, 7, 174, 175, 176, 177, 7, 32, 30, 0, 0, 0, 0, 211, 212, 213],
                    [0, 326, 327, 328, 329, 330, 346, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 30, 70, 0, 0, 0, 26, 27, 27, 27, 194, 195, 196, 197, 27, 27, 28, 0, 0, 0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0, 0, 366, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 30, 50, 50, 50, 0, 0, 50, 0, 50, 214, 215, 216, 217, 50, 0, 50, 0, 0, 143, 144, 161, 143, 144],
+                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 30, 50, 50, 50, 0, 0, 50, 0, 50, 214, 215, 216, 217, 50, 0, 50, 0, 0, 143, 144, 161, 143, 144],
                    [0, 97, 98, 0, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 174, 175, 176, 177, 32, 30, 70, 70, 70, 52, 0, 70, 50, 70, 0, 0, 0, 0, 70, 50, 70, 0, 0, 163, 164, 120, 163, 164],
                    [116, 117, 118, 0, 9, 11, 27, 27, 27, 27, 27, 27, 27, 27, 194, 195, 196, 197, 27, 28, 52, 51, 50, 72, 0, 0, 70, 0, 0, 0, 0, 0, 0, 70, 0, 0, 0, 183, 184, 180, 183, 184],
                    [136, 137, 138, 0, 9, 30, 20, 20, 0, 0, 0, 0, 0, 0, 214, 215, 216, 217, 0, 0, 72, 71, 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 242, 0, 0, 0, 0],
-                   [156, 157, 158, 0, 9, 30, 9, 9, 9, 9, 37, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 242, 224, 244, 243, 262, 241, 240, 240, 0],
-                   [0, 0, 0, 0, 9, 30, 0, 0, 0, 0, 57, 58, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 240, 244, 262, 241, 264, 263, 203, 261, 260, 260, 222],
-                   [0, 0, 0, 0, 9, 30, 0, 0, 40, 0, 0, 0, 13, 14, 15, 16, 18, 0, 0, 40, 0, 0, 0, 0, 201, 0, 0, 240, 0, 202, 242, 260, 264, 242, 261, 0, 2, 3, 4, 5, 0, 242],
+                   [156, 157, 158, 0, 9, 30, 0, 0, 0, 0, 37, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 242, 224, 244, 243, 262, 241, 240, 240, 0],
+                   [283, 0, 0, 0, 9, 30, 0, 0, 0, 0, 57, 58, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 240, 244, 262, 241, 264, 263, 203, 261, 260, 260, 222],
+                   [0, 281, 281, 0, 9, 30, 0, 0, 40, 0, 0, 0, 13, 14, 15, 16, 18, 0, 0, 40, 0, 0, 0, 0, 201, 0, 0, 240, 0, 202, 242, 260, 264, 242, 261, 0, 2, 3, 4, 5, 0, 242],
                    [7, 7, 7, 7, 32, 30, 0, 40, 40, 40, 0, 0, 33, 34, 35, 36, 17, 0, 40, 40, 40, 0, 0, 0, 0, 0, 244, 260, 201, 204, 262, 241, 0, 262, 220, 21, 22, 23, 24, 25, 202, 263],
                    [27, 27, 27, 27, 27, 28, 0, 0, 40, 0, 0, 19, 53, 54, 55, 56, 37, 38, 0, 40, 0, 0, 0, 0, 241, 203, 264, 0, 200, 240, 223, 261, 244, 240, 0, 41, 42, 43, 44, 45, 0, 241],
-                   [0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 17, 17, 73, 74, 75, 76, 57, 58, 0, 40, 0, 0, 0, 204, 261, 0, 202, 200, 0, 260, 0, 202, 264, 260, 0, 61, 62, 63, 64, 65, 201, 261],
-                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 93, 94, 95, 96, 0, 18, 0, 0, 0, 0, 200, 0, 0, 0, 0, 97, 98, 0, 0, 201, 242, 201, 200, 81, 82, 83, 84, 85, 0, 0],
+                   [0, 281, 0, 0, 0, 0, 0, 0, 40, 0, 17, 17, 73, 74, 75, 76, 57, 58, 0, 40, 0, 0, 0, 204, 261, 0, 202, 200, 0, 260, 0, 202, 264, 260, 0, 61, 62, 63, 64, 65, 201, 261],
+                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 93, 94, 95, 96, 0, 18, 0, 0, 0, 0, 200, 0, 0, 0, 0, 97, 98, 0, 0, 201, 242, 201, 200, 81, 82, 83, 84, 85, 0, 283],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 116, 117, 118, 0, 0, 0, 252, 0, 0, 101, 102, 103, 104, 105, 221, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 136, 137, 138, 0, 0, 0, 0, 0, 0, 0, 122, 123, 124, 125, 0, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 156, 157, 158, 0, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 260, 200, 202, 204, 0, 0, 0, 0, 0, 0, 0, 0]],
                     [], [], new Tilesheet("./imgs/maplevel3.png", 32, 20), [0, 1, 2, 3, 4, 5],
-                   [new Portal(0,7,3, gameEngine, Level2)], ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
+                   [new Portal(0, 7, 3, gameEngine, Level2), new CactusFlower(1, 4, 3, gameEngine), new CactusFlower(2, 4, 3, gameEngine), new CactusFlower(1, 7, 3, gameEngine), new CactusFlower(8, 2, 1, gameEngine),
+                    new CactusFlower(9, 2, 1, gameEngine), new Chest(18, 8, 1, gameEngine, [new Potion(gameEngine, "Heal Berry", 10, 2, ASSET_MANAGER.getAsset("./imgs/items/heal_berry.png"), "health", 1, "A delicious berry that makes you feel more refreshed."), 55], true),
+                   new Chest(5, 1, 0, gameEngine, [new Potion(gameEngine, "Potion of Strength", 35, 3, ASSET_MANAGER.getAsset("./imgs/items/potion_str.png"), "str", 2, "A strange red liquid that will make you temporarily stronger!"), 455], false),
+                   new Chest(18, 8, 5, gameEngine, [new Armor(gameEngine, "Blessed Staff", 320, ASSET_MANAGER.getAsset("./imgs/items/staff3.png"), "mainhand", new Statistics(0, 15, 0, 0, 0, 6), "A golden rod that seems to radiate a holy aura.")], true),
+                   new Chest(0, 3, 3, gameEngine, [new Armor(gameEngine, "Sword of Protection", 355, ASSET_MANAGER.getAsset("./imgs/items/sword2.png"), "mainhand", new Statistics(0, 20, 20, 5, 0, 0), "A powerful, shiny, exotic, desert-like sword."),
+                    new Armor(gameEngine, "Golden Shiny Armor", 420, ASSET_MANAGER.getAsset("./imgs/items/armor3.png"), "armor", new Statistics(0, 0, 30, 5, 10, 0), "Shiny, sexy, and hopefully blinding armor.")], true)],
+                    ["Skeleton", "Malboro", "Ogre"], "level3", "./imgs/desert.png", 0, [1, 2, 4, 5]);
 
 
 
@@ -765,6 +878,7 @@ ASSET_MANAGER.downloadAll(function () {
 
 		gameEngine.addEntity(aladdin);
 		gameEngine.addEntity(jasmine);
+		gameEngine.addEntity(sultan);
 	//gameEngine.addEntity(siren_NPC);
     gameEngine.init(context);
     gameEngine.esc_menu.initHero(warrior);
