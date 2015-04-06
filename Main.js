@@ -481,7 +481,7 @@ ASSET_MANAGER.downloadAll(function () {
                                             new Animation(aladdin_spritesheet, 0, 1, 56, 73.75, 0.1, 3, true, true),
                                             new Animation(aladdin_spritesheet, 0, 3, 56, 73.75, 0.1, 3, true, true), null, null, null);
     var aladdin_quest_sword = new SpecialItem(gameEngine, "Aladdin Sword", ASSET_MANAGER.getAsset("./imgs/items/sword.gif"), 1, function () { }, "The sword that strikes the Demon!");
-     var aladdin_reward = ghost_quest_potion;
+    var aladdin_reward = ghost_quest_potion;
     var aladdin_quest = new RETRIEVE_ITEM_QUEST(gameEngine, "Aladdin", aladdin_reward, aladdin_quest_sword);
 
     var aladdin = new NPC_QUEST(gameEngine, "Aladdin", [["Oh Dear God! Finally there is someone alive in the Death Valley! ",
